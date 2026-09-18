@@ -1,0 +1,17 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-2-detail",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "validated_input_sha256": [
+      "f1ecfc24ee4beac0949edb3d89e2e6433625991a18a13918b35c72e1d9aac945",
+      "61344436c0a3112237577bb0c7d57a130c8a96036168765e3c60f0d1db642c2d"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=8d89719e-2083-4756-bd6b-c5bd10ca0e8b), call 2 of 3, returned Overall Status VALID. Input: the byte-copied content of app/routes/app.history.$id.tsx and app/components/saved-calculation-page.tsx as committed at ffd3bf7244e0f08c8fe0b64e7d3759dcc95a512e. Code block 1 (app.history.$id.tsx, incl. its ErrorBoundary): SUCCESS, found components s-page, s-link, s-section, s-banner, s-button. Code block 2 (saved-calculation-page.tsx, the frozen-snapshot page body: banner, lock-icon Snapshot s-badge, Duplicate-as-new-calculation s-button href): SUCCESS, found components s-page, s-link, s-section, s-banner, s-badge, s-button. First-pass VALID on both blocks.",
+      "errors": []
+    }
+  }
+}

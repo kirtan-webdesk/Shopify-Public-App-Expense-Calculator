@@ -1,0 +1,17 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-1-results-history",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "validated_input_sha256": [
+      "45025f2a51fa429b45b8b7c6d616e02a8112aa52bb67747a3c4322eafb1ea2cc",
+      "607e3dd79fa4de6a1acf34a9a1f2ceb12e6dca6aded0c34a06c41f9204d135c1"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=8d89719e-2083-4756-bd6b-c5bd10ca0e8b), call 1 of 3, returned Overall Status VALID. Input: the byte-copied content of app/routes/app.results.tsx and app/routes/app.history.tsx as committed at ffd3bf7244e0f08c8fe0b64e7d3759dcc95a512e (sha256 of each file on disk recorded in validated_input_sha256; content was passed unmodified after the last edit to either file, and no later edit was made). Code block 1 (app.results.tsx): SUCCESS, found components s-page, s-link, s-section, s-banner, s-modal, s-button (incl. the command=\"--show\"/\"--hide\" + commandFor props on s-button used to open/close the save-confirmation s-modal, and the slot=\"primary-action\"/\"secondary-actions\" slots). Code block 2 (app.history.tsx): SUCCESS, found components s-page, s-section, s-banner, s-button, s-link. First-pass VALID on both blocks; no defects were found or fixed by this validation.",
+      "errors": []
+    }
+  }
+}

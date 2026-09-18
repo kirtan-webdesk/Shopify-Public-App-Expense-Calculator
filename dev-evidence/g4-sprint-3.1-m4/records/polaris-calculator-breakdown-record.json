@@ -1,0 +1,17 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-3-calculator-breakdown",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "validated_input_sha256": [
+      "784f77f9003ca9cb4e05f331770e540d58632f1688c4070c8f21c86a4b59978b",
+      "a576d8fbc98e96e687410fee24e0737872ed55a01f16ed63b39284d9405d1622"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=8d89719e-2083-4756-bd6b-c5bd10ca0e8b), call 3 of 3, returned Overall Status VALID. Input: the byte-copied content of app/routes/app.calculator.tsx (post-edit: duplicate-prefill loader + info banner; the duplicate-import merge was made BEFORE this call) and app/components/expense-breakdown.tsx as committed at ffd3bf7244e0f08c8fe0b64e7d3759dcc95a512e. Code block 1 (app.calculator.tsx): SUCCESS, found components s-page, s-section, s-banner, s-number-field, s-select, s-option, s-button. Code block 2 (expense-breakdown.tsx, shared table + hand-rolled SVG donut): SUCCESS with 'No components found to validate' -- it contains no Polaris web components (native table/svg only, per ADR-0004), so this block is a no-op for the validator and is recorded for completeness, not as substantive Polaris coverage.",
+      "errors": []
+    }
+  }
+}

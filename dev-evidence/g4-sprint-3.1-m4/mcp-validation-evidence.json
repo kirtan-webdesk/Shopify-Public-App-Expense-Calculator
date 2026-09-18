@@ -1,0 +1,132 @@
+{
+  "schema_version": "1.0.0",
+  "distribution_type": "public",
+  "api_version": "2026-07",
+  "commit_sha": "ffd3bf7244e0f08c8fe0b64e7d3759dcc95a512e",
+  "executed_at_utc": "2026-09-18T15:50:15Z",
+  "executor": "shopify-developer-agent (Claude Code, session 93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f)",
+  "session_id": "93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f",
+  "local_gates": {
+    "lint": {
+      "status": "pass",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.1-m4/gates/lint.log",
+      "output_sha256": "2dbcadf6952581a31688b8990252cff06d619a59f26bc1de0c6354579732c7f9",
+      "detail": "eslint . --max-warnings=0, exit 0. Produced by a manual equivalent run through the Bash tool (identical command, identical capture-stdout+stderr-and-append-__GATE_EXIT__-marker contract as run-gates.py) because tools/scripts/run-gates.py itself still fails on this Windows environment: it spawns ['npm', ...] with shell=False, which cannot exec npm.cmd, so all four gates record exit 127 (re-confirmed this sprint by actually running it; that all-127 output was discarded and is not used). Same cross-platform gap disclosed every round since G4-sprint-1.1. Output hash is IDENTICAL to the two prior sprints' lint.log (no findings), confirming zero lint findings including on the new tests and dev-evidence script."
+    },
+    "typecheck": {
+      "status": "pass",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.1-m4/gates/typecheck.log",
+      "output_sha256": "c995b2fcfa2359e3b7c1a9855200c6777993f0a953aacd19d0fe6d82b0d3d555",
+      "detail": "react-router typegen && tsc --noEmit, exit 0. Produced by a manual equivalent run through the Bash tool (identical command, identical capture-stdout+stderr-and-append-__GATE_EXIT__-marker contract as run-gates.py) because tools/scripts/run-gates.py itself still fails on this Windows environment: it spawns ['npm', ...] with shell=False, which cannot exec npm.cmd, so all four gates record exit 127 (re-confirmed this sprint by actually running it; that all-127 output was discarded and is not used). Same cross-platform gap disclosed every round since G4-sprint-1.1. Output hash identical to prior sprints' typecheck.log (clean)."
+    },
+    "tests": {
+      "status": "pass",
+      "command": "npm test",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.1-m4/gates/tests.log",
+      "output_sha256": "3400cfe21c656efb3c45a6e2e79826102d68fa753a7910aa0a4008bc4f7a59b6",
+      "detail": "vitest run: 18 files passed + 1 skipped; 214 tests passed + 22 skipped (up from 160 at G4-sprint-2.1). The 22 skipped are tests/db/calculation-history.db.test.ts, which is OPT-IN (RUN_DB_TESTS=1, real Postgres) and is reported as skipped by default, not silently green. Its real-DB run (22/22 passed) is dev-evidence/g4-sprint-3.1-m4/01-db-test-suite-output.log. Produced by a manual equivalent run through the Bash tool (identical command, identical capture-stdout+stderr-and-append-__GATE_EXIT__-marker contract as run-gates.py) because tools/scripts/run-gates.py itself still fails on this Windows environment: it spawns ['npm', ...] with shell=False, which cannot exec npm.cmd, so all four gates record exit 127 (re-confirmed this sprint by actually running it; that all-127 output was discarded and is not used). Same cross-platform gap disclosed every round since G4-sprint-1.1."
+    },
+    "build": {
+      "status": "pass",
+      "command": "npm run build",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.1-m4/gates/build.log",
+      "output_sha256": "bb67fcb9c16b5c8cd4301089deb1d91811418dfee183eef129fa030dab8724f7",
+      "detail": "react-router build (client + ssr), exit 0. Produced by a manual equivalent run through the Bash tool (identical command, identical capture-stdout+stderr-and-append-__GATE_EXIT__-marker contract as run-gates.py) because tools/scripts/run-gates.py itself still fails on this Windows environment: it spawns ['npm', ...] with shell=False, which cannot exec npm.cmd, so all four gates record exit 127 (re-confirmed this sprint by actually running it; that all-127 output was discarded and is not used). Same cross-platform gap disclosed every round since G4-sprint-1.1."
+    }
+  },
+  "validations": [
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-1-results-history",
+      "conversation_id": "8d89719e-2083-4756-bd6b-c5bd10ca0e8b",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.results.tsx",
+          "sha256": "45025f2a51fa429b45b8b7c6d616e02a8112aa52bb67747a3c4322eafb1ea2cc"
+        },
+        {
+          "path": "app/routes/app.history.tsx",
+          "sha256": "607e3dd79fa4de6a1acf34a9a1f2ceb12e6dca6aded0c34a06c41f9204d135c1"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.1-m4/records/polaris-results-history-record.json",
+        "sha256": "53dcd0e75e96675a0aecf7c73cf9fa9f9c9503d27233cb8b56c6b17df55d00b9"
+      }
+    },
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-2-detail",
+      "conversation_id": "8d89719e-2083-4756-bd6b-c5bd10ca0e8b",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.history.$id.tsx",
+          "sha256": "f1ecfc24ee4beac0949edb3d89e2e6433625991a18a13918b35c72e1d9aac945"
+        },
+        {
+          "path": "app/components/saved-calculation-page.tsx",
+          "sha256": "61344436c0a3112237577bb0c7d57a130c8a96036168765e3c60f0d1db642c2d"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.1-m4/records/polaris-history-detail-record.json",
+        "sha256": "0317b6ee05c8d1d0d0dc468b478b77565cc6f949e4355cad523432c968eec629"
+      }
+    },
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-1-call-3-calculator-breakdown",
+      "conversation_id": "8d89719e-2083-4756-bd6b-c5bd10ca0e8b",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.calculator.tsx",
+          "sha256": "784f77f9003ca9cb4e05f331770e540d58632f1688c4070c8f21c86a4b59978b"
+        },
+        {
+          "path": "app/components/expense-breakdown.tsx",
+          "sha256": "a576d8fbc98e96e687410fee24e0737872ed55a01f16ed63b39284d9405d1622"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.1-m4/records/polaris-calculator-breakdown-record.json",
+        "sha256": "7c819769ad753f046381dc60aeceb9cc461582c9c7f7470001bbdc81da4d438b"
+      }
+    }
+  ],
+  "overall_status": "VALID",
+  "remaining_warnings": [
+    "PROVENANCE INCIDENT (not caused by this agent, disclosed prominently): while this sprint was in progress, a concurrent commit 105b1c6 (message: 'feat(rfc): add RFC-002 ...', author kirtan-webdesk, 2026-09-18 20:52 +0530, already at origin/main) swept up this sprint's in-progress working-tree changes -- app/components/expense-breakdown.tsx, app/components/saved-calculation-page.tsx, app/db/repositories/calculation.repository.ts, app/domain/calculation-verification.ts, app/domain/ids.ts, app/domain/presentation.ts, app/routes/app.calculator.tsx, app/routes/app.history.tsx, app/routes/app.history.$id.tsx, app/routes/app.results.tsx, app/services/calculation-history.service.ts -- alongside project.json and the RFC document. This agent did not run that commit and did not touch project.json or RFC-002. History was NOT rewritten (no amend/reset/force-push). The remainder of the sprint (tests, a 1-line import merge in app.calculator.tsx, tests/README.md) is commit ffd3bf7, which is the commit this evidence is bound to; the tree at ffd3bf7 is the tree that was gated and MCP-validated. Consequence: the M4 application source is on origin/main under an RFC commit message, ahead of Code Review/QA and of this handoff; a human should decide whether that matters for review/audit-trail purposes.",
+    "tool_call_ref values are descriptive ids, not runtime tool_use ids: the Claude Code runtime does not expose the toolu_... block id to this agent, so each of the three validate_component_codeblocks calls is identified by a descriptive ref plus the real Dev MCP conversationId (8d89719e-2083-4756-bd6b-c5bd10ca0e8b). This is a consistency-checked record, not an authenticated capture of the live MCP call (the schema's own caveat).",
+    "The validator input was passed as the byte-copied content of each file after its final edit; validated_input_sha256 values are hashes of the files on disk at ffd3bf7 and no UI file was edited after validation. This agent cannot independently prove the MCP received exactly those bytes beyond that.",
+    "MCP scope limit: validate_component_codeblocks type-checks Polaris component names/props/slots only. It accepts s-button command/commandFor and s-modal slots as typed, but it cannot prove the runtime behaviour of the save-confirmation modal (show/hide, primary-action submit) or the App Bridge toast in a real embedded Admin iframe. app/components/expense-breakdown.tsx has no Polaris components, so its 'validation' is a no-op recorded for completeness.",
+    "run-gates.py cross-platform gap (see each gate's detail): gate logs are manual equivalents, not produced by run-gates.py.",
+    "Double-submit: the modal's Save button is disabled while the request is in flight (client-side), but there is no server-side idempotency key (no schema column for one; the schema is G-Schema-owned and was not touched). Two genuinely concurrent POSTs of the same payload would create two history rows. Append-only history has no dedupe by design; flagged, not fixed.",
+    "Engine-version drift policy (a judgement call): the server recomputes with the CURRENT engine at save time and stores that engine's ENGINE_VERSION. If the engine changed between Calculate and Save, the save is rejected only when the recomputed amounts differ from what the merchant saw (with a 'run Calculate again' message); if amounts are identical it saves under the current version. The payload's own claimed 'ev' is never persisted.",
+    "Timestamps are rendered in UTC with an explicit 'UTC' suffix (formatSavedAt) because the project timezone is still unconfirmed (spec OQ-6). No local-time conversion was invented.",
+    "Detail page '% of revenue' and the donut geometry are display-only math derived at render time from the STORED amounts (same as the mockup); the engine is never invoked on the detail path (static test + FT-14a). Engine version is shown as the stored string 'expense-engine@1.0.0' where the mockup showed '1.0.0'.",
+    "DB-backed tests (tests/db) are opt-in and NOT in the default `npm test` / CI run (no DATABASE_URL secret in CI, .github/workflows/app-ci.yml) -- they were run manually against the real Neon Postgres this sprint (22/22 passed; log committed). Until CI has a throwaway Postgres, FT-02b/FT-14 DB-level coverage depends on someone running them with RUN_DB_TESTS=1.",
+    "Sequelize behaviour observed live, not a defect: when the DEFERRED reconciliation trigger fails at COMMIT, Sequelize logs 'Committing transaction ... failed ... We are killing its connection' and discards that connection; with pool.max=1 the next query opens a fresh connection (proven by the 'pool not wedged' checks). It costs a reconnect on that rare path.",
+    "Pre-existing, NOT fixed (out of this sprint's scope, disclosed per instruction): (a) app.calculator.tsx's per-category at-a-glance summary and 'Fixed amount' prefix hardcode '$' regardless of the selected currency (CAD/EUR/GBP show '$'); (b) formatRuleApplied (moved unchanged from app.results.tsx) renders fixed amounts as '450.00 fixed' with no currency symbol; (c) db/config/config.cjs P3 (eager 3-env evaluation) untouched per instruction. None is a direct consequence of M4.",
+    "No migration was run or needed this sprint: the calculation / calculation_line_item tables, append-only trigger and reconciliation trigger were already applied on the target Neon database. Placeholder rates/formulas remain illustrative pending OQ-4.",
+    "Not touched, per instruction: db/config/config.cjs, shopify.app.toml, project.json, hosting/Vercel config."
+  ],
+  "live_store_items": [
+    "Confirm in a real embedded Admin session that <s-modal id=save-calculation-modal> opens from the 'Save this calculation' s-button (command=--show / commandFor), that its primary-action button hides the modal AND submits the hidden form, and that the Form POST (session-token fetch) redirects to /app/history/:id?saved=1.",
+    "Confirm the App Bridge toast (shopify.toast.show('Calculation saved')) fires once on the post-save redirect, and that s-link / s-button href navigation to /app/history, /app/history?page=N, /app/history/:id and /app/calculator?from=:id works inside the iframe (session-token reload) without a re-auth bounce.",
+    "Run the axe-core accessibility pass (ADR-0004 FT-19a, still outstanding) over the now-live history list, detail (frozen-snapshot signals: banner, lock badge, no editable controls) and results pages.",
+    "Real token-exchange install of a brand-new shop followed by first save (the earlier install defect was fixed and verified at the repo level; a full dev-store install remains a live-store item).",
+    "Decide whether the concurrent-commit provenance incident (105b1c6) needs any audit-trail action before Code Review/QA."
+  ]
+}
