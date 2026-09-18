@@ -1,0 +1,209 @@
+/*
+  expense-calculator — app stylesheet (M2/M3)
+  ------------------------------------------------------------------
+  Ported from the G2-approved design/mockup/assets/styles.css. The
+  visual system IS Polaris: colour, type, spacing, and component
+  chrome come from the Polaris web-components bundle (polaris.js)
+  loaded in every page <head> (see app/root.tsx). This file only
+  covers layout needs that aren't a component on their own — the
+  donut/legend layout, the rule disclosure rows, and the native
+  accessible <table> (ADR-0004).
+
+  Deliberately NOT ported from the mockup: `.mockup-shell` (a no-op
+  preview-only width wrapper — <s-page> already constrains content
+  width for real) and `.design-review-aid*` (the G2 fixture-data-swap
+  dropdown, already stripped at G3 per project.json's explicit
+  instruction — never reintroduced).
+
+  VERIFY AT BUILD: exact Polaris token names/values against the
+  polaris.js version resolved from the CDN at build time — the
+  fallback values after each var() are not authoritative.
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--p-color-bg, #f1f1f1);
+  color: var(--p-color-text, #1a1a1a);
+}
+
+/* ---------------------------------------------------------------
+   Results layout: accessible data table is the primary element and
+   is always full-width above the fold; the donut + legend is a
+   supplementary column that sits beside the table on wide viewports
+   and stacks below it at Admin's narrower embedded breakpoints.
+   ADR-0004: table first in DOM order, chart is supplementary.
+------------------------------------------------------------------ */
+.results-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--p-space-500, 20px);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .results-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  }
+}
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--p-space-300, 12px);
+  text-align: center;
+}
+
+.donut-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-150, 6px);
+  text-align: start;
+}
+.donut-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--p-space-200, 8px);
+  font-size: 0.8125rem;
+}
+.donut-legend__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+.donut-legend__label {
+  flex: 1 1 auto;
+  color: var(--p-color-text, #1a1a1a);
+}
+.donut-legend__value {
+  color: var(--p-color-text-secondary, #616161);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------
+   Accessible data table — native semantic HTML by deliberate choice
+   (ADR-0004 requires this be the always-rendered primary
+   representation).
+------------------------------------------------------------------ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.data-table caption {
+  text-align: start;
+  font-size: 0.8125rem;
+  color: var(--p-color-text-secondary, #616161);
+  margin-block-end: var(--p-space-200, 8px);
+}
+.data-table th,
+.data-table td {
+  text-align: start;
+  padding: var(--p-space-200, 8px) var(--p-space-300, 12px);
+  border-block-end: 1px solid var(--p-color-border, #e3e3e3);
+}
+.data-table th[scope="col"] {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--p-color-text-secondary, #616161);
+}
+.data-table td.numeric,
+.data-table th.numeric {
+  text-align: end;
+}
+.data-table tfoot td,
+.data-table tfoot th {
+  font-weight: 600;
+  border-block-end: none;
+  border-block-start: 2px solid var(--p-color-border, #e3e3e3);
+}
+.data-table__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-inline-end: var(--p-space-150, 6px);
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------
+   Category rule rows (calculator page) — native <details>/<summary>
+   used deliberately for the 10-category list: accessible and
+   keyboard-operable with zero custom JS required for open/close.
+------------------------------------------------------------------ */
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-200, 8px);
+}
+.rule-row {
+  border: 1px solid var(--p-color-border, #e3e3e3);
+  border-radius: var(--p-border-radius-200, 8px);
+  background: var(--p-color-bg-surface, #ffffff);
+  overflow: hidden;
+}
+.rule-row__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--p-space-300, 12px);
+  padding: var(--p-space-300, 12px) var(--p-space-400, 16px);
+  cursor: pointer;
+  list-style: none;
+}
+.rule-row__summary::-webkit-details-marker {
+  display: none;
+}
+.rule-row__summary:focus-visible {
+  outline: 2px solid var(--p-color-border-focus, #005bd3);
+  outline-offset: -2px;
+}
+.rule-row__title {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+.rule-row__at-a-glance {
+  color: var(--p-color-text-secondary, #616161);
+  font-size: 0.8125rem;
+}
+.rule-row__body {
+  padding: 0 var(--p-space-400, 16px) var(--p-space-400, 16px);
+  border-block-start: 1px solid var(--p-color-border, #e3e3e3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-300, 12px);
+}
+.rule-row__field-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-space-300, 12px);
+  align-items: flex-end;
+}
+.field-error {
+  color: var(--p-color-text-critical, #b52125);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+.field-error:empty {
+  display: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

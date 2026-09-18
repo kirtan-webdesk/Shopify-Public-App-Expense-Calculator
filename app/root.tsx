@@ -8,6 +8,13 @@ import {
   useLoaderData,
 } from "react-router";
 import type { Route } from "./+types/root";
+import appStylesHref from "./styles/app.css?url";
+
+// M2/M3: the app's own layout stylesheet (ported from the G2-approved
+// mockup — see app/styles/app.css's header). Registered once here so it
+// loads on every route, the same "one place, can't be forgotten per-route"
+// reasoning already applied to the App Bridge/Polaris <script> tags below.
+export const links: Route.LinksFunction = () => [{ rel: "stylesheet", href: appStylesHref }];
 
 // --------------------------------------------------------------------------
 // App Bridge + Polaris in <head> of EVERY page (App Store Req 2.2.3 /

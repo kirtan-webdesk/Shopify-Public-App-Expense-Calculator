@@ -1,15 +1,13 @@
+import type { Transaction } from "sequelize";
 import { ExpenseRuleModel } from "~/db/models/expense-rule.model";
 import type { ShopContext } from "~/db/repositories/shop-context";
+import type { RuleType } from "~/domain/rule-types";
+import { sequelize } from "~/db/sequelize";
 
 // expense-rule.repository — stands up the ADR-0003 pattern for a table that
 // M2 (Configuration milestone) owns the UI/validation for. Every function
 // takes ShopContext first; no query here (or anywhere else in the app)
 // constructs a shop_id predicate from anything other than that context.
-//
-// M1 scope note: this repository is not yet called by any route — the
-// configuration UI (D4, D6) is M2. It exists now so the tenancy choke point
-// is established for every table from day one, per the G3 task's explicit
-// instruction, not merely for the tables M1's own webhooks touch.
 
 export async function listExpenseRulesForShop(ctx: ShopContext) {
   return ExpenseRuleModel.findAll({
@@ -21,5 +19,76 @@ export async function listExpenseRulesForShop(ctx: ShopContext) {
 export async function findExpenseRule(ctx: ShopContext, categoryKey: string) {
   return ExpenseRuleModel.findOne({
     where: { shopId: ctx.shopId, categoryKey },
+  });
+}
+
+export interface UpsertExpenseRuleInput {
+  readonly categoryKey: string;
+  readonly ruleType: RuleType;
+  readonly rateBasisPoints: number | null;
+  readonly fixedAmountMinor: number | null;
+  readonly formulaKey: string | null;
+  readonly enabled: boolean;
+}
+
+/**
+ * Creates or updates the ONE rule row for (shop, category) — matches the
+ * `uq_expense_rule_shop_category` unique constraint (data-model.md §4.2:
+ * "one configured rule per category per shop", not a history of versions).
+ * Does not use Sequelize's `upsert()` (which performs an ON CONFLICT on the
+ * PRIMARY KEY, not this table's actual uniqueness constraint) — instead an
+ * explicit find-then-create-or-update inside the caller's transaction, so
+ * concurrent saves for the same shop serialize through the row lock rather
+ * than racing on a conflict target that isn't the row's identity column.
+ */
+export async function upsertExpenseRule(
+  ctx: ShopContext,
+  input: UpsertExpenseRuleInput,
+  transaction: Transaction,
+): Promise<ExpenseRuleModel> {
+  const existing = await ExpenseRuleModel.findOne({
+    where: { shopId: ctx.shopId, categoryKey: input.categoryKey },
+    transaction,
+    lock: transaction.LOCK.UPDATE,
+  });
+
+  if (existing) {
+    existing.ruleType = input.ruleType;
+    existing.rateBasisPoints = input.rateBasisPoints;
+    existing.fixedAmountMinor = input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor);
+    existing.formulaKey = input.formulaKey;
+    existing.enabled = input.enabled;
+    await existing.save({ transaction });
+    return existing;
+  }
+
+  return ExpenseRuleModel.create(
+    {
+      shopId: ctx.shopId,
+      categoryKey: input.categoryKey,
+      ruleType: input.ruleType,
+      rateBasisPoints: input.rateBasisPoints,
+      fixedAmountMinor: input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor),
+      formulaKey: input.formulaKey,
+      enabled: input.enabled,
+    },
+    { transaction },
+  );
+}
+
+/**
+ * Replaces every category's rule for this shop in one transaction — the
+ * calculator's "Save" action persists all 10 rows together rather than one
+ * request per row, so a partial save (e.g. rows 1-6 written, row 7 fails
+ * validation) can never leave the shop's configuration half-updated.
+ */
+export async function replaceExpenseRulesForShop(
+  ctx: ShopContext,
+  inputs: readonly UpsertExpenseRuleInput[],
+): Promise<void> {
+  await sequelize.transaction(async (transaction) => {
+    for (const input of inputs) {
+      await upsertExpenseRule(ctx, input, transaction);
+    }
   });
 }

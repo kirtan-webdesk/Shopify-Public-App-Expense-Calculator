@@ -1,7 +1,8 @@
 import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes } from "sequelize";
 import { sequelize } from "~/db/sequelize";
+import type { RuleType } from "~/domain/rule-types";
 
-export type RuleType = "percentage" | "fixed" | "formula";
+export type { RuleType } from "~/domain/rule-types";
 
 // expense_rule — per-shop configured rule per fixed category
 // (data-model.md §4.2). Mutable; this is the LIVE config a saved
