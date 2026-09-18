@@ -5,6 +5,8 @@ import { authenticate } from "~/shopify.server";
 import { findShopContextByDomain } from "~/db/repositories/shop.repository";
 import { getOrSeedExpenseRules, saveExpenseRules, type ExpenseRuleView } from "~/services/expense-rule.service";
 import { runCalculation } from "~/services/expense-calculation.service";
+import { getDuplicatePrefill } from "~/services/calculation-history.service";
+import { formatSavedAt } from "~/domain/presentation";
 import { encodeCalculationResult } from "~/domain/calculation-transport";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryKey } from "~/domain/expense-categories";
 import { EXPENSE_FORMULAS } from "~/domain/expense-formulas";
@@ -12,6 +14,7 @@ import { minorUnitsToInputString } from "~/domain/presentation";
 import {
   SUPPORTED_CURRENCY_CODES,
   hasAnyFieldError,
+  isSupportedCurrencyCode,
   parseDecimalString,
   validateExpenseRuleRow,
   type ExpenseRuleFieldErrors,
@@ -42,8 +45,27 @@ export async function loader({ request }: Route.LoaderArgs) {
       status: 404,
     });
   }
-  const rules = await getOrSeedExpenseRules(ctx);
-  return { rules };
+  const liveRules = await getOrSeedExpenseRules(ctx);
+
+  // "Duplicate as new calculation" (G2 default-accepted): /app/calculator?from=<id>
+  // pre-fills the form from a saved snapshot's stored inputs. The lookup is
+  // tenant-scoped through the history service; a malformed, nonexistent, or
+  // other-shop id simply yields no prefill (the normal calculator renders —
+  // the response does not reveal whether such an id exists). Read-only:
+  // nothing is written and the saved record is never modified.
+  const from = new URL(request.url).searchParams.get("from");
+  const prefill = from ? await getDuplicatePrefill(ctx, from, liveRules) : null;
+
+  return {
+    rules: prefill ? prefill.rules : liveRules,
+    prefill: prefill
+      ? {
+          savedAtIso: prefill.savedAtIso,
+          revenueMinor: prefill.revenueMinor,
+          currencyCode: prefill.currencyCode,
+        }
+      : null,
+  };
 }
 
 interface ActionResult {
@@ -161,13 +183,18 @@ function ruleSummary(row: RuleRowState): string {
 }
 
 export default function CalculatorPage() {
-  const { rules } = useLoaderData<typeof loader>();
+  const { rules, prefill } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as ActionResult | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  const [revenueText, setRevenueText] = useState("0.00");
-  const [currency, setCurrency] = useState<string>(SUPPORTED_CURRENCY_CODES[0]);
+  const initialRevenueText = prefill ? minorUnitsToInputString(prefill.revenueMinor) : "0.00";
+  const [revenueText, setRevenueText] = useState(initialRevenueText);
+  const [currency, setCurrency] = useState<string>(
+    prefill && isSupportedCurrencyCode(prefill.currencyCode)
+      ? prefill.currencyCode
+      : SUPPORTED_CURRENCY_CODES[0],
+  );
   const [rows, setRows] = useState<Record<string, RuleRowState>>(() => {
     const initial: Record<string, RuleRowState> = {};
     for (const view of rules) initial[view.categoryKey] = toRowState(view);
@@ -180,7 +207,7 @@ export default function CalculatorPage() {
     const reset: Record<string, RuleRowState> = {};
     for (const view of rules) reset[view.categoryKey] = toRowState(view);
     setRows(reset);
-    setRevenueText("0.00");
+    setRevenueText(initialRevenueText);
   }
 
   function handleCalculateClick() {
@@ -239,6 +266,17 @@ export default function CalculatorPage() {
       */}
       <Form method="post" ref={formRef} data-save-bar="true" onReset={resetToLoadedRules}>
         <input type="hidden" name="intent" defaultValue="save" ref={intentInputRef} />
+        {prefill && (
+          <s-section>
+            <s-banner tone="info" heading="New calculation, pre-filled from a saved snapshot">
+              <p>
+                These values were loaded from the calculation saved {formatSavedAt(prefill.savedAtIso)}.
+                This is a new, unsaved calculation — changing it will not edit that saved record.
+              </p>
+            </s-banner>
+          </s-section>
+        )}
+
         <s-section>
           <s-banner tone="info" heading="Revenue is entered manually">
             <p>

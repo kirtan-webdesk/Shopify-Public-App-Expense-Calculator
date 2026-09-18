@@ -1,39 +1,84 @@
+import { useRef } from "react";
+import { Form, redirect, useActionData, useNavigation } from "react-router";
 import type { Route } from "./+types/app.results";
 import { authenticate } from "~/shopify.server";
+import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { saveCalculationFromTransport } from "~/services/calculation-history.service";
 import { decodeCalculationResult } from "~/domain/calculation-transport";
-import { withPercentages, formatMoney, formatPercent } from "~/domain/presentation";
-import { buildDonutChartData, CATEGORY_COLORS, type DonutSliceInput } from "~/domain/donut-chart";
+import { formatMoney } from "~/domain/presentation";
+import { ExpenseBreakdown, SummaryField } from "~/components/expense-breakdown";
 
 // --------------------------------------------------------------------------
-// /app/results — M3 real implementation, replacing the M1 static shell.
+// /app/results — M3 results view + M4 "Save this calculation" (D10).
 //
 // Ports design/mockup/results.html (G2-confirmed): the accessible data table
-// is the PRIMARY, always-rendered representation (ADR-0004) and comes first
-// in reading order; the hand-rolled inline SVG donut is supplementary and
-// renders from the exact same computed line-item array — neither derives a
-// number the other doesn't have. The mockup's dev-only fixture-data-swap
-// dropdown was already stripped at G3 and is NOT reintroduced here.
+// is the PRIMARY, always-rendered representation (ADR-0004) and the inline
+// SVG donut is supplementary — both live in app/components/expense-breakdown
+// and are shared with the saved-calculation detail page. The mockup's
+// dev-only fixture-data-swap dropdown was stripped at G3 and is NOT
+// reintroduced here.
 //
-// This route does NOT read from the database and does NOT persist anything
-// — M4 (save/history) is explicitly out of scope this sprint. The result it
-// renders comes entirely from the `d` query parameter the calculator's
-// "Calculate" action produced (app/domain/calculation-transport.ts) — a
-// non-persisted, live preview of the form state at the moment Calculate was
-// pressed, per the G2 design note this mockup already documented.
+// The loader does NOT read from the database: the result it renders comes
+// from the `d` query parameter the calculator's "Calculate" action produced
+// (app/domain/calculation-transport.ts) — a non-persisted live preview.
+//
+// Saving is a POST to this route's action, confirmed through an <s-modal>
+// (the mockup's save-confirmation step; saving is permanent, so it is
+// confirmed rather than fired directly). The action NEVER persists the
+// transported amounts: saveCalculationFromTransport re-validates the inputs,
+// recomputes with the pure engine, and rejects a payload whose amounts do
+// not match. The shop identity comes from the authenticated session, never
+// from the form.
 // --------------------------------------------------------------------------
+
+const SAVE_MODAL_ID = "save-calculation-modal";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await authenticate.admin(request);
   const url = new URL(request.url);
   const encoded = url.searchParams.get("d");
   const result = encoded ? decodeCalculationResult(encoded) : null;
-  return { result };
+  // `encoded` is handed back only when it decoded — it is what the Save form
+  // posts, so the server re-verifies exactly the calculation the merchant saw.
+  return { result, encoded: result ? encoded : null };
+}
+
+interface SaveActionError {
+  readonly ok: false;
+  readonly message: string;
+}
+
+export async function action({ request }: Route.ActionArgs) {
+  const { session } = await authenticate.admin(request);
+  const ctx = await findShopContextByDomain(session.shop);
+  if (!ctx) {
+    throw new Response("Shop record not found for this session — try reinstalling the app.", {
+      status: 404,
+    });
+  }
+
+  const formData = await request.formData();
+  const intent = String(formData.get("intent") ?? "");
+  if (intent !== "save") {
+    throw new Response(`Unknown intent "${intent}".`, { status: 400 });
+  }
+
+  const saved = await saveCalculationFromTransport(ctx, String(formData.get("d") ?? ""));
+  if (!saved.ok) {
+    const error: SaveActionError = { ok: false, message: saved.message };
+    return error;
+  }
+  return redirect(`/app/history/${saved.id}?saved=1`);
 }
 
 export default function ResultsPage({ loaderData }: Route.ComponentProps) {
-  const { result } = loaderData;
+  const { result, encoded } = loaderData;
+  const actionData = useActionData<typeof action>() as SaveActionError | undefined;
+  const navigation = useNavigation();
+  const isSaving = navigation.state === "submitting";
+  const formRef = useRef<HTMLFormElement>(null);
 
-  if (!result) {
+  if (!result || !encoded) {
     return (
       <s-page heading="Results">
         <s-link slot="breadcrumb-actions" href="/app/calculator">
@@ -51,38 +96,71 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
     );
   }
 
-  const lineItems = withPercentages(result);
-  const slices: DonutSliceInput[] = lineItems.map((li) => ({
-    categoryKey: li.categoryKey,
-    label: li.categoryLabel,
-    amountMinor: li.computedAmountMinor,
-    percentageOfRevenue: li.percentageOfRevenue,
-    color: CATEGORY_COLORS[li.categoryKey] ?? "#8A8A8A",
-  }));
-  const donut = buildDonutChartData(slices);
-
-  const totalPercentage =
-    result.revenueMinor > 0 ? (result.totalExpensesMinor / result.revenueMinor) * 100 : 0;
-
   return (
     <s-page heading="Results">
       <s-link slot="breadcrumb-actions" href="/app/calculator">
         Calculator
       </s-link>
 
+      {/* Save-confirmation modal (App Bridge/Polaris <s-modal>, not a bespoke
+          dialog). The primary action hides the modal and submits the hidden
+          form below; the form is outside the modal so it exists regardless of
+          the modal's own rendering. */}
+      <s-modal id={SAVE_MODAL_ID} heading="Save this calculation?">
+        <p>
+          This creates a permanent record of today&apos;s revenue figure and the rule values used
+          to calculate it. It will <strong>not</strong> update later if you edit your category
+          rules — that&apos;s by design, so past calculations stay comparable.
+        </p>
+        <s-button
+          slot="primary-action"
+          variant="primary"
+          commandFor={SAVE_MODAL_ID}
+          command="--hide"
+          disabled={isSaving}
+          onClick={() => formRef.current?.requestSubmit()}
+        >
+          Save calculation
+        </s-button>
+        <s-button slot="secondary-actions" commandFor={SAVE_MODAL_ID} command="--hide">
+          Cancel
+        </s-button>
+      </s-modal>
+
+      <Form method="post" ref={formRef}>
+        <input type="hidden" name="intent" value="save" />
+        <input type="hidden" name="d" value={encoded} />
+      </Form>
+
+      {actionData && !actionData.ok && (
+        <s-section>
+          <s-banner tone="critical" heading="Calculation not saved">
+            <p>{actionData.message}</p>
+          </s-banner>
+        </s-section>
+      )}
+
       <s-section>
-        <s-banner tone="warning" heading="Estimate only — not saved">
+        <s-banner tone="warning" heading="Estimate only — not saved yet">
           <p>
             This is a live preview using the rule values from the Calculator page, including any
-            unsaved edits. It has not been saved as a record (save/history is coming in a later
-            milestone). Percentages and formula amounts above used placeholder illustrative
-            defaults where you have not entered your own figures.
+            unsaved edits. Select <strong>Save this calculation</strong> to keep a permanent
+            snapshot of it in your history. Percentages and formula amounts above used placeholder
+            illustrative defaults where you have not entered your own figures.
           </p>
         </s-banner>
       </s-section>
 
       <s-section>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "space-between" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "20px",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}
+        >
           <SummaryField label="Revenue" value={formatMoney(result.revenueMinor, result.currencyCode)} />
           <SummaryField
             label="Total expenses"
@@ -93,195 +171,26 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
             value={formatMoney(result.netAmountMinor, result.currencyCode)}
             negative={result.netAmountMinor < 0}
           />
+          <div>
+            <s-button
+              variant="primary"
+              commandFor={SAVE_MODAL_ID}
+              command="--show"
+              disabled={isSaving}
+            >
+              Save this calculation
+            </s-button>
+          </div>
         </div>
       </s-section>
 
       <s-section heading="Expense breakdown">
-        <div className="results-grid">
-          {/* ADR-0004: the data table is the primary, always-rendered
-              representation and comes FIRST in DOM/reading order. */}
-          <div>
-            <table className="data-table">
-              <caption>Per-category expense breakdown against the revenue figure above.</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Category</th>
-                  <th scope="col">Rule applied</th>
-                  <th scope="col" className="numeric">
-                    Amount
-                  </th>
-                  <th scope="col" className="numeric">
-                    % of revenue
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {lineItems.length === 0 && (
-                  <tr>
-                    <td colSpan={4}>No expense rules are enabled for this calculation.</td>
-                  </tr>
-                )}
-                {lineItems.map((li) => (
-                  <tr key={li.categoryKey}>
-                    <th scope="row">
-                      <span
-                        className="data-table__swatch"
-                        style={{ background: CATEGORY_COLORS[li.categoryKey] ?? "#8A8A8A" }}
-                        aria-hidden="true"
-                      ></span>
-                      {li.categoryLabel}
-                    </th>
-                    <td>{ruleAppliedText(li)}</td>
-                    <td className="numeric">{formatMoney(li.computedAmountMinor, result.currencyCode)}</td>
-                    <td className="numeric">
-                      {result.revenueMinor > 0 ? formatPercent(li.percentageOfRevenue) : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th scope="row">Total expenses</th>
-                  <td></td>
-                  <td className="numeric">{formatMoney(result.totalExpensesMinor, result.currencyCode)}</td>
-                  <td className="numeric">
-                    {result.revenueMinor > 0 ? formatPercent(totalPercentage) : "—"}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          {/* Supplementary, hand-rolled inline SVG donut (ADR-0004) — renders
-              from the SAME `slices` array the table above renders from. */}
-          <div className="chart-panel">
-            <DonutChart data={donut} size={220} stroke={28} />
-            {!donut.isEmpty && (
-              <ul className="donut-legend">
-                {lineItems
-                  .filter((li) => li.computedAmountMinor > 0)
-                  .map((li) => (
-                    <li key={li.categoryKey}>
-                      <span
-                        className="donut-legend__swatch"
-                        style={{ background: CATEGORY_COLORS[li.categoryKey] ?? "#8A8A8A" }}
-                        aria-hidden="true"
-                      ></span>
-                      <span className="donut-legend__label">{li.categoryLabel}</span>
-                      <span className="donut-legend__value">
-                        {result.revenueMinor > 0
-                          ? formatPercent(li.percentageOfRevenue)
-                          : formatMoney(li.computedAmountMinor, result.currencyCode)}
-                      </span>
-                    </li>
-                  ))}
-              </ul>
-            )}
-          </div>
-        </div>
+        <ExpenseBreakdown
+          result={result}
+          caption="Per-category expense breakdown against the revenue figure above."
+          ruleColumnHeading="Rule applied"
+        />
       </s-section>
     </s-page>
-  );
-}
-
-function SummaryField({
-  label,
-  value,
-  negative,
-}: {
-  readonly label: string;
-  readonly value: string;
-  readonly negative?: boolean;
-}) {
-  return (
-    <div>
-      <div style={{ fontSize: "0.8125rem", color: "var(--p-color-text-secondary, #616161)" }}>{label}</div>
-      <div style={{ fontSize: "1.25rem", fontWeight: 600, color: negative ? "#D82C0D" : undefined }}>
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function ruleAppliedText(li: { readonly ruleType: string; readonly rateBasisPoints: number | null; readonly fixedAmountMinor: number | null; readonly formulaKey: string | null }): string {
-  if (li.ruleType === "percentage" && li.rateBasisPoints !== null) {
-    return `${(li.rateBasisPoints / 100).toFixed(2)}% of revenue`;
-  }
-  if (li.ruleType === "fixed" && li.fixedAmountMinor !== null) {
-    return `${(li.fixedAmountMinor / 100).toFixed(2)} fixed`;
-  }
-  if (li.ruleType === "formula" && li.formulaKey) {
-    return `Formula: ${li.formulaKey}`;
-  }
-  return "—";
-}
-
-// --------------------------------------------------------------------------
-// Hand-rolled inline SVG donut renderer (ADR-0004). Geometry comes entirely
-// from app/domain/donut-chart.ts (pure, tested); this component only maps
-// that data to <circle> elements. role="img" + aria-label carries the
-// accessible summary; every element inside is aria-hidden — the table above
-// remains the accessible source of truth.
-// --------------------------------------------------------------------------
-function DonutChart({
-  data,
-  size,
-  stroke,
-}: {
-  readonly data: ReturnType<typeof buildDonutChartData>;
-  readonly size: number;
-  readonly stroke: number;
-}) {
-  const radius = size / 2 - stroke / 2;
-  const cx = size / 2;
-  const cy = size / 2;
-
-  if (data.isEmpty) {
-    return (
-      <svg role="img" aria-label={data.ariaLabel} viewBox={`0 0 ${size} ${size}`} width={size} height={size}>
-        <circle
-          aria-hidden="true"
-          cx={cx}
-          cy={cy}
-          r={radius}
-          fill="none"
-          stroke="var(--p-color-border, #e3e3e3)"
-          strokeWidth={stroke}
-        />
-        <text
-          aria-hidden="true"
-          x={cx}
-          y={cy}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize={13}
-          fill="var(--p-color-text-secondary, #616161)"
-        >
-          No data
-        </text>
-      </svg>
-    );
-  }
-
-  return (
-    <svg role="img" aria-label={data.ariaLabel} viewBox={`0 0 ${size} ${size}`} width={size} height={size}>
-      <g transform={`rotate(-90 ${cx} ${cy})`}>
-        {data.segments.map((seg) => (
-          <circle
-            key={seg.categoryKey}
-            aria-hidden="true"
-            cx={cx}
-            cy={cy}
-            r={radius}
-            fill="none"
-            stroke={seg.color}
-            strokeWidth={stroke}
-            pathLength={100}
-            strokeDasharray={`${seg.dash} ${seg.gap}`}
-            strokeDashoffset={seg.dashOffset}
-          />
-        ))}
-      </g>
-    </svg>
   );
 }

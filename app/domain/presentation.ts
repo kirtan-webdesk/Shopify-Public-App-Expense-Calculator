@@ -53,6 +53,68 @@ export function formatMoney(amountMinor: number, currencyCode: string): string {
   }).format(major);
 }
 
+/**
+ * One-line description of the rule applied to a category, rendered from the
+ * rule's own values (never from the current live rule). Shared by the
+ * Results page and the saved-calculation detail page so both describe a rule
+ * identically — on the detail page the inputs are the stored `*_at_save`
+ * columns, so a later edit to the live rule cannot change this text.
+ */
+export function formatRuleApplied(li: {
+  readonly ruleType: string;
+  readonly rateBasisPoints: number | null;
+  readonly fixedAmountMinor: number | null;
+  readonly formulaKey: string | null;
+}): string {
+  if (li.ruleType === "percentage" && li.rateBasisPoints !== null) {
+    return `${(li.rateBasisPoints / 100).toFixed(2)}% of revenue`;
+  }
+  if (li.ruleType === "fixed" && li.fixedAmountMinor !== null) {
+    return `${(li.fixedAmountMinor / 100).toFixed(2)} fixed`;
+  }
+  if (li.ruleType === "formula" && li.formulaKey) {
+    return `Formula: ${li.formulaKey}`;
+  }
+  return "—";
+}
+
+const MONTH_ABBREVIATIONS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+/**
+ * Formats a stored timestamp as e.g. "Sep 17, 2026, 9:14 AM UTC" (matches the
+ * G2 mockup's "Sep 17, 2026, 9:14 AM" plus an explicit zone).
+ *
+ * Deliberately hand-assembled from UTC fields rather than Intl.DateTimeFormat:
+ * (1) the project timezone is still unconfirmed (spec OQ-6) so the zone is
+ * stated rather than guessed, and (2) newer ICU builds emit a narrow
+ * no-break space before AM/PM in some runtimes and not others — a server/
+ * browser difference in that character would be a hydration mismatch. This
+ * function is pure and produces identical output everywhere.
+ */
+export function formatSavedAt(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  const month = MONTH_ABBREVIATIONS[date.getUTCMonth()] ?? "—";
+  const hours24 = date.getUTCHours();
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+  const meridiem = hours24 < 12 ? "AM" : "PM";
+  return `${month} ${date.getUTCDate()}, ${date.getUTCFullYear()}, ${hours12}:${minutes} ${meridiem} UTC`;
+}
+
 export function formatPercent(value: number): string {
   return `${value.toFixed(value !== 0 && value < 1 ? 2 : 1)}%`;
 }

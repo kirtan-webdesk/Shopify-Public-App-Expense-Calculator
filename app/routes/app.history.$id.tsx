@@ -1,29 +1,97 @@
+import { useEffect } from "react";
+import { isRouteErrorResponse } from "react-router";
+import type { Route } from "./+types/app.history.$id";
+import { authenticate } from "~/shopify.server";
+import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { getSavedCalculation } from "~/services/calculation-history.service";
+import { SavedCalculationPage } from "~/components/saved-calculation-page";
+
 // --------------------------------------------------------------------------
-// /app/history/:id — M1 SCAFFOLD PAGE.
+// /app/history/:id — M4 saved-calculation detail (D11).
 //
-// Structural placeholder for design/mockup/history-detail.html
-// (G2-confirmed). Rendering a saved calculation's frozen snapshot (D11) is
-// M4 scope and is NOT wired to a loader here.
+// Renders STORED values only (app/services/calculation-history.service.ts
+// rebuilds the view from the calculation + calculation_line_item rows). It
+// never recomputes with the engine and never consults expense_rule, so
+// editing live rules afterwards cannot change what this page shows (FT-14a).
 //
-// backAction is not a real <s-page> prop (verified against the Dev MCP
-// polaris-app-home docs) — uses the real breadcrumb-actions slot pattern.
+// Tenant isolation (D12): the lookup is scoped by the authenticated shop.
+// Another shop's id, a nonexistent id, and a malformed id all produce the
+// SAME 404 response, so the route cannot be used to probe which ids exist.
+//
+// There is deliberately NO action on this route: saved calculations are
+// append-only in normal operation (no edit, no delete UI — deletion happens
+// only through the shop/redact cascade).
 // --------------------------------------------------------------------------
 
-export default function HistoryDetailPage() {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const { session } = await authenticate.admin(request);
+  const ctx = await findShopContextByDomain(session.shop);
+  if (!ctx) {
+    throw new Response("Shop record not found for this session — try reinstalling the app.", {
+      status: 404,
+    });
+  }
+
+  const saved = await getSavedCalculation(ctx, params.id);
+  if (!saved) {
+    // One response for "not yours", "does not exist" and "not an id".
+    throw new Response("Saved calculation not found.", { status: 404 });
+  }
+
+  const justSaved = new URL(request.url).searchParams.get("saved") === "1";
+  return { saved, justSaved };
+}
+
+interface ToastHost {
+  readonly shopify?: { readonly toast?: { readonly show: (message: string) => void } };
+}
+
+export default function HistoryDetailPage({ loaderData }: Route.ComponentProps) {
+  const { saved, justSaved } = loaderData;
+
+  // App Bridge toast for the save confirmation (design notes §5). The global
+  // is provided by the App Bridge script in <head>; absent outside the admin
+  // iframe, in which case the snapshot banner below is the confirmation.
+  useEffect(() => {
+    if (justSaved) {
+      (window as unknown as ToastHost).shopify?.toast?.show("Calculation saved");
+    }
+  }, [justSaved]);
+
+  return <SavedCalculationPage saved={saved} />;
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (isRouteErrorResponse(error) && error.status === 404) {
+    return (
+      <s-page heading="Saved calculation">
+        <s-link slot="breadcrumb-actions" href="/app/history">
+          History
+        </s-link>
+        <s-section>
+          <s-banner tone="warning" heading="Calculation not found">
+            <p>
+              This saved calculation does not exist. Return to your history to pick one of your
+              saved calculations.
+            </p>
+            <s-button slot="action" href="/app/history">
+              Back to history
+            </s-button>
+          </s-banner>
+        </s-section>
+      </s-page>
+    );
+  }
+
+  console.error(error);
   return (
-    <s-page heading="Saved calculation">
-      <s-link slot="breadcrumb-actions" href="/app/history">
-        History
-      </s-link>
-      <s-section>
-        <s-banner tone="info" heading="Saved-calculation detail — M4 scope">
-          <p>
-            Rendering a saved calculation&apos;s frozen snapshot (D11) is not
-            yet built. This route exists to prove the App Bridge/Polaris/
-            navigation shell renders correctly at this path.
-          </p>
-        </s-banner>
-      </s-section>
+    <s-page heading="Something went wrong">
+      <s-banner tone="critical" heading="Unexpected error">
+        <p>
+          Something went wrong loading this page. No details are shown here to avoid leaking
+          internals — this event has been logged.
+        </p>
+      </s-banner>
     </s-page>
   );
 }

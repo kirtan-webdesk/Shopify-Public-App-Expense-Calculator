@@ -5,8 +5,8 @@
     "client_slug": "expense-calculator",
     "project_type": "app-build",
     "build_context": "shopify-app",
-    "stage": "architecture",
-    "current_gate": "G1.5-revision",
+    "stage": "development",
+    "current_gate": "G4-sprint-3.1",
     "schema_version": "1.0.0",
     "shopify": {
       "distribution": "public",
@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-18T11:42:47Z",
-    "version": 30,
+    "updated_at": "2026-09-18T15:13:37Z",
+    "version": 47,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -81,7 +81,7 @@
       "expires_at": "2026-09-19T18:08:23Z",
       "approver": "PM lead (named approver TBD \u2014 OQ-7 unanswered; role-based approval by project stakeholder in the interim)",
       "ticket_id": "EXPCALC-G1-EST-001",
-      "notes": "Independent bottom-up estimate: 225-390 engineering hours across 5 milestones (M1 Foundation 34-52, M2 Configuration 44-70, M3 Engine+Results 40-62, M4 Save+History 26-42, M5 Hardening+Launch 48-78; engineering subtotal 192-304) plus gate/coordination lines (G1.5 8-16, G-Schema 6-12, G2 8-36, PM shepherding 10-20). Confidence: LOW - no estimation spreadsheet or historical actuals; OQ-1 (hosting) and OQ-8 (design path) sit directly on cost drivers; OQ-4 (default rates) unfinalised. Ranges, not points. The source doc's 250hr lump sum was NOT used as an input and sits at ~20th percentile of the derived range. Planning figure ~300hr with contingency to 390. Conditional gates determined: G1.5 FIRES (triggers: estimate >80hr AND undecided non-trivial hosting; runs before G-Schema), G-Schema FIRES (always), G2 FIRES (reduced-UI candidate pending OQ-8), G-PCD SKIPPED (reason: no protected order/customer scopes requested - confirmed at G0.5). TIMELINE: target 2026-10-20 is NOT achievable as a launch date - RENEGOTIATE recommended. Recommended submission-readiness range: 2026-10-24 to 2026-11-27 (2 devs) or 2026-11-17 to 2026-12-29 (1 dev), assuming build start 2026-09-22 and OQ-1/4/7/8 answered within the week. Launch = submission date + Shopify review (external, G6, no internal SLA, no committed date; one resubmission cycle budgeted). Artifact: projects/expense-calculator/spec.md sections 11-12. Estimate authored by pm-agent; pm-agent is NOT the approver. sla_hours=48 is nominal - OQ-6 (timezone) unanswered so no confirmed local SLA frame; America/Toronto not assumed. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:10:12Z. Launch-date renegotiation accepted in principle (2026-10-20 dropped as a launch commitment; submission-readiness target to be finalized). Hosting (OQ-1) explicitly deferred to G1.5 by the approver, not answered now \u2014 architect to recommend at G1.5, human confirms there.",
+      "notes": "Independent bottom-up estimate: 225-390 engineering hours across 5 milestones (M1 Foundation 34-52, M2 Configuration 44-70, M3 Engine+Results 40-62, M4 Save+History 26-42, M5 Hardening+Launch 48-78; engineering subtotal 192-304) plus gate/coordination lines (G1.5 8-16, G-Schema 6-12, G2 8-36, PM shepherding 10-20). Confidence: LOW - no estimation spreadsheet or historical actuals; OQ-1 (hosting) and OQ-8 (design path) sit directly on cost drivers; OQ-4 (default rates) unfinalised. Ranges, not points. The source doc's 250hr lump sum was NOT used as an input and sits at ~20th percentile of the derived range. Planning figure ~300hr with contingency to 390. Conditional gates determined: G1.5 FIRES (triggers: estimate >80hr AND undecided non-trivial hosting; runs before G-Schema), G-Schema FIRES (always), G2 FIRES (reduced-UI candidate pending OQ-8), G-PCD SKIPPED (reason: no protected order/customer scopes requested - confirmed at G0.5). TIMELINE: target 2026-10-20 is NOT achievable as a launch date - RENEGOTIATE recommended. Recommended submission-readiness range: 2026-10-24 to 2026-11-27 (2 devs) or 2026-11-17 to 2026-12-29 (1 dev), assuming build start 2026-09-22 and OQ-1/4/7/8 answered within the week. Launch = submission date + Shopify review (external, G6, no internal SLA, no committed date; one resubmission cycle budgeted). Artifact: projects/expense-calculator/spec.md sections 11-12. Estimate authored by pm-agent; pm-agent is NOT the approver. sla_hours=48 is nominal - OQ-6 (timezone) unanswered so no confirmed local SLA frame; America/Toronto not assumed. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:10:12Z. Launch-date renegotiation accepted in principle (2026-10-20 dropped as a launch commitment; submission-readiness target to be finalized). Hosting (OQ-1) explicitly deferred to G1.5 by the approver, not answered now \u2014 architect to recommend at G1.5, human confirms there. | RENEGOTIATE recorded 2026-09-18T12:56:48Z per RFC-001 (rfcs/RFC-001-hosting-reversal-vercel-serverless.md) and ADR-0001's own Enforcement clause (hosting-class change requires RFC->ADR supersession + G1 RENEGOTIATE if effort moves). New estimate: +40-85hr on top of the 225-390hr baseline (planning figure ~60hr added, new planning total ~360hr), confidence LOW. Accepted by sales@webdesksolution.ca as part of the combined G1.5-revision CONFIRM decision.",
       "escalation_log": [],
       "decided_by": "sales@webdesksolution.ca",
       "decided_at": "2026-09-17T18:10:12Z",
@@ -151,32 +151,62 @@
       "id": "G4-sprint-1.1",
       "type": "sprint-qa",
       "scope": "M1-Foundation",
-      "status": "open",
+      "status": "passed",
       "opened_at": "2026-09-18T08:59:11Z",
       "sla_hours": 24,
       "expires_at": "2026-09-19T08:59:11Z",
       "approver": "QA lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
-      "notes": "First sprint QA, covering the M1 Foundation work delivered at G3 (commit 299328c). QA is read-only: reviews dev-evidence/g3-scaffold/ artifacts (MCP validation evidence, local gate logs) and the actual source (auth, session storage, webhook handlers, repository/tenancy layer, route-auth-matrix test) - does not run tests itself. Checks: GraphQL contract (N/A by design - zero Admin GraphQL calls per ADR-0006, verify that claim is actually true in code, not just asserted), webhook compliance (HMAC verification, idempotency/dedup via webhook_event unique index, GDPR shop/redact ACTUALLY deletes with asserted row counts, customers/data_request acks correctly even though delivery-transport is flagged as an open gap), auth (route-auth-matrix - no unauthenticated sensitive route), billing (N/A - free app, no App Pricing integration), security (no credentials in responses/logs, scopes=[] is maximally least-privilege). DB-integration tests needing a live Postgres were explicitly deferred by the developer - QA to confirm that's correctly disclosed as deferred, not silently missing. | QA VERDICT: BLOCKED (not PASS, not FAIL) - report at qa-reports/G4-sprint-1.1.md. Code-level review found no P1/P2 defects (GraphQL-zero-dependency verified by grep, HMAC+dedup+real-deletion code confirmed by direct read, route-auth-matrix confirmed correct by direct read, billing N/A confirmed clean, App Bridge-in-head confirmed). BLOCKED strictly because no live Postgres exists in this environment to produce the mandatory redact-then-query evidence (FT-08/FT-08b) or a runtime route-probe transcript - infrastructure gap, not a code defect, and honestly disclosed by the developer in 3 independent places. F3 (P3): .env contains a realistic-format (non-placeholder) Shopify key/secret - flagged for rotation (SECURITY NOTE: QA's report echoed the literal secret value in plaintext, exposing it into this session/transcript - orchestrator instructed the human to rotate it via Partner Dashboard regardless of whether it was 'real'; future QA delegations instructed to flag secret-format findings by pattern only, never echo literal values). Awaiting human decision: (a) stand up a real local/dev Postgres so full evidence can be gathered before CONFIRM, or (b) explicit logged override carrying the live-DB evidence obligation forward to G5. | LIVE EVIDENCE GATHERED against a real local Postgres (dev-evidence/g4-sprint-1.1-live-evidence/, start at 00-SUMMARY.md). F2 (auth probe) RESOLVED CLEAN: no unauthenticated/bad-HMAC request ever returned 200 with sensitive content. F1 (redact-then-query) surfaced 2 NEW P1 DEFECTS invisible from source review alone - exactly why live evidence was required, not a source-review substitute: BUG-1 (P1): authenticate.webhook() normalizes topic (shop/redact -> SHOP_REDACT) but a DB CHECK constraint expects the literal 'shop/redact' string - a correctly-HMAC-signed live webhook request returns 500 on ALL FOUR webhook routes, not just shop/redact. BUG-2 (P1): shop-redact.service.ts calls sessionStorageInstance.deleteSessions([]) unconditionally; the session-storage library builds 'WHERE id IN ()' with no empty-array guard, causing a Postgres syntax error that rolls back the ENTIRE redact transaction. Since app/uninstalled (fires immediately on uninstall) already deletes all sessions, and shop/redact fires ~48h later per the designed lifecycle, EVERY REAL SHOP following the normal uninstall path hits this crash - GDPR hard-deletion currently cannot complete for any real merchant. BUG-3 (P3, note): webhook_event's ON DELETE CASCADE deletes the in-flight row anyway when shop is deleted, making the code's 'mark processed_at, do not delete' comment dead/inaccurate (harmless side effect: it does produce the literal zero-rows FT-08 wants, by accident not design). Deletion topology CONFIRMED CORRECT once reached: real before/after row counts, all tenant tables 1->0, compliance_audit_log recorded outcome=completed with asserted counts. NO SOURCE FIXES applied (no-auto-fix rule) - awaiting explicit human fix command per project rules. Gate remains BLOCKED, now for defects found rather than missing infrastructure - infrastructure blocker is CLEARED. | BUG-1 + BUG-2 FIXED, commit 6f5525affa752b9646fd9e91e0094abcb3fedead. BUG-1: new app/services/webhook-topic.service.ts reads raw X-Shopify-Topic header instead of authenticate.webhook()'s internally-normalized topic field, applied consistently across all 4 webhook routes (verified by direct diff review, not just developer claim). BUG-2: shop-redact service now guards deleteSessions() with sessions.length>0. shopify.app.toml separately reconciled: confirmed via .shopify/project.json (gitignored) tied to a real linked dev store (wds55.myshopify.com) - consistent with a genuine shopify app config link/dev run, not fabrication. Real Shopify CLI (v4.8.0) config validate --json returned valid:true before and after. Per real shopify.dev docs, compliance_topics is only documented as a per-[[webhooks.subscriptions]] field - removed a redundant top-level compliance_topics array present in both old and CLI-relinked versions, kept the 4 correct per-subscription entries, restored ADR/architecture explanatory comments. App URL: SHOPIFY_APP_URL and application_url both set to http://localhost:3000 per human request - EXPLICITLY CAVEATED (by developer and orchestrator) that Shopify's servers cannot reach a bare localhost for real OAuth/webhook delivery; only valid for same-machine direct-HTTP test probes. A real install on any store needs a public HTTPS tunnel via `shopify app dev`. FRESH LIVE EVIDENCE (dev-evidence/g4-sprint-1.1-live-evidence-v2/): correctly-signed shop/redact webhook with a shop that has ZERO sessions (the exact prior-crash case) -> 200 (was 500), drained successfully, compliance_audit_log outcome=completed, all 6 tenant tables 1->0. Auth probes re-confirmed unchanged (healthz 200, unauth app-route 410, missing-HMAC webhook 400, bad-HMAC webhook 401). GATES: typecheck/tests(77)/build clean; lint FAILS but solely on a pre-existing, untracked, OUT-OF-SCOPE file (decisions/migrations/00000000000001-initial-schema.js, 'module is not defined' no-undef) not part of this diff - not a regression from this fix, needs cleanup separately. run-gates.py again failed on Windows (same known WinError 2 issue, F4 from earlier), manually reproduced with SHA-256-bound logs. MCP validation N/A - backend webhook/session/config work only, no GraphQL/Polaris/theme touched, reasoning explicit. NEW FINDING (not fixed, not authorized): app-uninstalled.service.ts has the IDENTICAL unguarded deleteSessions([]) pattern BUG-2 fixed elsewhere - not triggered live yet, found by code reading, flagged for human fix-decision (see next audit entry). | QA RE-VERIFICATION (independent, not trusting developer self-report): BUG-1 and BUG-2 CONFIRMED GENUINELY FIXED via direct source read of all 4 webhook routes + shop-redact.service.ts AND cross-referenced live-evidence-v2 (200 replacing 500, zero-session-shop redaction completes with full 1->0 deletion across all 6 tenant tables). NEW P1 CONFIRMED TRUE by independent read: BUG-4 in app-uninstalled.service.ts - identical unguarded deleteSessions([]) pattern, CONFIRMED WORSE than BUG-2 because drain-worker.ts dispatches handleAppUninstalled WITHOUT the shared claim transaction shop-redact uses, so markShopUninstalled can commit independently before deleteSessions throws, leaving a half-committed state + a webhook_event row retrying forever. Gate remains BLOCKED - cannot PASS with an open P1 (QA rule 1), even though the two originally authorized bugs are verified closed. Also confirmed: lint failure genuinely unrelated to fix commit (decisions/ fully untracked in git status, file never committed). New P4s: F7 (CLI-validate claim not backed by a captured artifact), evidence artifacts don't self-embed commit SHA (tightened before G5). RECOMMENDED PATH: human authorizes BUG-4 fix (same length>0 guard pattern), developer fixes + produces live-evidence-v3 on app/uninstalled with a zero-session shop, QA re-verifies once more - then PASS_WITH_FLAGS is achievable (F3/F5/F7/lint-cleanup carried forward as disclosed non-blocking items). | BUG-4 FIXED, commits 942179845f889e13b1d6dd870875f2f07e79e866 (code) + 9123217b8052269409bcc1ec521eba75a491b78f (evidence). Same length>0 guard applied to app-uninstalled.service.ts. Developer additionally judged the transaction-wrapping concern QA raised (handleAppUninstalled not sharing the claim transaction) as small/safe and fixed it in-scope: shop.repository.ts markShopUninstalled now requires a transaction param, drain-worker.ts passes the shared savepoint transaction into handleAppUninstalled matching the existing shop/redact pattern. Live-verified (v3 evidence, self-embeds commit SHA + file content hashes this time per QA's F5 ask): zero-session shop, correctly-signed app/uninstalled webhook -> 200, drained on first attempt (attempts:0, last_error:null), shop.uninstalled_at set correctly, no infinite retry. Auth probes re-confirmed. Gates: typecheck/tests(77)/build clean, lint fails only on the same pre-existing out-of-scope migration file (unrelated). NEW FINDING (BUG-5, not fixed, not authorized): app/workers/sweeper.ts line 34 has the IDENTICAL unguarded deleteSessions() pattern in the 45-day safety-sweeper path - found while fixing BUG-4, flagged not fixed, awaiting human decision. This is now the 3rd occurrence of the same defect class across the compliance code paths - worth asking QA to do a comprehensive sweep for any other occurrences before another round-trip. | QA RE-VERIFICATION #3 (independent): BUG-4 CONFIRMED GENUINELY FIXED - guard + shared savepoint transaction plumbing traced end-to-end through drain-worker.ts/claimAndProcessOne by direct read, not description. BUG-5 (sweeper.ts:34) CONFIRMED TRUE and RECLASSIFIED P1 (not P3) - fires on the sweeper's NORMAL case (every shop reaching the 45-day sweeper already had sessions cleared by app/uninstalled, so deleteSessions([]) throws almost every time, not an edge case), and the throw is uncaught inside runSweeper's for-loop, aborting the rest of that sweep pass for every OTHER eligible shop too - directly defeats ADR-0008 R2's GDPR safety-net guarantee (the sweeper exists specifically to catch a lost/never-delivered shop/redact; as shipped it very likely crashes on its first eligible shop and never processes the backlog). FULL-CODEBASE SWEEP for this defect class CONFIRMED CLEAN except BUG-5: only 3 total deleteSessions() call sites exist in app/ (shop-redact guarded, app-uninstalled guarded, sweeper unguarded) - no BUG-6/7 surprises, other .destroy() calls confirmed N/A (scalar/range where-clauses, not array-IN construction). Gate remains BLOCKED on this single open P1. Path to clear: same length>0 guard for sweeper.ts:34 + live evidence proving both the immediate fix AND that the sweep loop continues correctly to a second eligible shop in the same pass (positively closing the blast-radius concern, not just the immediate crash). | BUG-5 FIXED, commit 8590c244a7db7f6b837bcfb8fd587491d75f9a17 (code) + evidence commit ccd040b. Same length>0 guard applied to sweeper.ts. Developer ALSO addressed the per-shop error-isolation concern QA raised (in-scope, judged small/safe): each shop's work in runSweeper's for-loop is now wrapped in its own try/catch, logging loudly and continuing to the next shop rather than aborting the whole sweep pass. Live-verified with BOTH scenarios QA required: two >45-day-stale zero-session shops seeded in the same pass - both hard-deleted successfully, both got distinct completed compliance_audit_log rows, zero crashes, proving both the immediate fix AND that one shop's processing no longer kills another's in the same sweep. Grep-confirmed all 3 deleteSessions() call sites (shop-redact/app-uninstalled/sweeper) now carry the identical guard - full defect-class sweep closed, no 4th variant introduced. Gates: typecheck/tests(77)/build clean, lint still confined to the same pre-existing unrelated migration file. This closes the BUG-1/2/4/5 chain discovered across 3 rounds of live-evidence QA re-verification. Awaiting final QA re-verification pass before this gate can move to PASS_WITH_FLAGS and be presented to the human for a G4-sprint-1.1 decision. | FINAL QA VERDICT: PASS WITH FLAGS. BUG-5 confirmed genuinely fixed (guard + per-shop try/catch isolation both verified by direct read; live-evidence-v4 shows 2 distinct completed compliance_audit_log rows ~70ms apart proving cross-shop isolation with DB-level evidence). BUG-1/2/4/5 ALL VERIFIED_FIXED across 4 independent QA re-verification rounds - zero open P1/P2 remain. Carried-forward disclosed non-blockers: F3 (.env secret still not rotated - P3, escalated a 2nd time, must not silently persist past G5), F5 (no CI workflow, all evidence developer-self-produced - P4, MUST be resolved before G5 milestone QA which requires CI/authorized-executor artifacts, not self-produced evidence), F7 (CLI-validate claim never captured as an artifact - P4), lint failure on decisions/migrations file (P4, confirmed unrelated across 3 consecutive rounds). AWAITING human final CONFIRM decision on G4-sprint-1.1.",
-      "escalation_log": []
+      "notes": "First sprint QA, covering the M1 Foundation work delivered at G3 (commit 299328c). QA is read-only: reviews dev-evidence/g3-scaffold/ artifacts (MCP validation evidence, local gate logs) and the actual source (auth, session storage, webhook handlers, repository/tenancy layer, route-auth-matrix test) - does not run tests itself. Checks: GraphQL contract (N/A by design - zero Admin GraphQL calls per ADR-0006, verify that claim is actually true in code, not just asserted), webhook compliance (HMAC verification, idempotency/dedup via webhook_event unique index, GDPR shop/redact ACTUALLY deletes with asserted row counts, customers/data_request acks correctly even though delivery-transport is flagged as an open gap), auth (route-auth-matrix - no unauthenticated sensitive route), billing (N/A - free app, no App Pricing integration), security (no credentials in responses/logs, scopes=[] is maximally least-privilege). DB-integration tests needing a live Postgres were explicitly deferred by the developer - QA to confirm that's correctly disclosed as deferred, not silently missing. | QA VERDICT: BLOCKED (not PASS, not FAIL) - report at qa-reports/G4-sprint-1.1.md. Code-level review found no P1/P2 defects (GraphQL-zero-dependency verified by grep, HMAC+dedup+real-deletion code confirmed by direct read, route-auth-matrix confirmed correct by direct read, billing N/A confirmed clean, App Bridge-in-head confirmed). BLOCKED strictly because no live Postgres exists in this environment to produce the mandatory redact-then-query evidence (FT-08/FT-08b) or a runtime route-probe transcript - infrastructure gap, not a code defect, and honestly disclosed by the developer in 3 independent places. F3 (P3): .env contains a realistic-format (non-placeholder) Shopify key/secret - flagged for rotation (SECURITY NOTE: QA's report echoed the literal secret value in plaintext, exposing it into this session/transcript - orchestrator instructed the human to rotate it via Partner Dashboard regardless of whether it was 'real'; future QA delegations instructed to flag secret-format findings by pattern only, never echo literal values). Awaiting human decision: (a) stand up a real local/dev Postgres so full evidence can be gathered before CONFIRM, or (b) explicit logged override carrying the live-DB evidence obligation forward to G5. | LIVE EVIDENCE GATHERED against a real local Postgres (dev-evidence/g4-sprint-1.1-live-evidence/, start at 00-SUMMARY.md). F2 (auth probe) RESOLVED CLEAN: no unauthenticated/bad-HMAC request ever returned 200 with sensitive content. F1 (redact-then-query) surfaced 2 NEW P1 DEFECTS invisible from source review alone - exactly why live evidence was required, not a source-review substitute: BUG-1 (P1): authenticate.webhook() normalizes topic (shop/redact -> SHOP_REDACT) but a DB CHECK constraint expects the literal 'shop/redact' string - a correctly-HMAC-signed live webhook request returns 500 on ALL FOUR webhook routes, not just shop/redact. BUG-2 (P1): shop-redact.service.ts calls sessionStorageInstance.deleteSessions([]) unconditionally; the session-storage library builds 'WHERE id IN ()' with no empty-array guard, causing a Postgres syntax error that rolls back the ENTIRE redact transaction. Since app/uninstalled (fires immediately on uninstall) already deletes all sessions, and shop/redact fires ~48h later per the designed lifecycle, EVERY REAL SHOP following the normal uninstall path hits this crash - GDPR hard-deletion currently cannot complete for any real merchant. BUG-3 (P3, note): webhook_event's ON DELETE CASCADE deletes the in-flight row anyway when shop is deleted, making the code's 'mark processed_at, do not delete' comment dead/inaccurate (harmless side effect: it does produce the literal zero-rows FT-08 wants, by accident not design). Deletion topology CONFIRMED CORRECT once reached: real before/after row counts, all tenant tables 1->0, compliance_audit_log recorded outcome=completed with asserted counts. NO SOURCE FIXES applied (no-auto-fix rule) - awaiting explicit human fix command per project rules. Gate remains BLOCKED, now for defects found rather than missing infrastructure - infrastructure blocker is CLEARED. | BUG-1 + BUG-2 FIXED, commit 6f5525affa752b9646fd9e91e0094abcb3fedead. BUG-1: new app/services/webhook-topic.service.ts reads raw X-Shopify-Topic header instead of authenticate.webhook()'s internally-normalized topic field, applied consistently across all 4 webhook routes (verified by direct diff review, not just developer claim). BUG-2: shop-redact service now guards deleteSessions() with sessions.length>0. shopify.app.toml separately reconciled: confirmed via .shopify/project.json (gitignored) tied to a real linked dev store (wds55.myshopify.com) - consistent with a genuine shopify app config link/dev run, not fabrication. Real Shopify CLI (v4.8.0) config validate --json returned valid:true before and after. Per real shopify.dev docs, compliance_topics is only documented as a per-[[webhooks.subscriptions]] field - removed a redundant top-level compliance_topics array present in both old and CLI-relinked versions, kept the 4 correct per-subscription entries, restored ADR/architecture explanatory comments. App URL: SHOPIFY_APP_URL and application_url both set to http://localhost:3000 per human request - EXPLICITLY CAVEATED (by developer and orchestrator) that Shopify's servers cannot reach a bare localhost for real OAuth/webhook delivery; only valid for same-machine direct-HTTP test probes. A real install on any store needs a public HTTPS tunnel via `shopify app dev`. FRESH LIVE EVIDENCE (dev-evidence/g4-sprint-1.1-live-evidence-v2/): correctly-signed shop/redact webhook with a shop that has ZERO sessions (the exact prior-crash case) -> 200 (was 500), drained successfully, compliance_audit_log outcome=completed, all 6 tenant tables 1->0. Auth probes re-confirmed unchanged (healthz 200, unauth app-route 410, missing-HMAC webhook 400, bad-HMAC webhook 401). GATES: typecheck/tests(77)/build clean; lint FAILS but solely on a pre-existing, untracked, OUT-OF-SCOPE file (decisions/migrations/00000000000001-initial-schema.js, 'module is not defined' no-undef) not part of this diff - not a regression from this fix, needs cleanup separately. run-gates.py again failed on Windows (same known WinError 2 issue, F4 from earlier), manually reproduced with SHA-256-bound logs. MCP validation N/A - backend webhook/session/config work only, no GraphQL/Polaris/theme touched, reasoning explicit. NEW FINDING (not fixed, not authorized): app-uninstalled.service.ts has the IDENTICAL unguarded deleteSessions([]) pattern BUG-2 fixed elsewhere - not triggered live yet, found by code reading, flagged for human fix-decision (see next audit entry). | QA RE-VERIFICATION (independent, not trusting developer self-report): BUG-1 and BUG-2 CONFIRMED GENUINELY FIXED via direct source read of all 4 webhook routes + shop-redact.service.ts AND cross-referenced live-evidence-v2 (200 replacing 500, zero-session-shop redaction completes with full 1->0 deletion across all 6 tenant tables). NEW P1 CONFIRMED TRUE by independent read: BUG-4 in app-uninstalled.service.ts - identical unguarded deleteSessions([]) pattern, CONFIRMED WORSE than BUG-2 because drain-worker.ts dispatches handleAppUninstalled WITHOUT the shared claim transaction shop-redact uses, so markShopUninstalled can commit independently before deleteSessions throws, leaving a half-committed state + a webhook_event row retrying forever. Gate remains BLOCKED - cannot PASS with an open P1 (QA rule 1), even though the two originally authorized bugs are verified closed. Also confirmed: lint failure genuinely unrelated to fix commit (decisions/ fully untracked in git status, file never committed). New P4s: F7 (CLI-validate claim not backed by a captured artifact), evidence artifacts don't self-embed commit SHA (tightened before G5). RECOMMENDED PATH: human authorizes BUG-4 fix (same length>0 guard pattern), developer fixes + produces live-evidence-v3 on app/uninstalled with a zero-session shop, QA re-verifies once more - then PASS_WITH_FLAGS is achievable (F3/F5/F7/lint-cleanup carried forward as disclosed non-blocking items). | BUG-4 FIXED, commits 942179845f889e13b1d6dd870875f2f07e79e866 (code) + 9123217b8052269409bcc1ec521eba75a491b78f (evidence). Same length>0 guard applied to app-uninstalled.service.ts. Developer additionally judged the transaction-wrapping concern QA raised (handleAppUninstalled not sharing the claim transaction) as small/safe and fixed it in-scope: shop.repository.ts markShopUninstalled now requires a transaction param, drain-worker.ts passes the shared savepoint transaction into handleAppUninstalled matching the existing shop/redact pattern. Live-verified (v3 evidence, self-embeds commit SHA + file content hashes this time per QA's F5 ask): zero-session shop, correctly-signed app/uninstalled webhook -> 200, drained on first attempt (attempts:0, last_error:null), shop.uninstalled_at set correctly, no infinite retry. Auth probes re-confirmed. Gates: typecheck/tests(77)/build clean, lint fails only on the same pre-existing out-of-scope migration file (unrelated). NEW FINDING (BUG-5, not fixed, not authorized): app/workers/sweeper.ts line 34 has the IDENTICAL unguarded deleteSessions() pattern in the 45-day safety-sweeper path - found while fixing BUG-4, flagged not fixed, awaiting human decision. This is now the 3rd occurrence of the same defect class across the compliance code paths - worth asking QA to do a comprehensive sweep for any other occurrences before another round-trip. | QA RE-VERIFICATION #3 (independent): BUG-4 CONFIRMED GENUINELY FIXED - guard + shared savepoint transaction plumbing traced end-to-end through drain-worker.ts/claimAndProcessOne by direct read, not description. BUG-5 (sweeper.ts:34) CONFIRMED TRUE and RECLASSIFIED P1 (not P3) - fires on the sweeper's NORMAL case (every shop reaching the 45-day sweeper already had sessions cleared by app/uninstalled, so deleteSessions([]) throws almost every time, not an edge case), and the throw is uncaught inside runSweeper's for-loop, aborting the rest of that sweep pass for every OTHER eligible shop too - directly defeats ADR-0008 R2's GDPR safety-net guarantee (the sweeper exists specifically to catch a lost/never-delivered shop/redact; as shipped it very likely crashes on its first eligible shop and never processes the backlog). FULL-CODEBASE SWEEP for this defect class CONFIRMED CLEAN except BUG-5: only 3 total deleteSessions() call sites exist in app/ (shop-redact guarded, app-uninstalled guarded, sweeper unguarded) - no BUG-6/7 surprises, other .destroy() calls confirmed N/A (scalar/range where-clauses, not array-IN construction). Gate remains BLOCKED on this single open P1. Path to clear: same length>0 guard for sweeper.ts:34 + live evidence proving both the immediate fix AND that the sweep loop continues correctly to a second eligible shop in the same pass (positively closing the blast-radius concern, not just the immediate crash). | BUG-5 FIXED, commit 8590c244a7db7f6b837bcfb8fd587491d75f9a17 (code) + evidence commit ccd040b. Same length>0 guard applied to sweeper.ts. Developer ALSO addressed the per-shop error-isolation concern QA raised (in-scope, judged small/safe): each shop's work in runSweeper's for-loop is now wrapped in its own try/catch, logging loudly and continuing to the next shop rather than aborting the whole sweep pass. Live-verified with BOTH scenarios QA required: two >45-day-stale zero-session shops seeded in the same pass - both hard-deleted successfully, both got distinct completed compliance_audit_log rows, zero crashes, proving both the immediate fix AND that one shop's processing no longer kills another's in the same sweep. Grep-confirmed all 3 deleteSessions() call sites (shop-redact/app-uninstalled/sweeper) now carry the identical guard - full defect-class sweep closed, no 4th variant introduced. Gates: typecheck/tests(77)/build clean, lint still confined to the same pre-existing unrelated migration file. This closes the BUG-1/2/4/5 chain discovered across 3 rounds of live-evidence QA re-verification. Awaiting final QA re-verification pass before this gate can move to PASS_WITH_FLAGS and be presented to the human for a G4-sprint-1.1 decision. | FINAL QA VERDICT: PASS WITH FLAGS. BUG-5 confirmed genuinely fixed (guard + per-shop try/catch isolation both verified by direct read; live-evidence-v4 shows 2 distinct completed compliance_audit_log rows ~70ms apart proving cross-shop isolation with DB-level evidence). BUG-1/2/4/5 ALL VERIFIED_FIXED across 4 independent QA re-verification rounds - zero open P1/P2 remain. Carried-forward disclosed non-blockers: F3 (.env secret still not rotated - P3, escalated a 2nd time, must not silently persist past G5), F5 (no CI workflow, all evidence developer-self-produced - P4, MUST be resolved before G5 milestone QA which requires CI/authorized-executor artifacts, not self-produced evidence), F7 (CLI-validate claim never captured as an artifact - P4), lint failure on decisions/migrations file (P4, confirmed unrelated across 3 consecutive rounds). AWAITING human final CONFIRM decision on G4-sprint-1.1. | CORRECTION: orchestrator had prematurely advanced current_gate to a nonexistent 'G4-sprint-1.2' without this gate ever being formally closed - reverted. This gate's scope now also covers the ADR-0009/0010 redesign implementation (commits 6fabae8/2af7a66), which is additional M1-Foundation-scope work, not a new sprint. Still open pending: (1) human live verification of RV-2/RV-7/RV-8 against the real Vercel deployment, (2) a decision on whether to run a fresh QA re-verification pass on the redesign before final CONFIRM, (3) the original PASS_WITH_FLAGS carry-forwards (F3/F5/F7/lint) still apply. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T13:49:58Z (inferred from explicit instruction to start M2/M3 build, which requires this gate closed first - orchestrator flagged this interpretation to the human rather than silently assuming). M1 Foundation + ADR-0009/0010 serverless redesign both verified PASS_WITH_FLAGS by independent QA, zero open P1/P2. Carried-forward non-blockers: F3 (.env/Neon secret hygiene), F5 (CI now exists as of this session, partially resolved), F7 (CLI-validate artifact), RV-2/RV-7/RV-8 (still need live Vercel verification - not blocking further development, but must happen before this app touches real merchant data).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T13:49:58Z",
+      "decision": "CONFIRM"
     },
     {
       "id": "G1.5-revision",
       "type": "architecture-review",
       "scope": "hosting-serverless-redesign",
-      "status": "open",
+      "status": "passed",
       "opened_at": "2026-09-18T11:31:38Z",
       "sla_hours": 48,
       "expires_at": "2026-09-20T11:31:38Z",
       "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
-      "notes": "Reopens the original G1.5 (passed, hosting=long-running-always-on-Node, ADR-0001) per explicit human decision to stay on Vercel serverless hosting instead, after the app was already deployed there externally and hit a blank-screen failure diagnosed by the developer as (a) no Vercel adapter wired + (b) the deeper, harder problem: the GDPR compliance mechanism (drain-worker.ts + sweeper.ts, both in-process setInterval timers, fixed across BUG-1/2/4/5 in G4-sprint-1.1) fundamentally cannot survive Vercel's per-invocation execution model. This gate must produce a real redesign (e.g. Vercel Cron Functions or an external queue replacing the in-process timers), not just a render/deploy config fix - a working render with a non-functioning compliance mechanism is not an acceptable outcome given how much verification work already went into BUG-1/2/4/5. ADR-0001 itself priced this class of rework at +10-25hr when it rejected serverless originally. | PM RFC-001 delivered (rfcs/RFC-001-hosting-reversal-vercel-serverless.md). RE-ESTIMATE: +40-85hr (planning figure ~60hr), confidence LOW, RENEGOTIATE required per ADR-0001's own Enforcement section ('a change of hosting class is an RFC -> ADR supersession, and if effort moves, a G1 RENEGOTIATE'). Key framing: B+C2 (14-30hr) closely matches ADR-0001's original +10-25hr estimate for this class of rework - the redesign itself isn't more expensive than predicted. The other 26-48hr (re-verifying BUG-1/2/4/5 live with the same rigor, migration mechanism rebaseline, extra QA round-trips) exists SOLELY because the reversal came after implementation + 4 rounds of live QA rather than at design time - timing cost, not redesign cost. Against the 225-390hr G1 baseline: 10-38% increase, lands entirely on M1. Submission-readiness moves out ~1-2 weeks (2 devs) / ~2-3 weeks (1 dev). Recommended: two-step RENEGOTIATE - provisional now at 40-85hr LOW, refine once cron cadence + pooler behavior are confirmed facts at G1.5-revision close. PM explicitly recommends NOT voiding G4-sprint-1.1's PASS_WITH_FLAGS verdict - its live evidence is execution-model-bound and doesn't transfer to serverless, but the defect-fixing work itself was legitimate and shouldn't be discarded; carry forward an explicit re-verification obligation instead. F3 (.env secret rotation) reclassified MORE urgent given a live public deployment URL now exists. Flagged verify-at-build: whether Vercel's free/Hobby tier terms permit this commercial (agency-built, App-Store-distributed) use case even though the app itself is free to merchants. | ARCHITECT DESIGN DELIVERED (PROPOSED, not approved): 2-tier mechanism - fast tier is an optimization (webhook route adds waitUntil-based post-response drain, explicitly allowed to fail), slow tier is the actual guarantee (single Vercel Cron Function /api/cron/tick: drain -> sweep -> prune -> heartbeat, budget-bounded/resumable, portable Hobby-to-Pro without redesign). Key reframe: the old 5-second drain interval was never a real SLA - every real deadline is 30-45 days, so cron granularity is architecturally irrelevant, guaranteed eventual execution is the actual constraint. Rejected alternatives with reasons: synchronous-in-route (re-couples correctness to latency, shop/redact is a guaranteed cold start ~48h post-uninstall), external queue/QStash (4th dependency, can't trigger the time-based sweeper anyway), GitHub Actions cron (auto-disables after ~60 days repo inactivity - compliance guarantee would silently switch off). Sweeper: runSweeper() body UNCHANGED including BUG-5's per-shop try/catch, now LIMIT+budget bounded. NEW COSTS introduced: (1) cron route is a 5th route-auth class (internal shared-secret, constant-time compare, fails closed if unset - getting this wrong = publicly-triggerable GDPR hard-delete); (2) cron is a silent single point of failure - new job_heartbeat table + /healthz cronStale boolean as dead-man's switch, ADR-0002's 15-min alert re-tuned to max(2x cron interval, 30min) - a real, stated regression in operational responsiveness. RE-VERIFICATION: deletion/transaction logic + BUG-1/2/4/5 fixes themselves carry over unchanged (this ADR changes the caller not the callee). 8 items MUST be re-proven live, not by source review alone: RV-2 (waitUntil actually runs post-response - cannot be proven locally), RV-3 (fast-tier-disabled -> cron collects the orphan, the actual guarantee), RV-6 (SKIP LOCKED concurrency, routine now not theoretical), RV-7 (pooler behavior, HIGHEST-RISK UNKNOWN), RV-8 (cold-start ack p95 vs 1s/5s budget - if this fails, it's an RFC back to PM, not a design workaround). G-SCHEMA DELTA REQUIRED: new job_heartbeat table, deliberately no shop_id, must be added to FT-02c non-tenant exemption + FT-08 enumeration exclusion lists. COST HONESTY: pooled Postgres + cron + billed waitUntil lands in the SAME monthly cost band as ADR-0001's always-on instance - no cost savings should be assumed. Verify-at-build flagged (human commercial question, not architectural): Vercel Hobby tier is documented as non-commercial use only - a public App Store listing plausibly falls outside it, separate from the earlier-flagged ToS concern. 7 new fitness tests (FT-21-27) + 3 alerts, G5-gated. ADRs: decisions/ADR-0009-serverless-webhook-processing.md (supersedes parts of ADR-0001/0002/0008, their original reasoning on ack-fast-then-async-process pattern itself remains valid) + decisions/ADR-0010-serverless-postgres-connection-strategy.md (companion, REQUIRED not optional - pooler mode correctness underpins the SKIP LOCKED + nested SAVEPOINT plumbing BUG-4 added).",
-      "escalation_log": []
+      "notes": "Reopens the original G1.5 (passed, hosting=long-running-always-on-Node, ADR-0001) per explicit human decision to stay on Vercel serverless hosting instead, after the app was already deployed there externally and hit a blank-screen failure diagnosed by the developer as (a) no Vercel adapter wired + (b) the deeper, harder problem: the GDPR compliance mechanism (drain-worker.ts + sweeper.ts, both in-process setInterval timers, fixed across BUG-1/2/4/5 in G4-sprint-1.1) fundamentally cannot survive Vercel's per-invocation execution model. This gate must produce a real redesign (e.g. Vercel Cron Functions or an external queue replacing the in-process timers), not just a render/deploy config fix - a working render with a non-functioning compliance mechanism is not an acceptable outcome given how much verification work already went into BUG-1/2/4/5. ADR-0001 itself priced this class of rework at +10-25hr when it rejected serverless originally. | PM RFC-001 delivered (rfcs/RFC-001-hosting-reversal-vercel-serverless.md). RE-ESTIMATE: +40-85hr (planning figure ~60hr), confidence LOW, RENEGOTIATE required per ADR-0001's own Enforcement section ('a change of hosting class is an RFC -> ADR supersession, and if effort moves, a G1 RENEGOTIATE'). Key framing: B+C2 (14-30hr) closely matches ADR-0001's original +10-25hr estimate for this class of rework - the redesign itself isn't more expensive than predicted. The other 26-48hr (re-verifying BUG-1/2/4/5 live with the same rigor, migration mechanism rebaseline, extra QA round-trips) exists SOLELY because the reversal came after implementation + 4 rounds of live QA rather than at design time - timing cost, not redesign cost. Against the 225-390hr G1 baseline: 10-38% increase, lands entirely on M1. Submission-readiness moves out ~1-2 weeks (2 devs) / ~2-3 weeks (1 dev). Recommended: two-step RENEGOTIATE - provisional now at 40-85hr LOW, refine once cron cadence + pooler behavior are confirmed facts at G1.5-revision close. PM explicitly recommends NOT voiding G4-sprint-1.1's PASS_WITH_FLAGS verdict - its live evidence is execution-model-bound and doesn't transfer to serverless, but the defect-fixing work itself was legitimate and shouldn't be discarded; carry forward an explicit re-verification obligation instead. F3 (.env secret rotation) reclassified MORE urgent given a live public deployment URL now exists. Flagged verify-at-build: whether Vercel's free/Hobby tier terms permit this commercial (agency-built, App-Store-distributed) use case even though the app itself is free to merchants. | ARCHITECT DESIGN DELIVERED (PROPOSED, not approved): 2-tier mechanism - fast tier is an optimization (webhook route adds waitUntil-based post-response drain, explicitly allowed to fail), slow tier is the actual guarantee (single Vercel Cron Function /api/cron/tick: drain -> sweep -> prune -> heartbeat, budget-bounded/resumable, portable Hobby-to-Pro without redesign). Key reframe: the old 5-second drain interval was never a real SLA - every real deadline is 30-45 days, so cron granularity is architecturally irrelevant, guaranteed eventual execution is the actual constraint. Rejected alternatives with reasons: synchronous-in-route (re-couples correctness to latency, shop/redact is a guaranteed cold start ~48h post-uninstall), external queue/QStash (4th dependency, can't trigger the time-based sweeper anyway), GitHub Actions cron (auto-disables after ~60 days repo inactivity - compliance guarantee would silently switch off). Sweeper: runSweeper() body UNCHANGED including BUG-5's per-shop try/catch, now LIMIT+budget bounded. NEW COSTS introduced: (1) cron route is a 5th route-auth class (internal shared-secret, constant-time compare, fails closed if unset - getting this wrong = publicly-triggerable GDPR hard-delete); (2) cron is a silent single point of failure - new job_heartbeat table + /healthz cronStale boolean as dead-man's switch, ADR-0002's 15-min alert re-tuned to max(2x cron interval, 30min) - a real, stated regression in operational responsiveness. RE-VERIFICATION: deletion/transaction logic + BUG-1/2/4/5 fixes themselves carry over unchanged (this ADR changes the caller not the callee). 8 items MUST be re-proven live, not by source review alone: RV-2 (waitUntil actually runs post-response - cannot be proven locally), RV-3 (fast-tier-disabled -> cron collects the orphan, the actual guarantee), RV-6 (SKIP LOCKED concurrency, routine now not theoretical), RV-7 (pooler behavior, HIGHEST-RISK UNKNOWN), RV-8 (cold-start ack p95 vs 1s/5s budget - if this fails, it's an RFC back to PM, not a design workaround). G-SCHEMA DELTA REQUIRED: new job_heartbeat table, deliberately no shop_id, must be added to FT-02c non-tenant exemption + FT-08 enumeration exclusion lists. COST HONESTY: pooled Postgres + cron + billed waitUntil lands in the SAME monthly cost band as ADR-0001's always-on instance - no cost savings should be assumed. Verify-at-build flagged (human commercial question, not architectural): Vercel Hobby tier is documented as non-commercial use only - a public App Store listing plausibly falls outside it, separate from the earlier-flagged ToS concern. 7 new fitness tests (FT-21-27) + 3 alerts, G5-gated. ADRs: decisions/ADR-0009-serverless-webhook-processing.md (supersedes parts of ADR-0001/0002/0008, their original reasoning on ack-fast-then-async-process pattern itself remains valid) + decisions/ADR-0010-serverless-postgres-connection-strategy.md (companion, REQUIRED not optional - pooler mode correctness underpins the SKIP LOCKED + nested SAVEPOINT plumbing BUG-4 added). | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T12:56:48Z. Serverless redesign (ADR-0009/0010) accepted as new architecture baseline. Combined decision per how the gate was presented: also accepts the +40-85hr G1 RENEGOTIATE (planning figure ~60hr). ADR-0001/0002/0008 status lines updated to ACCEPTED-then-partially-superseded; ADR-0009/0010 updated to ACCEPTED. Implementation authorized next: 2-tier drain (waitUntil fast path + single Vercel Cron slow path), sweeper on same cron tick (body unchanged incl. BUG-5 fix), cron shared-secret auth (5th route-auth class, fails closed), job_heartbeat table + healthz cronStale field, ADR-0002 alert threshold re-tuned. Small G-Schema delta (job_heartbeat table, no shop_id by design) to be applied as part of implementation, added to FT-02c/FT-08 exemption lists.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T12:56:48Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G4-sprint-2.1",
+      "type": "sprint-qa",
+      "scope": "M2-Configuration+M3-Engine",
+      "status": "passed",
+      "opened_at": "2026-09-18T13:49:58Z",
+      "sla_hours": 24,
+      "approver": "QA lead (role \u2014 project stakeholder in the interim)",
+      "notes": "M2 Configuration + M3 Engine build starting, using PLACEHOLDER default expense rates (OQ-4 not yet answered by a real business decision - human explicitly chose placeholders over waiting). Scope: make the calculator input screen live (currently a disabled structural placeholder), wire expense_rule CRUD per shop, implement the deterministic calculation engine (percentage/fixed/formula rule types per decisions/data-model.md), wire the Calculate button and results display against the already-G2-approved results.html design. Placeholder rates must be clearly labeled as illustrative, not real business defaults, in the UI - do not let them look authoritative. | QA VERDICT: PASS WITH FLAGS, zero open P1/P2. Independently hand-reconstructed the largest-remainder reconciliation for the revenue=5,000,007 adversarial case from raw rule values - matched the live-evidence log exactly (total 2,761,004; naive 2,728,503; formula 32,500; tie winners marketing+taxes), strong confirmation the evidence is real not fabricated. Confirmed placeholder-rate warning banners present in actual UI code (not just claimed), the 2-formula set has no evaluator, ADR-0004 table-primary/chart-supplementary ordering confirmed correct in code. Shop-install fix confirmed: DataTypes.NOW matches migration's DB-side NOW() exactly, live evidence genuinely exercises the real upsertInstalledShop() function (no SQL workaround this time), broader-sweep claim spot-checked line-by-line and confirmed accurate. 3 findings logged: P3 db/config/config.cjs eager env-block evaluation (QA's own independent assessment: REAL bug, not a non-issue, will keep recurring for any environment without DIRECT_DATABASE_URL set, recommend human fix-decision to convert to lazy per-environment evaluation); P3 no axe-core automated a11y evidence run yet against live calculator/results pages despite ADR-0004's own FT-19a enforcement requiring it - recommend closing before G5; P4 app.results.tsx ruleAppliedText() bypasses shared presentation.ts formatting helpers, cosmetic only, fixed-amount display missing currency symbol. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T15:12:23Z. M2+M3+shop-install fix accepted; P3/P3/P4 findings carried forward (config.cjs eager eval, axe-core a11y run before G5, ruleAppliedText formatting).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T15:12:23Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G4-sprint-3.1",
+      "type": "sprint-qa",
+      "scope": "M4-Save+History",
+      "status": "open",
+      "sla_hours": 24,
+      "approver": "QA lead (role - stakeholder in the interim)",
+      "notes": "Upcoming: M4 Save + History (calculation snapshot persistence, history list/detail, engine_version on saved rows, append-only). NOT started - pending human go-ahead. Carry-forward before G5: axe-core a11y run (FT-19a), config.cjs lazy-eval fix decision, RV-2/RV-7/RV-8 live Vercel verification, real OQ-4 rates. | OPENED 2026-09-18T15:13:37Z on human instruction 'start M4'. Note: human has not yet confirmed M2/M3 works on the live Vercel deploy nor that the job_heartbeat migration was run on Neon - not a blocker for building, but live verification still owed.",
+      "opened_at": "2026-09-18T15:13:37Z"
     }
   ],
   "budget": {
     "token_used": 0,
     "token_cap": 0,
     "hours_burned": 0,
-    "hours_budget": 0
+    "hours_budget": 360
   },
   "audit_log": [
     {
@@ -937,6 +967,367 @@
       },
       "project_version_before": 29,
       "project_version_after": 30
+    },
+    {
+      "timestamp": "2026-09-18T11:52:52Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "vercel_production_crash_diagnosed",
+      "details": {
+        "status": "DIAGNOSIS ONLY - not a code fix, no commit made, root cause is infrastructure/credentials",
+        "confirmed_via_code_trace": "app's own React ErrorBoundary is rendering (not a platform crash page), meaning module import succeeded - env vars are likely PRESENT but non-functional, not missing. Most likely: DATABASE_URL set to an unreachable value (human's local .env literally has localhost:5432, which cannot be reached from Vercel). Secondary co-equal hypothesis: wrong/mismatched SHOPIFY_API_SECRET for the released app version.",
+        "separately_flagged_not_todays_cause": "app/entry.server.tsx still unconditionally calls startBackgroundWorkers() (setInterval-based) - architecturally wrong for serverless, ADR-0009/0010 already designed to replace it but still PROPOSED, not implemented. Compliance webhooks will ack 200 but not reliably process on Vercel until that lands - independent risk from today's crash.",
+        "human_action_required": [
+          "Provision a real reachable Postgres (Neon/Supabase/Railway all named with tradeoffs)",
+          "Set env vars in Vercel dashboard: SHOPIFY_API_KEY, SHOPIFY_API_SECRET, SHOPIFY_APP_URL, SCOPES=empty, DATABASE_URL (real, not localhost), NODE_ENV=production",
+          "Run npm run db:migrate against the new real database from a machine that can reach it",
+          "Redeploy on Vercel so new env vars take effect",
+          "Check Vercel function logs (root.tsx ErrorBoundary console.error's server-side) if still broken, for a definitive stack trace"
+        ]
+      },
+      "project_version_before": 30,
+      "project_version_after": 31
+    },
+    {
+      "timestamp": "2026-09-18T12:42:29Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "production_database_provisioned_and_migrated",
+      "details": {
+        "provider": "Neon (cloud Postgres, free tier)",
+        "migration_result": "20260918120000-initial-schema migrated successfully (7.467s) against the real Neon database, run manually by the human from their own machine using --env production",
+        "security_note": "The Neon connection password was pasted into the chat transcript multiple times (4 occurrences across two different passwords) despite repeated requests not to. First password was rotated once after being flagged; the human was advised to rotate the current (also-exposed) password again after confirming the app works, and to stop pasting connection strings into chat going forward. Orchestrator declined at every step to run any command using the pasted credential itself, per this project's 'credentials never handled directly by AI' rule.",
+        "next_steps": "Set the POOLED Neon connection string as DATABASE_URL in Vercel's environment variables (distinct from the UNPOOLED one just used for migration), redeploy on Vercel, reload the app in Shopify Admin to verify"
+      },
+      "project_version_before": 31,
+      "project_version_after": 32
+    },
+    {
+      "timestamp": "2026-09-18T12:49:38Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "vercel_ssl_root_cause_confirmed",
+      "details": {
+        "status": "ROOT CAUSE CONFIRMED via library source inspection, not guessed",
+        "root_cause": "@shopify/shopify-app-session-storage-postgresql's PostgreSQLSessionStorage builds its own pg.Pool from manually destructured DATABASE_URL fields (host/user/password/database/port) and NEVER reads the URL's query string - so ?sslmode=require in DATABASE_URL is silently ignored. The library has no ssl/dialectOptions parameter in its public API. pg's own fallback then checks PGSSLMODE env var, which is unset anywhere in this repo, defaulting to ssl:false - a plaintext connection attempt against Neon, which requires SSL and rejects it. This pool is constructed eagerly at module load and awaited on every authenticate.admin() call, explaining why the error is identical and universal, not intermittent.",
+        "immediate_fix_no_code_change": "Set PGSSLMODE=no-verify in Vercel environment variables (Production + Preview), redeploy. Uses pg's own env-var SSL fallback, matches the rejectUnauthorized:false posture already proven working in db/config/config.cjs's production block.",
+        "durable_fix_proposed_not_committed": "app/shopify.server.ts - set process.env.PGSSLMODE='no-verify' in code (guarded by NODE_ENV===production, same pattern already used elsewhere) before constructing PostgreSQLSessionStorage, so this doesn't depend on a dashboard-only env var a future environment could forget to set. Awaiting human approval to commit.",
+        "ruled_out": [
+          "NODE_ENV vs VERCEL_ENV confusion in app/db/sequelize.ts - checked, correct as written, not the cause of this specific symptom since that pool isn't touched by authenticate.admin()",
+          "PgBouncer/transaction-pooling breaking prepared statements - ruled out, session-storage library uses unnamed one-shot queries, and SSL handshake fails before migrator DDL would even run"
+        ]
+      },
+      "project_version_before": 32,
+      "project_version_after": 33
+    },
+    {
+      "timestamp": "2026-09-18T12:54:53Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "vercel_deployment_render_confirmed_working",
+      "details": {
+        "fix_applied": "PGSSLMODE=no-verify set in Vercel environment variables (dashboard-only fix, durable code fix still NOT applied/approved)",
+        "confirmation": "App now loads correctly embedded in Shopify Admin (admin.shopify.com/store/wds55/apps/expense-calculator/app/calculator), showing the M1 Foundation static scaffold screen as designed (revenue field disabled/placeholder, 10 expense categories listed, Calculate button disabled with 'M3 scope' note)",
+        "IMPORTANT_UNRESOLVED": "This fixes RENDERING only. The GDPR webhook compliance mechanism (drain-worker.ts/sweeper.ts) is STILL running the old in-process setInterval design on this Vercel deployment - confirmed still unconditionally started in app/entry.server.tsx. The G1.5-revision gate (serverless redesign per ADR-0009/0010) was presented to the human but NEVER DECIDED (CONFIRM/REJECT/REVISE/RENEGOTIATE) - work got diverted into fixing the white-screen/SSL rendering issue instead. Compliance webhooks on this live Vercel deployment will currently ack 200 and NOT reliably process. G1 RENEGOTIATE (+40-85hr estimate) also never formally decided. G4-sprint-1.1 final CONFIRM also never given despite PASS_WITH_FLAGS verdict sitting since v22."
+      },
+      "project_version_before": 33,
+      "project_version_after": 34
+    },
+    {
+      "timestamp": "2026-09-18T12:56:48Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G1.5-revision",
+        "decision": "CONFIRM",
+        "scope": "Accepts serverless redesign (ADR-0009/0010) AND the required +40-85hr G1 RENEGOTIATE as one combined decision",
+        "adr_status_updates": [
+          "ADR-0001: ACCEPTED then partially superseded",
+          "ADR-0002: ACCEPTED then partially superseded",
+          "ADR-0008: ACCEPTED then partially superseded",
+          "ADR-0009: ACCEPTED",
+          "ADR-0010: ACCEPTED"
+        ]
+      },
+      "project_version_before": 34,
+      "project_version_after": 35
+    },
+    {
+      "timestamp": "2026-09-18T13:31:23Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "adr_0009_0010_implemented",
+      "details": {
+        "commit_code": "6fabae8",
+        "commit_evidence": "2af7a66",
+        "built": [
+          "Fast tier: scheduleAfterResponse (waitUntil wrapper) + drainUpTo, one line added to each of 4 webhook routes",
+          "Slow tier: app/routes/api.cron.tick.tsx - drain -> sweep -> prune -> heartbeat, budgeted+resumable",
+          "Cron auth: SHA-256+timingSafeEqual Bearer CRON_SECRET, fails closed 401 zero-DB-work if unset (verified live)",
+          "Sweeper bounded with limit/budgetMs, BUG-5 per-shop try/catch untouched",
+          "job_heartbeat table/model/repo (no shop_id), healthz returns cronStale boolean",
+          "bootstrap.server.ts DELETED (not flagged) per ADR-0009 explicit instruction; drainOnce/drainBacklog kept for cheap reversal",
+          "G-Schema delta: data-model.md SS4.7, fitness-test-plan.md FT-02c/FT-08 exemption lists updated (FT-21-27 full transcription NOT done, flagged as optional follow-up)",
+          "ADR-0010: pool.max 10->1, DIRECT_DATABASE_URL preferred for migrations, verified against installed pg/sequelize source re: prepared statements",
+          "vercel.json cron schedule added"
+        ],
+        "new_defects_found_and_fixed_inline": "2 deadlocks found via live pool.max:1 testing (customers-redact/customers-data-request, and shop-redact's findShopContextByDomain each opened a 2nd DB connection while the outer transaction held the pool's only one) - fixed by threading the transaction through, matching existing handleShopRedact/handleAppUninstalled pattern. Judged as a DIRECT CONSEQUENCE of implementing the commanded ADR-0010 change (not an unrelated pre-existing bug requiring separate authorization) - disclosed prominently in commit message and evidence, not silently fixed.",
+        "locally_verified_live": [
+          "cron-auth 401+zero-DB-writes",
+          "orphan-row + two-shop sweep via real tick",
+          "healthz cronStale fresh/stale/never-ran",
+          "concurrency: 2 simultaneous real HTTP cron ticks, no double-processing",
+          "resumability across 2 budget-capped ticks",
+          "fast-tier-off fallback: signed webhook -> DB updated 18ms, no cron involved"
+        ],
+        "needs_human_live_verification_on_real_vercel": {
+          "RV-2": "does waitUntil() genuinely keep a frozen/reclaimed Vercel instance alive post-response - trigger real webhook via dev store, compare response timestamp to DB processed_at, check Vercel function logs",
+          "RV-7_highest_risk": "connection behavior under the REAL Neon pooler - confirm DATABASE_URL is pooled endpoint, DIRECT_DATABASE_URL is unpooled, confirm SKIP LOCKED + nested SAVEPOINT hold under real concurrent Vercel invocations (only locally single-Postgres tested)",
+          "RV-8": "cold-start webhook ack p95 latency vs Shopify's 1s/5s budget - not measurable in sandbox",
+          "other": "exact Authorization header Vercel Cron sends (wired defensively both loader/action), Hobby vs Pro cron interval/quota (daily default), function region vs Neon us-east-1 region (not baked into vercel.json), Vercel Hobby non-commercial-use terms vs public app listing (human/commercial question)"
+        }
+      },
+      "project_version_before": 35,
+      "project_version_after": 36
+    },
+    {
+      "timestamp": "2026-09-18T13:34:26Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_bookkeeping_correction",
+      "details": {
+        "error": "current_gate was advanced to 'G4-sprint-1.2' (no such gate record exists) without G4-sprint-1.1 ever being formally CONFIRMed",
+        "fix": "current_gate reverted to G4-sprint-1.1 (still open), stage reverted to sprint-qa"
+      },
+      "project_version_before": 36,
+      "project_version_after": 37
+    },
+    {
+      "timestamp": "2026-09-18T13:41:26Z",
+      "actor": "pm",
+      "actor_type": "agent",
+      "action": "f6_resolved_rfc_002",
+      "details": {
+        "determination": "F6's premise was wrong - a delivery transport is only needed if there's a payload to transport, and there isn't one. App has scopes=[], zero Admin GraphQL calls (grep-confirmed), and every table/column enumerated against migrations+models has no customer_id/email/phone/name/address/order-derived column anywhere. Current ack-and-record no-op behavior is ALREADY correct and compliant. Resolution: documentation-only, no code change, no estimate movement, G-PCD stays skipped.",
+        "real_nuance_found": "webhook_event.payload (JSONB) stores the VERBATIM webhook body for all 4 topics, including customers/* bodies which DO contain real customer.id/email/phone/orders_requested from Shopify's own payload. Real PII physically in the DB, though never read (drain-worker doesn't pass payload to the handler) and cascade-deleted on shop/redact + 30-day retention-pruned. Named explicitly rather than glossed over - a G-Review inspector grepping the DB could find this and conclude the RFC overclaimed if not addressed.",
+        "followups_recommended_not_blocking": [
+          "~0.5hr P3: fix compliance_audit_log outcome for customers-data-request - currently records 'completed' claiming a report was compiled/delivered when none was; also update stale KNOWN GAP code comment to point at RFC-002",
+          "~1-2hr P3: store a redacted placeholder instead of raw webhook body for customers/* topics + add a test asserting no customer key persisted"
+        ],
+        "rfc_ref": "rfcs/RFC-002-customers-data-request-no-exportable-data.md",
+        "g_review_checklist": "RFC section 9 gives 5 checkable facts for Tech lead to confirm at G-Review rather than prose to accept on trust"
+      },
+      "project_version_before": 37,
+      "project_version_after": 38
+    },
+    {
+      "timestamp": "2026-09-18T13:42:12Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "adr_0009_0010_qa_verdict",
+      "details": {
+        "scope": "ADR-0009/ADR-0010 implementation re-verification (G1.5-revision)",
+        "commits_reviewed": [
+          "6fabae8",
+          "2af7a66"
+        ],
+        "verdict": "PASS_WITH_FLAGS",
+        "p1_p2_open": 0,
+        "key_checks_independently_confirmed": [
+          "cron-auth: constant-time SHA-256+timingSafeEqual, fails closed with zero DB work if CRON_SECRET unset - verified in code + live 401 probes with byte-identical row counts before/after",
+          "bootstrap.server.ts genuinely deleted, no in-process setInterval anywhere in app/ - backed by a permanent regression test",
+          "2 deadlock fixes traced through FULL call graph, not partial - every call site inside the claim-transaction now threads the transaction correctly, the one untransacted call site (webhook-inbox.service.ts) is correctly untransacted (runs pre-claim)",
+          "job_heartbeat schema + exemption lists match claims exactly",
+          "sweeper budget-check sits BEFORE the per-shop try/catch, cannot interrupt a shop mid-transaction - BUG-5 isolation preserved",
+          "cross-verified live evidence against independent sources: cascade-delete FK confirmed in migration file directly, waitUntil no-op-off-Vercel behavior confirmed by reading actual @vercel/functions package source (not just trusting a code comment)",
+          "independently agrees RV-2/RV-7/RV-8 cannot be proven from the repo alone, checked for and found no additional session-scoped Postgres features that would compound RV-7 risk"
+        ],
+        "flags_carried_forward": [
+          "evidence provenance still developer-self-produced (not CI) - sufficient for this pre-G5 checkpoint per established precedent, NOT sufficient for G5 sign-off",
+          "FT-23-27 declared in ADR-0009 but not yet permanent automated tests - ADR itself scopes this to G5, not a violation now",
+          "customers/data_request delivery transport - QA flagged this as still-open from reading the code's KNOWN GAP comment, RECONCILED: PM's RFC-002 (recorded separately this session) determined no transport is actually needed since the app holds no exportable customer data - documentation-only resolution, the code comment is now stale and should be updated to reference RFC-002 rather than describing live open work (folded into RFC-002's existing follow-up recommendation)",
+          "pre-existing unrelated lint failure on decisions/migrations/00000000000001-initial-schema.js, confirmed genuinely untouched by this diff",
+          "run-gates.py still fails on Windows (F4), gates manually reproduced with equivalent SHA-256-bound contract"
+        ]
+      },
+      "project_version_before": 38,
+      "project_version_after": 39
+    },
+    {
+      "timestamp": "2026-09-18T13:42:28Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "ci_workflow_and_fitness_test_transcription_done",
+      "details": {
+        "f5_resolved": "Created .github/workflows/app-ci.yml - runs the exact 4 gate commands (lint/typecheck/test/build) on push/PR, Node 22. Commit dce803f. Local pre-check: typecheck/test(95)/build clean.",
+        "lint_finding": "CI's first real run would catch a genuine (not phantom) bug: decisions/migrations/00000000000001-initial-schema.js (a draft G-Schema review artifact explicitly headed DO NOT RUN, superseded by the real db/migrations/*.cjs files) is not excluded in eslint.config.js's ignores list, unlike the real db/migrations/** which is. Fix not applied - awaiting human authorization (add to eslint ignores, or delete/archive the superseded draft file).",
+        "fitness_test_plan_completed": "FT-21 through FT-27 transcribed from ADR-0009 SS9 into decisions/fitness-test-plan.md in established format, all gated G5/M1. Also updated SS3 production alerts (added cronStale dead-man's-switch alert, retuned webhook_event threshold, dropped superseded single-instance-restart alert) and SS5 M1 rollout row for consistency. Commit 54d2fe3."
+      },
+      "project_version_before": 39,
+      "project_version_after": 40
+    },
+    {
+      "timestamp": "2026-09-18T13:46:09Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "lint_cleanup_done",
+      "details": {
+        "commit_sha": "bd29c4b90e1d2792db9351c8171767bdf31049ef",
+        "action_taken": "Deleted decisions/migrations/00000000000001-initial-schema.js (superseded draft, DO NOT RUN artifact, fully duplicated by db/migrations/20260918120000-initial-schema.cjs); preserved in git history at commit d9d7503",
+        "reasoning": "Distinguished from permanent documentation artifacts (ADRs/RFCs/data-model.md) kept in decisions/ - this was literal draft executable code, one-time review deliverable, now fully superseded",
+        "result": "npm run lint now fully clean (0 errors, 0 warnings), typecheck clean, tests 95/95 pass, build succeeds"
+      },
+      "project_version_before": 40,
+      "project_version_after": 41
+    },
+    {
+      "timestamp": "2026-09-18T13:49:58Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G4-sprint-1.1",
+        "decision": "CONFIRM",
+        "inferred_from": "explicit instruction to start M2/M3 build"
+      },
+      "project_version_before": 41,
+      "project_version_after": 42
+    },
+    {
+      "timestamp": "2026-09-18T13:49:58Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "sprint_opened",
+      "details": {
+        "gate": "G4-sprint-2.1",
+        "scope": "M2-Configuration+M3-Engine",
+        "rates": "placeholder, OQ-4 still unanswered"
+      },
+      "project_version_before": 41,
+      "project_version_after": 42
+    },
+    {
+      "timestamp": "2026-09-18T14:32:39Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g4-sprint-2.1-m2-m3/DEVELOPER-HANDOFF.md",
+        "commit": "58050e1a4d9b17b617122cf34606eb4e32b99a0c",
+        "result": "EXIT 0 - HANDOFF OK, independently re-run, not taken on developer's word"
+      },
+      "project_version_before": 42,
+      "project_version_after": 42
+    },
+    {
+      "timestamp": "2026-09-18T14:32:39Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "m2_m3_delivered",
+      "details": {
+        "commit_code": "58050e1a4d9b17b617122cf34606eb4e32b99a0c",
+        "commit_evidence": "967c3a19dc9211bf34ac9d64b19359dd5d2e1eba",
+        "built": "expense_rule CRUD + validation + 2 predefined formula patterns (M2); pure BigInt calculation engine with half-away-from-zero + largest-remainder reconciliation so sum(lineItems)===total exactly, asserted at runtime (M3); calculator.tsx and results.tsx wired live against G2-approved mockups; donut chart geometry as pure tested function; stateless calc-transport for unsaved preview since M4 persistence is out of scope",
+        "placeholder_rates": "reused the same figures already G2-approved in design/mockup/calculator.html rather than inventing new ones, visibly labeled as illustrative/non-authoritative via banners on both screens",
+        "money_rounding_verified_live": "Neon Postgres, revenue=5,000,007 minor units chosen to not divide evenly, engine total exactly matches sum(lineItems), remainder allocation hand-traced and confirmed doing real work (naive per-category rounding would be 1 unit short)",
+        "tests": "160 vitest tests (up from 76), including determinism test, 200-trial randomized reconciliation property test, explicit tie-break test",
+        "mcp_evidence": "dev-evidence/g4-sprint-2.1-m2-m3/mcp-validation-evidence.json - independently re-checked by orchestrator via check-dev-handoff.py, exit 0",
+        "mcp_caught_2_real_defects_fixed_before_final": "hand-rolled <ui-save-bar> element doesn't exist in real Polaris/App Bridge types (switched to data-save-bar form attribute), s-button has no name/value prop (switched Calculate to type=button + hidden intent field + form.requestSubmit())"
+      },
+      "project_version_before": 42,
+      "project_version_after": 43
+    },
+    {
+      "timestamp": "2026-09-18T14:32:39Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "SEVERE_new_finding_shop_install_broken",
+      "details": {
+        "severity": "P1 - blocks ALL real installs, more severe than the compliance-webhook bugs found earlier since nothing works at all without a successful install first",
+        "finding": "app/db/repositories/shop.repository.ts's upsertInstalledShop() cannot create a brand-new shop row - ShopModel.installedAt (app/db/models/shop.model.ts) has no defaultValue at the Sequelize/client validation layer, only a DB-side default, so Sequelize's own validator rejects the insert BEFORE any SQL is sent to Postgres. Found live because the evidence script seeded a genuinely fresh shop domain (not reusing an already-installed test shop like most prior evidence runs did).",
+        "impact": "Every real token-exchange install (any new merchant, or the human's own dev store if the session/shop row doesn't already exist) would fail at this exact point",
+        "fix_status": "NOT FIXED - no command given, developer correctly followed no-auto-fix rule, only worked around it inside their own evidence script (documented inline), not in the actual app code",
+        "awaiting": "explicit human authorization to fix (add a client-side defaultValue to installedAt, matching the DB-side default)"
+      },
+      "project_version_before": 42,
+      "project_version_after": 42
+    },
+    {
+      "timestamp": "2026-09-18T14:48:17Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "shop_install_bug_fixed_verified_live",
+      "details": {
+        "commit_code": "3922723de6f2d9312ec3ea5dcaf35ec7026f2359",
+        "commit_evidence": "8b436afdea340f14d734066e18cf4ab79db54034",
+        "fix": "app/db/models/shop.model.ts - added defaultValue: DataTypes.NOW to installedAt, matching the migration's DB-side DEFAULT now() exactly (checked migration DDL before writing fix)",
+        "live_verification": "genuinely fresh randomUUID-based shop domain (never used in any prior evidence run) installs successfully via real upsertInstalledShop(); installed_at set correctly; same-domain reinstall idempotent (doesn't touch installed_at per ADR-0008); full post-install sequence (session storage + shop upsert) verified end-to-end with a second fresh domain; cleanup verified inline AND via independent follow-up query",
+        "broader_sweep": "checked all 7 models for the same DB-side-only-default gap. installedAt was the ONLY live bug. createdAt/updatedAt safe everywhere (Sequelize timestamps:true sets at JS layer regardless). webhook_event.receivedAt and compliance_audit_log.occurredAt share the same SHAPE of gap but are NOT live bugs (repositories always pass the value explicitly) - flagged as defensive follow-up, not fixed, not in scope.",
+        "mcp_check_dev_handoff_note": "check-dev-handoff.py would reject this (zero validations recorded) because this is a legitimate MCP-N/A pure-backend-model fix, same precedent as the earlier G-Schema task - orchestrator did not run the checker for this handoff, consistent with 'MCP validation is only mandatory for Shopify-specific implementation' and the established G-Schema-task precedent",
+        "other_flagged_not_fixed": "db/config/config.cjs eagerly evaluates all 3 env blocks so production's DIRECT_DATABASE_URL requirement throws even when migrating development - worked around session-only, not written to .env, needs a human fix-decision separately"
+      },
+      "project_version_before": 43,
+      "project_version_after": 44
+    },
+    {
+      "timestamp": "2026-09-18T14:52:50Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_sprint_2_1_qa_verdict",
+      "details": {
+        "gate": "G4-sprint-2.1",
+        "commits_reviewed": [
+          "58050e1a4d9b17b617122cf34606eb4e32b99a0c",
+          "967c3a19dc9211bf34ac9d64b19359dd5d2e1eba",
+          "3922723de6f2d9312ec3ea5dcaf35ec7026f2359",
+          "8b436afdea340f14d734066e18cf4ab79db54034"
+        ],
+        "verdict": "PASS_WITH_FLAGS",
+        "p1_p2_open": 0,
+        "findings": [
+          {
+            "severity": "P3",
+            "summary": "db/config/config.cjs eager env-block evaluation blocks migrations without DIRECT_DATABASE_URL set - QA independently assessed as a real recurring bug, not a non-issue"
+          },
+          {
+            "severity": "P3",
+            "summary": "no axe-core automated a11y evidence yet against live calculator/results pages (ADR-0004's own FT-19a enforcement) - recommend closing before G5"
+          },
+          {
+            "severity": "P4",
+            "summary": "app.results.tsx ruleAppliedText() cosmetic formatting inconsistency, not a correctness bug"
+          }
+        ],
+        "independent_verification": "hand-reconstructed the money/rounding adversarial case from raw rule values and matched the evidence log exactly; spot-checked the broader-sweep claim line-by-line in 2 files and confirmed accurate"
+      },
+      "project_version_before": 44,
+      "project_version_after": 45
+    },
+    {
+      "timestamp": "2026-09-18T15:12:23Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G4-sprint-2.1",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 45,
+      "project_version_after": 46
+    },
+    {
+      "timestamp": "2026-09-18T15:13:37Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "sprint_opened",
+      "details": {
+        "gate": "G4-sprint-3.1",
+        "scope": "M4-Save+History"
+      },
+      "project_version_before": 46,
+      "project_version_after": 47
     }
   ],
   "lock": {
@@ -947,10 +1338,17 @@
     {
       "id": "RFC-001",
       "title": "Hosting reversal: long-running Node (ADR-0001) -> Vercel serverless",
-      "status": "under-discussion",
+      "status": "accepted",
       "ref": "rfcs/RFC-001-hosting-reversal-vercel-serverless.md",
-      "resulting_adr": "ADR-0009 (pending, architect in progress)",
+      "resulting_adr": "ADR-0009, ADR-0010",
       "triggers_reestimate": true
+    },
+    {
+      "id": "RFC-002",
+      "title": "customers/data_request has no exportable data - no delivery mechanism required",
+      "status": "accepted",
+      "ref": "rfcs/RFC-002-customers-data-request-no-exportable-data.md",
+      "triggers_reestimate": false
     }
   ],
   "health_score": null,
