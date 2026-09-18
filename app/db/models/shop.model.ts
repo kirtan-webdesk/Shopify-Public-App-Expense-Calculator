@@ -23,7 +23,21 @@ ShopModel.init(
       defaultValue: DataTypes.UUIDV4,
     },
     shopDomain: { type: DataTypes.TEXT, allowNull: false, unique: true, field: "shop_domain" },
-    installedAt: { type: DataTypes.DATE, allowNull: false, field: "installed_at" },
+    // BUG-5 fix (G4-sprint-2.1 live-install bug): client-side defaultValue
+    // added to match the DB-side `TIMESTAMPTZ NOT NULL DEFAULT now()` in the
+    // migration (db/migrations/20260918120000-initial-schema.cjs, `shop`
+    // table). Without this, Sequelize's own client-side attribute validation
+    // rejected `ShopModel.create({ shopDomain })` (upsertInstalledShop, the
+    // token-exchange install path) before any SQL was sent — every
+    // brand-new-shop install failed. DataTypes.NOW compiles to SQL `NOW()`,
+    // the same expression the migration uses, so this doesn't introduce a
+    // second, different definition of "now".
+    installedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: "installed_at",
+      defaultValue: DataTypes.NOW,
+    },
     uninstalledAt: { type: DataTypes.DATE, allowNull: true, field: "uninstalled_at" },
     createdAt: { type: DataTypes.DATE, allowNull: false, field: "created_at" },
     updatedAt: { type: DataTypes.DATE, allowNull: false, field: "updated_at" },
