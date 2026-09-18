@@ -6,11 +6,10 @@ import { findShopContextByDomain } from "~/db/repositories/shop.repository";
 import { getOrSeedExpenseRules, saveExpenseRules, type ExpenseRuleView } from "~/services/expense-rule.service";
 import { runCalculation } from "~/services/expense-calculation.service";
 import { getDuplicatePrefill } from "~/services/calculation-history.service";
-import { formatSavedAt } from "~/domain/presentation";
 import { encodeCalculationResult } from "~/domain/calculation-transport";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryKey } from "~/domain/expense-categories";
 import { EXPENSE_FORMULAS } from "~/domain/expense-formulas";
-import { minorUnitsToInputString } from "~/domain/presentation";
+import { formatSavedAt, minorUnitsToInputString } from "~/domain/presentation";
 import {
   SUPPORTED_CURRENCY_CODES,
   hasAnyFieldError,
