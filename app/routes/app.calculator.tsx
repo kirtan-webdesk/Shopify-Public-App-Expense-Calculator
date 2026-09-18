@@ -31,16 +31,18 @@ export default function CalculatorPage() {
       </s-section>
 
       <s-section heading="Revenue">
-        <s-text-field
+        {/* s-number-field, not s-text-field type="number" — verified via
+            Dev MCP validate_component_codeblocks: s-text-field has no
+            `type` prop; typed numeric input is its own component. */}
+        <s-number-field
           label="Revenue amount"
           name="revenue"
-          type="number"
-          min="0"
-          step="0.01"
+          min={0}
+          step={0.01}
           placeholder="0.00"
           disabled
           details="Configuration + calculation (M2/M3) are not yet wired — this field is a structural placeholder."
-        ></s-text-field>
+        ></s-number-field>
       </s-section>
 
       <s-section heading="Expense category rules">

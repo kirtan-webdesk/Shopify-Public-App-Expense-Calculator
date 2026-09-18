@@ -25,15 +25,19 @@ declare module "react" {
     interface IntrinsicElements {
       "s-page": PolarisElementProps;
       "s-section": PolarisElementProps;
-      "s-app-nav": PolarisElementProps;
       "s-link": PolarisElementProps;
       "s-banner": PolarisElementProps;
       "s-button": PolarisElementProps;
       "s-badge": PolarisElementProps;
       "s-modal": PolarisElementProps;
       "s-text-field": PolarisElementProps;
+      "s-number-field": PolarisElementProps;
       "s-select": PolarisElementProps;
       "s-option": PolarisElementProps;
+      // App Bridge web components (NOT Polaris — see app/routes/app.tsx's
+      // header comment on why validate_component_codeblocks doesn't cover
+      // these two).
+      "s-app-nav": PolarisElementProps;
       "ui-save-bar": PolarisElementProps;
     }
   }

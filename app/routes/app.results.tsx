@@ -8,11 +8,20 @@
 // NOT built here. The G2 mockup's dev-only fixture-data-swap dropdown is
 // intentionally NOT ported (it was explicitly flagged non-shippable at G2
 // and must be stripped before any real port of this page's markup).
+//
+// The mockup's `backAction="./calculator.html"` attribute does NOT exist on
+// the real <s-page> component (verified against the Dev MCP polaris-app-home
+// docs at build time — DESIGN-NOTES.md §7 had already flagged this as
+// verify-at-build). The real pattern is an <s-link slot="breadcrumb-actions">
+// child.
 // --------------------------------------------------------------------------
 
 export default function ResultsPage() {
   return (
-    <s-page heading="Results" backAction="/app/calculator">
+    <s-page heading="Results">
+      <s-link slot="breadcrumb-actions" href="/app/calculator">
+        Calculator
+      </s-link>
       <s-section>
         <s-banner tone="info" heading="Results view — M3 scope">
           <p>
