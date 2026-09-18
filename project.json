@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-18T15:13:37Z",
-    "version": 47,
+    "updated_at": "2026-09-18T15:58:26Z",
+    "version": 49,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -198,7 +198,7 @@
       "status": "open",
       "sla_hours": 24,
       "approver": "QA lead (role - stakeholder in the interim)",
-      "notes": "Upcoming: M4 Save + History (calculation snapshot persistence, history list/detail, engine_version on saved rows, append-only). NOT started - pending human go-ahead. Carry-forward before G5: axe-core a11y run (FT-19a), config.cjs lazy-eval fix decision, RV-2/RV-7/RV-8 live Vercel verification, real OQ-4 rates. | OPENED 2026-09-18T15:13:37Z on human instruction 'start M4'. Note: human has not yet confirmed M2/M3 works on the live Vercel deploy nor that the job_heartbeat migration was run on Neon - not a blocker for building, but live verification still owed.",
+      "notes": "Upcoming: M4 Save + History (calculation snapshot persistence, history list/detail, engine_version on saved rows, append-only). NOT started - pending human go-ahead. Carry-forward before G5: axe-core a11y run (FT-19a), config.cjs lazy-eval fix decision, RV-2/RV-7/RV-8 live Vercel verification, real OQ-4 rates. | OPENED 2026-09-18T15:13:37Z on human instruction 'start M4'. Note: human has not yet confirmed M2/M3 works on the live Vercel deploy nor that the job_heartbeat migration was run on Neon - not a blocker for building, but live verification still owed. | QA VERDICT: PASS WITH FLAGS, 0 open P1/P2, 5 P3 + 6 P4. Verified by reading tree at HEAD ac0b2d3: snapshot immutability (detail path never calls engine, never reads expense_rule, no FK, by-value typed columns), tenant isolation (ShopContext first arg everywhere, identical 404 for cross-tenant/nonexistent/malformed), save integrity (server recomputes + rejects tampered amounts, only 2 DB calls inside the transaction both pass {transaction}), append-only (no update/delete export, no mutating action on history routes, BEFORE UPDATE triggers). Live evidence cross-checked: 41 PASS, sha256 equal before/after with the live-rule hash provably changed, 20+5 pagination contiguous. FLAGS: F1 P3 double-submit no server idempotency (duplicate rows only via Back/two tabs, permanent since append-only; fix = nullable save_token + partial unique index, needs G-Schema-owner sign-off); F2 P3 22 DB tests opt-in and skipped in CI so tenant-predicate and {transaction}-threading regressions would pass CI green (mitigate with static guard test or Postgres service container); F3 P3 live logs carry no embedded SHA/env header, bound to ffd3bf7 only via bundle+timing; F4 P3 provenance: M4 source on origin/main under RFC-002 commit 105b1c6 before QA; F5 P3 calculator hardcodes $ for all currencies (wrong for CAD/EUR/GBP, pre-existing); F6 P3 axe-core FT-19a still not run (must close before G5). P4s: transitive engine import in detail bundle, trigger blind spot for zero-line-item calculation, no per-shop save cap, formatRuleApplied lacks currency symbol, UTC label pending OQ-6, cosmetic G2 deviations/toast replay.",
       "opened_at": "2026-09-18T15:13:37Z"
     }
   ],
@@ -1328,6 +1328,98 @@
       },
       "project_version_before": 46,
       "project_version_after": 47
+    },
+    {
+      "timestamp": "2026-09-18T15:52:13Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g4-sprint-3.1-m4/DEVELOPER-HANDOFF.md",
+        "commit": "ffd3bf7 (full sha resolved from git)",
+        "result": "EXIT 0 - HANDOFF OK, 3 validations, independently re-run by orchestrator"
+      },
+      "project_version_before": 47,
+      "project_version_after": 47
+    },
+    {
+      "timestamp": "2026-09-18T15:52:13Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "m4_delivered",
+      "details": {
+        "commits": {
+          "105b1c6": "NOT the developer's - authored kirtan-webdesk, swept most M4 in-progress source + project.json + RFC-002 into an 'feat(rfc)' commit, already on origin/main",
+          "ffd3bf7": "rest of code (5 test files, calc-fixtures, calculator import) - evidence bound to this",
+          "ac0b2d3": "evidence"
+        },
+        "built": "Save via s-modal (single transaction, by-value snapshot, no FK to expense_rule, server recomputes and rejects mismatching amounts); history list (newest-first, 20/page, empty state, tenant-scoped); detail from stored columns only, never recomputes, frozen-snapshot signals, identical 404 for cross-tenant/nonexistent/malformed ids; Duplicate-as-new via /app/calculator?from=:id; append-only (no update/delete exported)",
+        "live_evidence": "real Neon, fresh shop domains, 41 PASS/0 FAIL: byte-identical detail across rule edits (sha256 of JSON, HTML, raw rows), cross-tenant read null while row exists, 3 failure injections leave zero rows, tampered payload rejected, UPDATE blocked by trigger, 25 rows paginate 20+5, engine_version expense-engine@1.0.0; 22 opt-in DB tests (RUN_DB_TESTS=1) skipped in default npm test/CI",
+        "gates": "lint/typecheck/build pass, tests 214 passed 22 skipped; run-gates.py still fails on Windows (F4)",
+        "flagged_not_fixed": [
+          "double-submit: modal button disabled client-side only, no server idempotency key, two concurrent POSTs create two rows",
+          "timestamps UTC-suffixed because OQ-6 open",
+          "server stores current ENGINE_VERSION never payload's",
+          "calculator summary + Fixed-amount prefix hardcode $ regardless of currency (pre-existing)",
+          "formatRuleApplied fixed amounts lack currency symbol (pre-existing, moved unchanged)"
+        ],
+        "live_store_items_owed": [
+          "modal show/hide + submit + toast + iframe nav",
+          "axe-core a11y pass",
+          "real dev-store install then first save"
+        ]
+      },
+      "project_version_before": 47,
+      "project_version_after": 48
+    },
+    {
+      "timestamp": "2026-09-18T15:52:13Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "provenance_incident_recorded",
+      "details": {
+        "what": "Unreviewed M4 application source reached origin/main via commit 105b1c6 (message 'feat(rfc): add RFC-002...') before Code Review or QA; orchestrator had instructed the developer NOT to push and planned to push after QA. Someone with kirtan-webdesk git identity staged everything (incl. in-progress M4 files and project.json) while work was in flight.",
+        "impact": "Vercel likely already deploying M4 source that has not been QA'd; code passed lint/typecheck/tests/build locally and live evidence exists, so risk is moderate not severe. No history rewrite/force-push performed (destructive, not authorized).",
+        "recommendation": "Avoid blanket 'git add .' commits while agents are mid-task; QA now proceeds on the already-pushed code."
+      },
+      "project_version_before": 47,
+      "project_version_after": 47
+    },
+    {
+      "timestamp": "2026-09-18T15:58:26Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_sprint_3_1_qa_verdict",
+      "details": {
+        "gate": "G4-sprint-3.1",
+        "scope": "M4-Save+History",
+        "commits_reviewed": [
+          "105b1c6",
+          "ffd3bf7",
+          "ac0b2d3"
+        ],
+        "verdict": "PASS_WITH_FLAGS",
+        "p1_p2_open": 0,
+        "findings": [
+          "F1 P3 double-submit idempotency",
+          "F2 P3 opt-in DB tests skipped in CI",
+          "F3 P3 evidence lacks embedded SHA",
+          "F4 P3 M4 source pushed under RFC-002 commit",
+          "F5 P3 hardcoded $ currency",
+          "F6 P3 axe-core outstanding",
+          "6x P4"
+        ],
+        "owed_live": [
+          "modal/toast/navigation on embedded store",
+          "axe-core FT-19a",
+          "first real save on fresh install",
+          "live Vercel verification of M2/M3/M4",
+          "job_heartbeat migration on Neon"
+        ]
+      },
+      "project_version_before": 48,
+      "project_version_after": 49
     }
   ],
   "lock": {
