@@ -80,7 +80,16 @@ export default tseslint.config(
     files: ["**/*.cjs"],
     languageOptions: {
       sourceType: "commonjs",
-      globals: { require: "readonly", module: "readonly", __dirname: "readonly", process: "readonly" },
+      globals: {
+        require: "readonly",
+        module: "readonly",
+        __dirname: "readonly",
+        process: "readonly",
+        // Added for db/config/config.cjs's DIRECT_DATABASE_URL fallback
+        // warning (ADR-0010 point 5) — the previous globals list only
+        // covered what the file needed before that warning existed.
+        console: "readonly",
+      },
     },
     rules: {
       "@typescript-eslint/no-require-imports": "off",

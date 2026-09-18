@@ -9,6 +9,28 @@ const SWEEPER_WINDOW_DAYS = Number(process.env.SWEEPER_WINDOW_DAYS || 45);
 const WEBHOOK_EVENT_RETENTION_DAYS = Number(
   process.env.WEBHOOK_EVENT_RETENTION_DAYS || 30,
 );
+const DEFAULT_SWEEP_LIMIT = Number(process.env.CRON_SWEEP_LIMIT || 50);
+
+export interface SweepBudget {
+  /** Page size for findShopsUninstalledBefore — ADR-0009 D3: bounded so a
+   * large backlog resumes on the next tick instead of one invocation trying
+   * to process everything. Defaults to CRON_SWEEP_LIMIT / 50. */
+  readonly limit?: number;
+  /** Wall-clock budget for the loop below. Defaults to unbounded (existing
+   * behaviour) when omitted — only the cron tick (ADR-0009 D3/D4) passes a
+   * real budget; the 45-day window has 30+ days of slack either way. */
+  readonly budgetMs?: number;
+}
+
+export interface SweepOutcome {
+  readonly consideredCount: number;
+  readonly deletedCount: number;
+  readonly failedCount: number;
+  /** true if there is very likely more work waiting for the next tick —
+   * either the budget ran out mid-page, or the page came back full (meaning
+   * there may be shops beyond this page's limit). */
+  readonly resumable: boolean;
+}
 
 /**
  * 45-day safety sweeper (ADR-0008 §5). Hard-deletes any shop with
@@ -16,15 +38,41 @@ const WEBHOOK_EVENT_RETENTION_DAYS = Number(
  * ever arrived — the failure mode this exists to close (R2: a lost/never-
  * delivered shop/redact silently retaining shop data indefinitely).
  *
+ * ADR-0009 D3/D4: now LIMIT- and wall-clock-budget-bounded so a large
+ * backlog resumes on the next cron tick rather than one invocation trying to
+ * process everything (irrelevant in practice at this app's volume, but the
+ * mechanism must not assume otherwise). The per-shop body inside the loop —
+ * including BUG-5's try/catch isolation — is UNCHANGED from the
+ * ADR-0002/ADR-0008-era version; only the bounding around the loop is new.
+ *
  * A sweeper firing is an ALERT, not a routine event — logged loudly here;
  * wiring that log into a real alert channel is G5.5 (observability +
  * runbooks) scope, not built in this scaffold.
  */
-export async function runSweeper(): Promise<void> {
+export async function runSweeper(budget: SweepBudget = {}): Promise<SweepOutcome> {
+  const limit = budget.limit ?? DEFAULT_SWEEP_LIMIT;
+  const budgetMs = budget.budgetMs ?? Number.POSITIVE_INFINITY;
+  const startedAt = Date.now();
+
   const cutoff = new Date(Date.now() - SWEEPER_WINDOW_DAYS * 24 * 60 * 60 * 1000);
-  const shops = await findShopsUninstalledBefore(cutoff);
+  const shops = await findShopsUninstalledBefore(cutoff, limit);
+
+  let consideredCount = 0;
+  let deletedCount = 0;
+  let failedCount = 0;
+  let resumable = shops.length >= limit;
 
   for (const ctx of shops) {
+    if (Date.now() - startedAt >= budgetMs) {
+      // Budget exhausted before this (already-limited) page finished — leave
+      // the rest for the next tick (ADR-0009 D4). The 45-day window has
+      // 30+ days of slack, so "resume next tick" costs nothing in compliance
+      // terms.
+      resumable = true;
+      break;
+    }
+    consideredCount += 1;
+
     // BUG-5 fix: each shop's work is isolated in its own try/catch so one
     // shop's failure (e.g. a future defect, a transient DB error) cannot
     // abort the whole sweep pass for every OTHER eligible shop — QA traced
@@ -66,12 +114,14 @@ export async function runSweeper(): Promise<void> {
         );
       });
 
+      deletedCount += 1;
       console.warn(
         `[sweeper] ALERT: shop ${ctx.shopDomain} was hard-deleted by the 45-day ` +
           "safety sweeper — this means shop/redact was never successfully " +
           "processed for it. Investigate the missed delivery (ADR-0008 R2).",
       );
     } catch (err) {
+      failedCount += 1;
       console.error(
         `[sweeper] ALERT: failed to hard-delete shop ${ctx.shopDomain} during the ` +
           "45-day safety sweep — this shop was NOT deleted and will be retried " +
@@ -81,9 +131,16 @@ export async function runSweeper(): Promise<void> {
       );
     }
   }
+
+  return { consideredCount, deletedCount, failedCount, resumable };
 }
 
-/** webhook_event retention pruning (data-model.md §4.5) — rides the same interval. */
+/** webhook_event retention pruning (data-model.md §4.5). UNCHANGED by
+ * ADR-0009 (D3 step 3: "Prune — runWebhookEventPruning(), unchanged") — a
+ * single indexed DELETE, cheap enough on every cron tick that it does not
+ * need its own LIMIT/budget bounding the way the sweeper does. Previously
+ * rode the sweeper's own setInterval cadence; now called directly by the
+ * cron tick (app/routes/api.cron.tick.tsx) as its own step. */
 export async function runWebhookEventPruning(): Promise<void> {
   const cutoff = new Date(
     Date.now() - WEBHOOK_EVENT_RETENTION_DAYS * 24 * 60 * 60 * 1000,

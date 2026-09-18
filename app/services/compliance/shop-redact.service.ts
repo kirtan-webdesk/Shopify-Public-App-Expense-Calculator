@@ -28,7 +28,11 @@ export async function handleShopRedact(
   currentWebhookEventId: string,
   transaction: Transaction,
 ): Promise<void> {
-  const ctx = await findShopContextByDomain(shopDomain);
+  // ADR-0010 fix (found live, G1.5-revision): pass the shared transaction —
+  // see shop.repository.ts's findShopContextByDomain doc comment for the
+  // full deadlock explanation (pool.max:1 + a standalone query while this
+  // handler's caller already holds the pool's one connection).
+  const ctx = await findShopContextByDomain(shopDomain, transaction);
 
   if (!ctx) {
     await recordComplianceOutcome(

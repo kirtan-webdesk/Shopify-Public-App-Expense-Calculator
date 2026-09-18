@@ -2,6 +2,8 @@ import type { Route } from "./+types/webhooks.customers-data-request";
 import { authenticate } from "~/shopify.server";
 import { ackAndEnqueueWebhook } from "~/services/webhook-inbox.service";
 import { getRawWebhookTopic } from "~/services/webhook-topic.service";
+import { scheduleAfterResponse } from "~/workers/after-response.server";
+import { continueDrainAfterResponse } from "~/workers/drain-worker";
 
 // webhooks/customers-data-request — mandatory GDPR compliance webhook,
 // declared via compliance_topics in shopify.app.toml. See
@@ -21,6 +23,10 @@ export async function action({ request }: Route.ActionArgs) {
     topic,
     payload: payload as Record<string, unknown>,
   });
+
+  // ADR-0009 D2 fast-tier continuation — best-effort, explicitly allowed to
+  // fail/not run. The slow-tier cron (/api/cron/tick) is the guarantee.
+  scheduleAfterResponse(continueDrainAfterResponse);
 
   return new Response(null, { status: 200 });
 }

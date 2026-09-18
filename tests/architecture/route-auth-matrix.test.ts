@@ -17,6 +17,12 @@ const UNAUTHENTICATED_ALLOWLIST = new Set(["healthz.tsx"]);
 // Covered directly by the "the app layout route calls authenticate.admin"
 // test below; child routes are not required to re-call it themselves.
 const LAYOUT_INHERITS_AUTH_FROM = new Set(["app._index.tsx"]);
+// ADR-0009 D5: a 5th route-auth class — internal shared-secret, never
+// Shopify auth, never the unauthenticated allowlist. Routes here must call
+// isAuthorizedCronRequest (app/services/cron-auth.service.ts), checked
+// below by its own dedicated test rather than folded into the
+// admin/webhook/allowlist branches above.
+const SHARED_SECRET_AUTH = new Set(["api.cron.tick.tsx"]);
 
 function listRouteFiles(): string[] {
   return readdirSync(ROUTES_DIR).filter((f) => f.endsWith(".tsx") || f.endsWith(".ts"));
@@ -43,13 +49,36 @@ describe("route-authentication matrix (FT-03 approximation)", () => {
     const inheritsFromLayout = LAYOUT_INHERITS_AUTH_FROM.has(file);
     const callsAdminAuth = /authenticate\.admin\s*\(/.test(source);
     const callsWebhookAuth = /authenticate\.webhook\s*\(/.test(source);
+    const isSharedSecretAuth =
+      SHARED_SECRET_AUTH.has(file) && /isAuthorizedCronRequest\s*\(/.test(source);
 
     expect(
-      isAllowlisted || inheritsFromLayout || callsAdminAuth || callsWebhookAuth,
+      isAllowlisted ||
+        inheritsFromLayout ||
+        callsAdminAuth ||
+        callsWebhookAuth ||
+        isSharedSecretAuth,
       `${file} has a loader/action but calls neither authenticate.admin nor ` +
-        "authenticate.webhook, is not on the unauthenticated allowlist, and " +
-        "is not a documented layout-inherits-auth exception.",
+        "authenticate.webhook nor isAuthorizedCronRequest, is not on the " +
+        "unauthenticated allowlist, and is not a documented layout-inherits-" +
+        "auth exception.",
     ).toBe(true);
+  });
+
+  it("the cron tick route is not accidentally in the unauthenticated allowlist and genuinely checks the shared secret (ADR-0009 D5 / FT-22 approximation)", () => {
+    for (const file of SHARED_SECRET_AUTH) {
+      expect(UNAUTHENTICATED_ALLOWLIST.has(file), `${file} must not double as unauthenticated`).toBe(false);
+      const source = readFileSync(join(ROUTES_DIR, file), "utf8");
+      expect(source, `${file} must call isAuthorizedCronRequest`).toMatch(
+        /isAuthorizedCronRequest\s*\(/,
+      );
+      expect(source, `${file} must not call authenticate.admin`).not.toMatch(
+        /authenticate\.admin\s*\(/,
+      );
+      expect(source, `${file} must not call authenticate.webhook`).not.toMatch(
+        /authenticate\.webhook\s*\(/,
+      );
+    }
   });
 
   it("webhook route files call authenticate.webhook, not authenticate.admin", () => {

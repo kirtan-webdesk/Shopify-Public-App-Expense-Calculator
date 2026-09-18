@@ -12,10 +12,27 @@ import { createShopContext, type ShopContext } from "~/db/repositories/shop-cont
 // point: everything downstream (routes, webhook handlers) gets its
 // ShopContext FROM this repository, never constructs one itself.
 
+/**
+ * `transaction` (ADR-0010 fix, found live, G1.5-revision): optional, and
+ * MUST be passed when this is called from inside an already-open
+ * transaction/savepoint (e.g. shop-redact.service.ts, invoked from
+ * claimAndProcessOne's outer transaction) — omitting it there makes
+ * Sequelize acquire a SECOND connection for this standalone query while the
+ * caller's transaction is still holding the pool's only connection
+ * (pool.max:1, ADR-0010), which blocks on `acquire: 30000` and times out
+ * ("Operation timeout"). Confirmed live: a seeded shop/redact webhook_event
+ * row failed with exactly this error before this fix, despite
+ * handleShopRedact already threading the transaction into hardDeleteShop
+ * and recordComplianceOutcome — this call was the one remaining gap.
+ * webhook-inbox.service.ts's call (no outer transaction open at that point,
+ * ack-and-enqueue happens before any claim) is unaffected either way and is
+ * left without a transaction argument.
+ */
 export async function findShopContextByDomain(
   shopDomain: string,
+  transaction?: Transaction,
 ): Promise<ShopContext | null> {
-  const shop = await ShopModel.findOne({ where: { shopDomain } });
+  const shop = await ShopModel.findOne({ where: { shopDomain }, transaction });
   if (!shop) return null;
   return createShopContext(shop.id, shop.shopDomain);
 }
@@ -63,10 +80,23 @@ export async function markShopUninstalled(
   );
 }
 
-/** ADR-0008 §5: shops past the sweeper window, for the 45-day safety sweep. */
-export async function findShopsUninstalledBefore(cutoff: Date): Promise<ShopContext[]> {
+/**
+ * ADR-0008 §5: shops past the sweeper window, for the 45-day safety sweep.
+ *
+ * `limit` (ADR-0009 D3): bounds the page size so a large backlog is
+ * processed across multiple cron ticks rather than one unbounded query/loop.
+ * Ordered oldest-uninstalled-first, same "oldest-first" convention the
+ * webhook_event drain query uses, so the longest-overdue shops are always
+ * the ones a bounded page picks up first.
+ */
+export async function findShopsUninstalledBefore(
+  cutoff: Date,
+  limit?: number,
+): Promise<ShopContext[]> {
   const shops = await ShopModel.findAll({
     where: { uninstalledAt: { [Op.ne]: null, [Op.lt]: cutoff } },
+    order: [["uninstalledAt", "ASC"]],
+    limit,
   });
   return shops.map((s) => createShopContext(s.id, s.shopDomain));
 }

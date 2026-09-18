@@ -6,13 +6,23 @@ import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import { addDocumentResponseHeaders } from "~/shopify.server";
 
-// Starts the in-process background workers (webhook drain + 45-day
-// sweeper, ADR-0001/ADR-0002) exactly once per server process. Top-level
-// side effect, module-cached by Node — see app/workers/bootstrap.server.ts
-// for why this is the correct place and not a custom server file.
-import { startBackgroundWorkers } from "~/workers/bootstrap.server";
-
-startBackgroundWorkers();
+// ADR-0009 D1 (G1.5-revision): app/workers/bootstrap.server.ts and its
+// startBackgroundWorkers() call here are REMOVED, not disabled behind a
+// flag. This app runs on Vercel now — a function instance is created per
+// invocation-burst and frozen/reclaimed after the response, so a
+// setInterval loop started here has no guarantee of ever firing again, and
+// several concurrent instances would each start their own redundant timers.
+// A dormant setInterval in a serverless bundle is a trap: it survives code
+// review, silently does nothing in production, and would do something
+// unbounded and unbilled-for if the runtime model ever changed back. The
+// same compliance work (drain, sweep, prune) is now invoked over HTTP —
+// best-effort per-request via app/workers/after-response.server.ts
+// (ADR-0009 D2), and guaranteed via the single scheduled
+// app/routes/api.cron.tick.tsx endpoint (ADR-0009 D3). See that ADR's
+// Consequences section for why reverting this (a future move back to a
+// long-running host) stays cheap: drainOnce/drainBacklog/runSweeper/
+// runWebhookEventPruning all kept their exact pre-ADR-0009 signatures and
+// bodies — only the caller changed.
 
 export const streamTimeout = 5_000;
 

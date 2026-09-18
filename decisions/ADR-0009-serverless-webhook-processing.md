@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | PROPOSED — pending G1.5-revision approval (Tech lead). Not self-approved. Not implemented. |
+| **Status** | ACCEPTED at G1.5-revision (2026-09-18, decided_by: sales@webdesksolution.ca). Supersedes the mechanism (not the correctness guarantees) of ADR-0002/ADR-0008. Implementation authorized, not yet built — re-verification scope (RV-1..RV-8) applies before this can be considered proven. |
 | **Date** | 2026-09-18 |
 | **Gate** | G1.5-revision |
 | **Supersedes** | **ADR-0001 in part** — the hosting *class* (long-running always-on Node) and its six acceptance criteria. ADR-0001's *reasoning* is not retracted; it was correct and it was overridden by the human on 2026-09-18 (`project.json` audit_log → `hosting_decision_reversal`). **ADR-0002 §4 only** — the in-process interval drain worker. **ADR-0008 §5 in part** — "the same in-process worker as ADR-0002". |

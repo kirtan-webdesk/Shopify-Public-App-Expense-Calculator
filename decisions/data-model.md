@@ -27,6 +27,7 @@ deliverable for the open G-Schema gate.
 | `webhook_event` | Durable inbox for the four webhook deliveries (ADR-0002): dedup, claim, retry | Yes |
 | `compliance_audit_log` | GDPR/compliance evidence that a redaction or no-op decision happened — **deliberately not tenant-scoped**, see §5 | **No** (by design — must survive shop deletion) |
 | `shopify_sessions` | Shopify session storage | **Not ours** — library-managed by `@shopify/shopify-app-session-storage-postgresql`, no app columns, no app migration (see §7) |
+| `job_heartbeat` | Dead-man's-switch for the serverless cron tick (ADR-0009 D6, G1.5-revision) — one row per named job, overwritten on every run | **No** (global operational table, same documented exception class as `compliance_audit_log` — see §4.7) |
 
 `ExpenseCategory` is **not a table** — see §2. There is no `ExpenseFormula` table
 either, for the same reasoning.
@@ -346,6 +347,39 @@ is a safe no-op," extended to the audit trail itself).
 
 Index: `idx_compliance_audit_shop_domain` (operational lookup only — this
 table is explicitly excluded from the tenancy/redaction machinery, see §5).
+
+---
+
+## 4.7 `job_heartbeat` (added at G1.5-revision — ADR-0009 D6/§7)
+
+| Column | Type | Constraints | Why |
+|---|---|---|---|
+| `job_name` | `TEXT` | PK | One row per named job — currently just `'cron_tick'` |
+| `last_run_at` | `TIMESTAMPTZ` | `NOT NULL` | Overwritten every run (success or failure) — the entire signal `/healthz`'s `cronStale` boolean derives from |
+| `last_result` | `TEXT` | `NOT NULL CHECK IN ('ok', 'error')` | |
+| `last_error` | `TEXT` | `NULL` | Set only on `last_result = 'error'` |
+
+Migration: `db/migrations/20260918130000-add-job-heartbeat.cjs`. Forward-only,
+additive — no existing table touched.
+
+**Deliberately NO `shop_id` column, same documented exception class as
+`compliance_audit_log` (§5):** this is a global operational table, not
+tenant data — one row describes the health of the cron mechanism itself, not
+any shop. It is excluded from the tenant-table conventions the same way
+`compliance_audit_log` is, for a related but distinct reason:
+`compliance_audit_log` must survive shop deletion to remain evidence;
+`job_heartbeat` was never about a shop in the first place. **This table must
+be added to fitness-test-plan.md's FT-02c (non-tenant exemption list) and
+FT-08 (redaction table-enumeration exclusion list)** — done in this same
+change — or both checks would wrongly flag a table that correctly has no
+`shop_id`.
+
+Written by the cron tick (`app/routes/api.cron.tick.tsx`, ADR-0009 D3/D6) at
+the end of every invocation via
+`app/db/repositories/job-heartbeat.repository.ts` — the only file that
+touches this table (ADR-0003 layering). Read only by `/healthz`
+(`app/routes/healthz.tsx`), and only as a derived boolean — the raw row
+(timestamp, error text) is never exposed in that route's response.
 
 ---
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | PROPOSED — pending G1.5 approval (Tech lead). Not self-approved. |
+| **Status** | ACCEPTED at G1.5 (2026-09-18, decided_by: sales@webdesksolution.ca). Uninstall-vs-redact lifecycle distinction and the 45-day safety sweeper concept remain valid and unchanged; PARTIALLY SUPERSEDED at G1.5-revision (2026-09-18) only regarding the sweeper's *trigger mechanism* (hourly in-process timer → daily Vercel Cron tick), per ADR-0009. |
 | **Date** | 2026-09-17 |
 | **Gate** | G1.5 |
 | **Related** | ADR-0002, ADR-0003, ADR-0007, spec.md §10, D3, D12, G-Schema |

@@ -1,3 +1,4 @@
+import type { Transaction } from "sequelize";
 import { recordComplianceOutcome } from "~/db/repositories/compliance-audit-log.repository";
 
 const NO_CUSTOMER_DATA_REASON =
@@ -24,16 +25,29 @@ const NO_CUSTOMER_DATA_REASON =
  * Dashboard message? transactional email? a merchant-visible in-app record?)
  * and confirm it satisfies "deliver to the store owner" as Shopify defines
  * it. Tracked here rather than guessed at.
+ *
+ * ADR-0010 fix (found live, G1.5-revision): same fix as
+ * customers-redact.service.ts — this handler now threads the caller's
+ * transaction through recordComplianceOutcome instead of letting it open a
+ * second, standalone connection, which deadlocked against pool.max:1 while
+ * the caller (claimAndProcessOne) still held the pool's one connection for
+ * its own outer/savepoint transaction. See that file's comment for the full
+ * live-reproduction details (identical failure mode, confirmed on this
+ * topic's own seeded row too).
  */
 export async function handleCustomersDataRequest(
   shopDomain: string,
   webhookId: string,
+  transaction: Transaction,
 ): Promise<void> {
-  await recordComplianceOutcome({
-    shopDomain,
-    webhookId,
-    topic: "customers/data_request",
-    outcome: "completed",
-    reason: NO_CUSTOMER_DATA_REASON,
-  });
+  await recordComplianceOutcome(
+    {
+      shopDomain,
+      webhookId,
+      topic: "customers/data_request",
+      outcome: "completed",
+      reason: NO_CUSTOMER_DATA_REASON,
+    },
+    transaction,
+  );
 }

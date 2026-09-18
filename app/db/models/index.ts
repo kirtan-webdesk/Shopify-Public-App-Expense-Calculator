@@ -18,6 +18,7 @@ import { CalculationModel } from "~/db/models/calculation.model";
 import { CalculationLineItemModel } from "~/db/models/calculation-line-item.model";
 import { WebhookEventModel } from "~/db/models/webhook-event.model";
 import { ComplianceAuditLogModel } from "~/db/models/compliance-audit-log.model";
+import { JobHeartbeatModel } from "~/db/models/job-heartbeat.model";
 
 ShopModel.hasMany(ExpenseRuleModel, { foreignKey: "shopId", as: "expenseRules" });
 ExpenseRuleModel.belongsTo(ShopModel, { foreignKey: "shopId" });
@@ -37,6 +38,10 @@ WebhookEventModel.belongsTo(ShopModel, { foreignKey: "shopId" });
 // compliance_audit_log has NO association to ShopModel — see the model's own
 // header comment and data-model.md §5. Do not add one.
 
+// job_heartbeat has NO association to ShopModel either, for the identical
+// reason (ADR-0009 D6, data-model.md §4.7) — it is a global operational
+// table, not tenant data. Do not add one.
+
 export {
   sequelize,
   ShopModel,
@@ -45,4 +50,5 @@ export {
   CalculationLineItemModel,
   WebhookEventModel,
   ComplianceAuditLogModel,
+  JobHeartbeatModel,
 };

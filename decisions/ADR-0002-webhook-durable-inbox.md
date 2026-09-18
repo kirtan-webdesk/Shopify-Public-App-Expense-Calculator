@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | PROPOSED — pending G1.5 approval (Tech lead). Not self-approved. |
+| **Status** | ACCEPTED at G1.5 (2026-09-18, decided_by: sales@webdesksolution.ca). PARTIALLY SUPERSEDED at G1.5-revision (2026-09-18) by ADR-0009 — the durable-inbox/dedup/ack-fast-then-async-process pattern this ADR established remains valid and is preserved by ADR-0009; only the mechanism draining the inbox (in-process setInterval) is replaced (Vercel Cron + waitUntil). |
 | **Date** | 2026-09-17 |
 | **Gate** | G1.5 |
 | **Related** | ADR-0001 (hosting), ADR-0008 (deletion lifecycle), spec.md §10, §12 |

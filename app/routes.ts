@@ -9,7 +9,12 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 //   webhooks.*   -> authenticate.webhook (HMAC, 401 on invalid) — MUST NOT
 //                   be nested under the app layout route (ADR-0002 /
 //                   architecture packet §3)
-//   healthz      -> no auth, static, no store data
+//   healthz      -> no auth, static-shaped, reports a cronStale boolean
+//                   (ADR-0009 D6)
+//   api/cron/tick -> internal shared-secret (constant-time Bearer compare,
+//                   fails closed if CRON_SECRET is unset) — a 5th
+//                   route-auth class, never Shopify auth, never the
+//                   unauthenticated allowlist (ADR-0009 D5)
 //
 // Webhook routes are declared as top-level `route()` entries, sibling to —
 // never nested inside — the `layout("routes/app.tsx", ...)` block below, so
@@ -28,6 +33,12 @@ export default [
   index("routes/_index.tsx"),
 
   route("healthz", "routes/healthz.tsx"),
+
+  // Slow-tier cron endpoint (ADR-0009 D3) — sibling to the webhook/healthz
+  // routes, never nested under the app layout route (would pick up
+  // authenticate.admin, which is the wrong auth class entirely for a
+  // platform-triggered request).
+  route("api/cron/tick", "routes/api.cron.tick.tsx"),
 
   route("auth/*", "routes/auth.$.tsx"),
 

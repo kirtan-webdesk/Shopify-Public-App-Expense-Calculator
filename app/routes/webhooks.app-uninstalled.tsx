@@ -2,6 +2,8 @@ import type { Route } from "./+types/webhooks.app-uninstalled";
 import { authenticate } from "~/shopify.server";
 import { ackAndEnqueueWebhook } from "~/services/webhook-inbox.service";
 import { getRawWebhookTopic } from "~/services/webhook-topic.service";
+import { scheduleAfterResponse } from "~/workers/after-response.server";
+import { continueDrainAfterResponse } from "~/workers/drain-worker";
 
 // webhooks/app-uninstalled — declared via [[webhooks.subscriptions]] in
 // shopify.app.toml (ADR-0006: no runtime registration mutation). NOT nested
@@ -27,6 +29,10 @@ export async function action({ request }: Route.ActionArgs) {
     topic,
     payload: payload as Record<string, unknown>,
   });
+
+  // ADR-0009 D2 fast-tier continuation — best-effort, explicitly allowed to
+  // fail/not run. The slow-tier cron (/api/cron/tick) is the guarantee.
+  scheduleAfterResponse(continueDrainAfterResponse);
 
   // Minimal 2xx body, never echoing merchant/customer data (WebDesk
   // hardening policy — not a Shopify requirement, ADR-0002 item 6).

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | PROPOSED — pending G1.5-revision approval (Tech lead). Not self-approved. Not implemented. |
+| **Status** | ACCEPTED at G1.5-revision (2026-09-18, decided_by: sales@webdesksolution.ca), required companion to ADR-0009. Implementation authorized, not yet built. |
 | **Date** | 2026-09-18 |
 | **Gate** | G1.5-revision |
 | **Supersedes** | **ADR-0001 §"Connection model"** (its alternative-analysis point 3) and the comment block in `app/db/sequelize.ts` that asserts "the default pool config is correct here … those only bite under serverless, which this app deliberately isn't." |

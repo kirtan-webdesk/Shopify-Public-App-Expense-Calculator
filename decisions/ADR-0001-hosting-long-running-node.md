@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | PROPOSED — pending G1.5 approval (Tech lead). Not self-approved. |
+| **Status** | ACCEPTED at G1.5 (2026-09-18, decided_by: sales@webdesksolution.ca). PARTIALLY SUPERSEDED at G1.5-revision (2026-09-18) by ADR-0009 (webhook processing mechanism) and ADR-0010 (Postgres connection strategy) — the hosting-class decision itself (long-running vs serverless) was overridden by an explicit human decision to use Vercel serverless hosting; this ADR's reasoning for why long-running was originally preferred remains valid documentation of the tradeoff, just no longer the active choice. |
 | **Date** | 2026-09-17 |
 | **Gate** | G1.5 |
 | **Closes** | OQ-1 (architectural half). Provider/plan/region selection remains human-owned. |
