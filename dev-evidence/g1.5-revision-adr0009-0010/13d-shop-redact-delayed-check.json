@@ -1,0 +1,9 @@
+[
+  {
+    "webhook_id": "shop-redact-pool1-test-1789737689",
+    "topic": "shop/redact",
+    "processed_at": null,
+    "attempts": 1,
+    "last_error": "Operation timeout"
+  }
+]

@@ -1,0 +1,9 @@
+HTTP/1.1 200 
+Vary: Origin
+content-type: application/json
+Date: Fri, 18 Sep 2026 13:18:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"ok":true,"elapsedMs":101,"drained":{"drained":1,"failed":0,"backlogExhausted":true},"swept":{"consideredCount":2,"deletedCount":2,"failedCount":0,"resumable":false},"pruned":"completed","errors":[]}

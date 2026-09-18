@@ -1,0 +1,47 @@
+{
+  "job_heartbeat": [
+    {
+      "job_name": "cron_tick",
+      "last_run_at": "2026-09-18T13:18:34.823Z",
+      "last_result": "ok",
+      "last_error": null
+    }
+  ],
+  "webhook_event": [
+    {
+      "id": "5fd30505-1918-4c3f-8de7-430ad8601ec6",
+      "topic": "customers/redact",
+      "processed_at": "2026-09-18T13:18:34.779Z",
+      "attempts": 0,
+      "last_error": null
+    }
+  ],
+  "remaining_rv_shops": [
+    {
+      "shop_domain": "rv3-orphan-row.myshopify.com"
+    }
+  ],
+  "compliance_audit_log_rv": [
+    {
+      "shop_domain": "rv3-orphan-row.myshopify.com",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "reason": "this app stores no customer-identified data; the app holds no records keyed to a customer (revenue is merchant-entered, not read from orders — see spec.md §4, ADR-0006).",
+      "occurred_at": "2026-09-18T13:18:34.772Z"
+    },
+    {
+      "shop_domain": "rv5-stale-shop-one.myshopify.com",
+      "topic": "shop/redact",
+      "outcome": "completed",
+      "reason": "45-day safety sweeper — shop/redact was never observed for this shop",
+      "occurred_at": "2026-09-18T13:18:34.808Z"
+    },
+    {
+      "shop_domain": "rv5-stale-shop-two.myshopify.com",
+      "topic": "shop/redact",
+      "outcome": "completed",
+      "reason": "45-day safety sweeper — shop/redact was never observed for this shop",
+      "occurred_at": "2026-09-18T13:18:34.819Z"
+    }
+  ]
+}

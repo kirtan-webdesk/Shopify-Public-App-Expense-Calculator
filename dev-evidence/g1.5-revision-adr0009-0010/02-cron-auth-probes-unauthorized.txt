@@ -1,0 +1,30 @@
+=== no Authorization header ===
+HTTP/1.1 401 
+Vary: Origin
+Date: Fri, 18 Sep 2026 13:14:48 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+
+=== wrong secret ===
+HTTP/1.1 401 
+Vary: Origin
+Date: Fri, 18 Sep 2026 13:14:48 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+
+=== malformed header (no Bearer prefix) ===
+HTTP/1.1 401 
+Vary: Origin
+Date: Fri, 18 Sep 2026 13:14:48 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+

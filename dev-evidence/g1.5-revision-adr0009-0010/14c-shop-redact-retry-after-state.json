@@ -1,0 +1,20 @@
+{
+  "shop_rows": 0,
+  "expense_rule_rows": 0,
+  "calculation_rows": 0,
+  "calculation_line_item_rows": 0,
+  "webhook_event_state": [],
+  "audit": [
+    {
+      "outcome": "completed",
+      "deleted_row_counts": {
+        "shop": 1,
+        "calculation": 1,
+        "expense_rule": 1,
+        "webhook_event": 0,
+        "shopify_sessions": 0,
+        "calculation_line_item": 1
+      }
+    }
+  ]
+}

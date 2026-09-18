@@ -1,0 +1,72 @@
+{
+  "webhook_event": [
+    {
+      "webhook_id": "rv6-concurrency-0-7e51f4b8-0809-440e-8265-9914a7f21997",
+      "processed_at": "2026-09-18T13:19:21.925Z",
+      "attempts": 0
+    },
+    {
+      "webhook_id": "rv6-concurrency-1-a3be06e0-4da4-488f-bdde-19821f415538",
+      "processed_at": "2026-09-18T13:19:21.976Z",
+      "attempts": 0
+    },
+    {
+      "webhook_id": "rv6-concurrency-2-aa20ad0c-d5d8-4619-af52-46c5fb90e80e",
+      "processed_at": "2026-09-18T13:19:21.986Z",
+      "attempts": 0
+    },
+    {
+      "webhook_id": "rv6-concurrency-3-df373990-762b-453d-a5a8-f7eb0cc39655",
+      "processed_at": "2026-09-18T13:19:21.992Z",
+      "attempts": 0
+    },
+    {
+      "webhook_id": "rv6-concurrency-4-806a4d5f-3b09-4001-bb14-3f746e8b1a9e",
+      "processed_at": "2026-09-18T13:19:21.997Z",
+      "attempts": 0
+    },
+    {
+      "webhook_id": "rv6-concurrency-5-207dc1e8-38a2-4272-b9ee-748255631a90",
+      "processed_at": "2026-09-18T13:19:22.002Z",
+      "attempts": 0
+    }
+  ],
+  "compliance_audit_log_grouped": [
+    {
+      "webhook_id": "rv6-concurrency-0-7e51f4b8-0809-440e-8265-9914a7f21997",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    },
+    {
+      "webhook_id": "rv6-concurrency-1-a3be06e0-4da4-488f-bdde-19821f415538",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    },
+    {
+      "webhook_id": "rv6-concurrency-2-aa20ad0c-d5d8-4619-af52-46c5fb90e80e",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    },
+    {
+      "webhook_id": "rv6-concurrency-3-df373990-762b-453d-a5a8-f7eb0cc39655",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    },
+    {
+      "webhook_id": "rv6-concurrency-4-806a4d5f-3b09-4001-bb14-3f746e8b1a9e",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    },
+    {
+      "webhook_id": "rv6-concurrency-5-207dc1e8-38a2-4272-b9ee-748255631a90",
+      "topic": "customers/redact",
+      "outcome": "no_op",
+      "n": 1
+    }
+  ]
+}

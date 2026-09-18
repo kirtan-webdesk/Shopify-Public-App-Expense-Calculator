@@ -1,0 +1,57 @@
+{
+  "root": "D:\\Projects\\Shopify Public App \u2014 Expense Calculator",
+  "note": "MANUALLY REPRODUCED (Bash tool, not subprocess.run) \u2014 run-gates.py itself fails on this Windows environment with exit 127 (FileNotFoundError: shell=False cannot exec npm.cmd), same pre-existing cross-platform gap (F4) disclosed in every prior round. Same log format/contract reproduced by hand: real npm invocation, real exit code, __GATE_EXIT__ marker appended, SHA-256 over the exact log file. lint's single failure (exit 1) is the pre-existing, untracked, out-of-scope decisions/migrations/00000000000001-initial-schema.js file ('module is not defined', no-undef) \u2014 confirmed unrelated to this round's diff (same finding across every prior QA round since G4-sprint-1.1).",
+  "gates": {
+    "lint": {
+      "gate": "lint",
+      "command": "npm run lint",
+      "argv": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 1,
+      "status": "fail",
+      "output_ref": "dev-evidence/g1.5-revision-adr0009-0010/gates/lint.log",
+      "output_sha256": "f2d672fee9fec08b7b4f62aaf52babdf211ee6299588081bd94204372d8bb644"
+    },
+    "typecheck": {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g1.5-revision-adr0009-0010/gates/typecheck.log",
+      "output_sha256": "c995b2fcfa2359e3b7c1a9855200c6777993f0a953aacd19d0fe6d82b0d3d555"
+    },
+    "tests": {
+      "gate": "tests",
+      "command": "npm test",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g1.5-revision-adr0009-0010/gates/tests.log",
+      "output_sha256": "6194f4017521c6855189f7f4ed2dbbe9dae14570ae914820dd17705c4884183d"
+    },
+    "build": {
+      "gate": "build",
+      "command": "npm run build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g1.5-revision-adr0009-0010/gates/build.log",
+      "output_sha256": "7bc30b7291d33a99b318ed682975fa0614e9884192588caa14e6326f908a2715"
+    }
+  }
+}
