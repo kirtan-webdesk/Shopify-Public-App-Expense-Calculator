@@ -1,0 +1,11 @@
+[
+  {
+    "id": "c0b1c68c-2b6a-4fa8-8cce-50c288017464",
+    "webhook_id": "bug4-live-v3-correct-signed-001",
+    "topic": "app/uninstalled",
+    "received_at": "2026-09-18T10:17:32.511Z",
+    "processed_at": "2026-09-18T10:17:33.954Z",
+    "attempts": 0,
+    "last_error": null
+  }
+]

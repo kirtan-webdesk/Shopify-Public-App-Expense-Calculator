@@ -1,0 +1,10 @@
+=== POST /webhooks/app-uninstalled — HMAC header MISSING ===
+HTTP/1.1 400 Bad Request
+Vary: Origin
+Date: Fri, 18 Sep 2026 10:17:20 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+=== POST /webhooks/app-uninstalled — HMAC header present but INVALID ===
+status: 401
+response body: ""

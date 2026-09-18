@@ -1,0 +1,4 @@
+GET /healthz: 200
+GET /app (unauth): 302
+POST /webhooks/app-uninstalled missing HMAC:
+HTTP/1.1 400 Bad Request

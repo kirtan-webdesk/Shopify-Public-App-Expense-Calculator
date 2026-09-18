@@ -1,0 +1,3 @@
+=== POST /webhooks/app-uninstalled — CORRECTLY SIGNED (real app/uninstalled, zero-session shop) ===
+status: 200
+response body: ""
