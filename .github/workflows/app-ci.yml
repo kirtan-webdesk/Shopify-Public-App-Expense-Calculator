@@ -1,0 +1,27 @@
+name: App CI
+# CI for the expense-calculator Shopify public app. Mandatory checks run
+# WITHOUT --if-present: the app defines lint / typecheck / test / build
+# scripts (package.json), so CI fails loudly if any of them regress or go
+# missing. These are the exact 4 gate commands tools/scripts/run-gates.py
+# uses, so a green run here matches the canonical local gate evidence.
+on:
+  push:
+    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
+  pull_request:
+    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: "npm" }
+      - run: npm ci
+      - name: Lint (mandatory)
+        run: npm run lint
+      - name: Typecheck (mandatory)
+        run: npm run typecheck
+      - name: Test (mandatory)
+        run: npm test
+      - name: Build (mandatory)
+        run: npm run build
