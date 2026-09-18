@@ -1,0 +1,13 @@
+// Sequelize CLI paths. Models live under app/db/models (Sequelize-managed
+// app tables only — the Shopify session table is library-managed, see
+// ADR-0007, and is NEVER touched by anything in this directory tree).
+"use strict";
+
+const path = require("path");
+
+module.exports = {
+  config: path.resolve("db", "config", "config.cjs"),
+  "migrations-path": path.resolve("db", "migrations"),
+  "seeders-path": path.resolve("db", "seeders"),
+  "models-path": path.resolve("app", "db", "models"),
+};
