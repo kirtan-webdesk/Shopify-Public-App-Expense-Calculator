@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "distribution_type": "public",
+  "api_version": "2026-07",
+  "commit_sha": "58050e1a4d9b17b617122cf34606eb4e32b99a0c",
+  "executed_at_utc": "2026-09-18T14:29:43Z",
+  "executor": "shopify-developer-agent (Claude Code, session 93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f)",
+  "session_id": "93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f",
+  "local_gates": {
+    "lint": {
+      "status": "pass",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "output_ref": "app/.gates/lint.log",
+      "output_sha256": "2dbcadf6952581a31688b8990252cff06d619a59f26bc1de0c6354579732c7f9",
+      "detail": "eslint . --max-warnings=0. run-gates.py (.claude/tools/scripts/run-gates.py) itself still fails on this Windows environment (subprocess.run(['npm',...], shell=False) cannot exec npm.cmd, same F4 gap disclosed since G4-sprint-1.1) -- produced by a manual equivalent (identical argv/command, identical capture-and-__GATE_EXIT__-marker contract) run directly, exit code and log content unchanged from what run-gates.py would have captured had it worked."
+    },
+    "typecheck": {
+      "status": "pass",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "output_ref": "app/.gates/typecheck.log",
+      "output_sha256": "c995b2fcfa2359e3b7c1a9855200c6777993f0a953aacd19d0fe6d82b0d3d555",
+      "detail": "react-router typegen && tsc --noEmit. Same manual-equivalent-invocation note as lint."
+    },
+    "tests": {
+      "status": "pass",
+      "command": "npm test",
+      "exit_code": 0,
+      "output_ref": "app/.gates/tests.log",
+      "output_sha256": "5310e78fd41cdbe032a369457e59d1fe9f577e6e0b3a419cd2e13646eb41f885",
+      "detail": "vitest run -- 160 tests across 13 files, all passing (up from 76 tests / 6 files at G3). DB-integration evidence for this sprint's expense-rule CRUD + engine-against-real-rows is NOT in this vitest run (vitest.config.ts deliberately stays DB-free -- no DATABASE_URL secret in CI, .github/workflows/app-ci.yml) -- it is a separate live run, see dev-evidence/g4-sprint-2.1-m2-m3/00-SUMMARY.md and live-evidence.ts."
+    },
+    "build": {
+      "status": "pass",
+      "command": "npm run build",
+      "exit_code": 0,
+      "output_ref": "app/.gates/build.log",
+      "output_sha256": "36d155018b8e27396cc9e39109cd3bd5f1b0eb878cc768975c677d79a5121b34",
+      "detail": "react-router build (client + ssr). Real DATABASE_URL/SHOPIFY_API_KEY/SHOPIFY_API_SECRET values present in this environment's .env (gitignored, not committed; same Neon Postgres used for the live evidence run)."
+    }
+  },
+  "validations": [
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-2-1-calculator-results-final",
+      "conversation_id": "093f7db4-4d16-406c-b65a-8be6a553efec",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.calculator.tsx",
+          "sha256": "5c210b069bf0a50e27826c9b945f897bac7d8cba643c26d8bed400d938248cee"
+        },
+        {
+          "path": "app/routes/app.results.tsx",
+          "sha256": "a79455c25773059671e0bef5f71af02b0912b71041bf1ef1a877663c7af3fa84"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-2.1-m2-m3/records/polaris-calculator-results-record.json",
+        "sha256": "fbdd632d402399cb652948b9553a92e168e82000f804bc7094a5cf8a92965ced"
+      }
+    }
+  ],
+  "overall_status": "VALID",
+  "remaining_warnings": [
+    "run-gates.py still fails on this Windows environment (same WinError2/npm.cmd gap as every prior round since G4-sprint-1.1) -- gate logs produced by a manual equivalent with the identical __GATE_EXIT__ contract, not by run-gates.py itself. This is a plugin cross-platform gap, not something this developer agent is authorized to fix unprompted.",
+    "NEW FINDING (found live, NOT fixed, NOT authorized -- no-auto-fix rule): app/db/repositories/shop.repository.ts's upsertInstalledShop() cannot create a brand-new shop row -- ShopModel.installedAt (app/db/models/shop.model.ts) is allowNull:false with no defaultValue at the Sequelize model layer, only a DB-side DEFAULT now(); Sequelize's client-side validator rejects the insert before SQL is ever sent. Full detail and reproduction in dev-evidence/g4-sprint-2.1-m2-m3/00-SUMMARY.md. Neither file was touched by this sprint's diff. This blocks every real token-exchange install in production and should be the next authorized bug-fix command -- same severity class as the BUG-1/2/4/5 chain from G4-sprint-1.1. Does not block or invalidate this sprint's own evidence: no route built this sprint creates a shop row.",
+    "M4 (save/history persistence of a `calculation` row) is explicitly out of scope this sprint per the task brief -- the Calculate flow is a live, non-persisted preview only (app/domain/calculation-transport.ts). ENGINE_VERSION exists as a real constant (app/domain/expense-engine.ts) for M4 to consume, per the task's explicit instruction, but nothing writes it to a database row yet.",
+    "Placeholder expense-rate defaults (app/domain/expense-rule-defaults.ts) and the 2 placeholder formula patterns (app/domain/expense-formulas.ts) are illustrative only, pending OQ-4 (real business sign-off) -- labeled visibly as such in the calculator UI (warning banner + inline per-formula note), never presented as business advice. Must be revisited once OQ-4 closes.",
+    "The `data-save-bar` form-attribute contextual-save-bar approach (app/routes/app.calculator.tsx) is confirmed against shopify.dev docs (Save Bar API / App Bridge web components) via the same Dev MCP conversation, but has not been exercised against a real embedded Admin session with actual App Bridge JS loaded -- VERIFY AT BUILD / at first real dev-store install that App Bridge actually auto-detects this form's dirty state and that the Save button's implicit form submission is captured correctly by the hidden intent field defaulting to \"save\".",
+    "SUPPORTED_CURRENCY_CODES (app/domain/expense-rule-validation.ts) hardcodes a 2-decimal minor-unit exponent for all 4 supported currencies (USD/CAD/EUR/GBP) -- correct for all four today, but flagged verify-at-build if a non-2-exponent currency (e.g. JPY, KWD) is ever added, per ADR-0005's general currency-exponent guidance.",
+    "MCP validation covers Polaris/App-Bridge component usage only (validate_component_codeblocks) -- it does not (and cannot) verify the calculation engine's money/rounding correctness; that is proven separately by the vitest determinism/reconciliation/tie-break tests and the live-evidence.ts run against a real database, both referenced above."
+  ],
+  "live_store_items": [
+    "Confirm the data-save-bar auto-detection and Save/Discard behavior against a real embedded Admin session with the real app-bridge.js loaded (see remaining_warnings) -- not exercisable in this sandbox.",
+    "Run an axe-core accessibility pass over the now-live calculator/results pages (ADR-0004 FT-19a, still deferred since G3) -- these pages are no longer static placeholders, so this is now real, exercisable work, not a deferred N/A.",
+    "Confirm the S2.1 seeded-defaults-on-install behavior once OQ-4 closes and this sprint's lazy per-shop seeding (getOrSeedExpenseRules, triggered on first calculator load) is reconciled against whatever the final product decision on install-time seeding turns out to be.",
+    "Fix decision needed on the NEW FINDING (ShopModel.installedAt) before any brand-new shop's real token-exchange install can complete in production -- see remaining_warnings and dev-evidence/g4-sprint-2.1-m2-m3/00-SUMMARY.md."
+  ]
+}

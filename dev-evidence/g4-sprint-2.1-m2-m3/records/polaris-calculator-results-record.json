@@ -1,0 +1,17 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-2-1-calculator-results-final",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "validated_input_sha256": [
+      "5c210b069bf0a50e27826c9b945f897bac7d8cba643c26d8bed400d938248cee",
+      "a79455c25773059671e0bef5f71af02b0912b71041bf1ef1a877663c7af3fa84"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=093f7db4-4d16-406c-b65a-8be6a553efec) run against the byte-exact content of app/routes/app.calculator.tsx and app/routes/app.results.tsx (content verified identical to the committed files via sha256 before and after submission — commit 58050e1a4d9b17b617122cf34606eb4e32b99a0c). Both code blocks returned SUCCESS. app.calculator.tsx: found components s-page, s-section, s-banner, s-number-field, s-select, s-option, s-button. app.results.tsx: found components s-page, s-link, s-section, s-banner. This was the THIRD validation pass on app.calculator.tsx in this session, not the first: pass 1 (an adapted, non-literal reconstruction, artifactId app-calculator-g4-2.1 rev 1) caught two real defects fixed before the literal pass — (a) a hand-rolled <ui-save-bar> element does not exist on JSX.IntrinsicElements in the real Shopify types (it is real but is for controlling a save bar defined on a PARENT page from inside a nested <s-app-window> iframe; this page's own shell needed the `data-save-bar` form-attribute approach instead, confirmed via a follow-up search_docs_chunks call in the same conversation), and s-button has no `name`/`value` prop (confirmed via the same docs lookup, which showed s-button's real prop set), so the Calculate button was changed from type=\"submit\" name=\"intent\" value=\"calculate\" to type=\"button\" with an onClick handler that sets a hidden <input name=\"intent\"> and calls form.requestSubmit(). Pass 2 (same adapted reconstruction, rev 2) caught a third, smaller issue: a native checkbox's onChange used e.target.checked, which the validator's stricter environment does not narrow from EventTarget; changed to e.currentTarget cast. Pass 3 (rev 3, still the adapted reconstruction) returned SUCCESS, and this final call re-validates the literal, byte-exact committed file content (not the adapted reconstruction) to produce honest hash-bound evidence. app.results.tsx required no changes across any pass — its first submission (an adapted reconstruction) and this final literal-content submission both returned SUCCESS unchanged.",
+      "errors": []
+    }
+  }
+}
