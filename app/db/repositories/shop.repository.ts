@@ -44,9 +44,23 @@ export async function upsertInstalledShop(shopDomain: string): Promise<ShopConte
  * see app/services/compliance/app-uninstalled.service.ts — because sessions
  * are library-owned (ADR-0007) and this repository never touches
  * shopify_sessions.
+ *
+ * BUG-4 fix: accepts the CALLER's transaction rather than opening its own —
+ * same pattern as hardDeleteShop (shop/redact). The drain worker
+ * (app/workers/drain-worker.ts) calls this from inside claimAndProcessOne's
+ * savepoint transaction, so if the session-deletion step that follows this
+ * call throws, the savepoint rolls back and this update is undone with it —
+ * no more half-committed uninstalled_at with a session-deletion failure
+ * retrying forever against a shop that already looks uninstalled.
  */
-export async function markShopUninstalled(shopDomain: string): Promise<void> {
-  await ShopModel.update({ uninstalledAt: new Date() }, { where: { shopDomain } });
+export async function markShopUninstalled(
+  shopDomain: string,
+  transaction: Transaction,
+): Promise<void> {
+  await ShopModel.update(
+    { uninstalledAt: new Date() },
+    { where: { shopDomain }, transaction },
+  );
 }
 
 /** ADR-0008 §5: shops past the sweeper window, for the 45-day safety sweep. */

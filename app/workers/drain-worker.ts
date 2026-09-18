@@ -14,7 +14,9 @@ import type { ClaimedWebhookEvent } from "~/db/repositories/webhook-event.reposi
 async function dispatch(row: ClaimedWebhookEvent, transaction: Transaction): Promise<void> {
   switch (row.topic) {
     case "app/uninstalled":
-      await handleAppUninstalled(row.shopDomain);
+      // BUG-4 fix: pass the shared savepoint transaction, same as
+      // handleShopRedact below — see app-uninstalled.service.ts.
+      await handleAppUninstalled(row.shopDomain, transaction);
       return;
     case "customers/data_request":
       await handleCustomersDataRequest(row.shopDomain, row.webhookId);
