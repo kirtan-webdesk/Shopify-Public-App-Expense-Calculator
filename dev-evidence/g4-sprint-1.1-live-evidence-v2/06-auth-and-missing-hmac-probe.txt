@@ -1,0 +1,15 @@
+=== GET /healthz (unauthenticated, expected 200) ===
+status: 200
+body: ok
+
+=== GET /app (unauthenticated) ===
+status: 302
+body(first 200 chars): 
+
+=== GET /app/calculator (unauthenticated) ===
+status: 410
+body(first 200 chars): <!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="shopify-api-key" content="54ba785866ef1841cfa1f6e015f46bb4"
+
+=== POST /webhooks/shop-redact — no headers at all ===
+status: 400
+body: 

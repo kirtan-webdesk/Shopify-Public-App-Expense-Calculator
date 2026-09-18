@@ -1,0 +1,56 @@
+{
+  "root": "D:\\Projects\\Shopify Public App \u2014 Expense Calculator",
+  "gates": {
+    "lint": {
+      "gate": "lint",
+      "command": "npm run lint",
+      "argv": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 127,
+      "status": "fail",
+      "output_ref": "D:/Projects/Shopify Public App \u2014 Expense Calculator/dev-evidence/g4-sprint-1.1-live-evidence-v2/gates/lint.log",
+      "output_sha256": "201fdae5678332b858bc9d6c77bc3234a07605fc4d6e2b5037259567974f84b3"
+    },
+    "typecheck": {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 127,
+      "status": "fail",
+      "output_ref": "D:/Projects/Shopify Public App \u2014 Expense Calculator/dev-evidence/g4-sprint-1.1-live-evidence-v2/gates/typecheck.log",
+      "output_sha256": "201fdae5678332b858bc9d6c77bc3234a07605fc4d6e2b5037259567974f84b3"
+    },
+    "tests": {
+      "gate": "tests",
+      "command": "npm test",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "exit_code": 127,
+      "status": "fail",
+      "output_ref": "D:/Projects/Shopify Public App \u2014 Expense Calculator/dev-evidence/g4-sprint-1.1-live-evidence-v2/gates/tests.log",
+      "output_sha256": "201fdae5678332b858bc9d6c77bc3234a07605fc4d6e2b5037259567974f84b3"
+    },
+    "build": {
+      "gate": "build",
+      "command": "npm run build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit_code": 127,
+      "status": "fail",
+      "output_ref": "D:/Projects/Shopify Public App \u2014 Expense Calculator/dev-evidence/g4-sprint-1.1-live-evidence-v2/gates/build.log",
+      "output_sha256": "201fdae5678332b858bc9d6c77bc3234a07605fc4d6e2b5037259567974f84b3"
+    }
+  }
+}

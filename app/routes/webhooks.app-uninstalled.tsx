@@ -1,6 +1,7 @@
 import type { Route } from "./+types/webhooks.app-uninstalled";
 import { authenticate } from "~/shopify.server";
 import { ackAndEnqueueWebhook } from "~/services/webhook-inbox.service";
+import { getRawWebhookTopic } from "~/services/webhook-topic.service";
 
 // webhooks/app-uninstalled — declared via [[webhooks.subscriptions]] in
 // shopify.app.toml (ADR-0006: no runtime registration mutation). NOT nested
@@ -14,12 +15,16 @@ import { ackAndEnqueueWebhook } from "~/services/webhook-inbox.service";
 // ADR-0008 step 1) runs asynchronously in the drain worker
 // (app/workers/drain-worker.ts), never in this request.
 export async function action({ request }: Route.ActionArgs) {
-  const { topic, shop, payload, webhookId } = await authenticate.webhook(request);
+  const { shop, payload, webhookId } = await authenticate.webhook(request);
+  // BUG-1 fix — use the literal wire-format topic (X-Shopify-Topic header),
+  // never authenticate.webhook()'s internally-normalized `topic` field. See
+  // app/services/webhook-topic.service.ts for the full explanation.
+  const topic = getRawWebhookTopic(request, "app/uninstalled");
 
   await ackAndEnqueueWebhook({
     webhookId,
     shopDomain: shop,
-    topic: topic as "app/uninstalled",
+    topic,
     payload: payload as Record<string, unknown>,
   });
 

@@ -1,0 +1,12 @@
+{
+  "shop_domain": "wsa-qa-g4-live-evidence-test.myshopify.com",
+  "after_redact_row_counts": {
+    "shop": 0,
+    "expense_rule": 0,
+    "calculation": 0,
+    "calculation_line_item": 0,
+    "webhook_event": 0,
+    "compliance_audit_log": 1,
+    "shopify_sessions": 0
+  }
+}

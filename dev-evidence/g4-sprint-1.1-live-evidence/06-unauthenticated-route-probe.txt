@@ -1,0 +1,119 @@
+=== GET /healthz (expected: unauthenticated OK, static, no store data) ===
+HTTP/1.1 200 
+Vary: Origin
+content-type: text/plain
+Date: Fri, 18 Sep 2026 09:14:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+ok
+=== GET /app (unauthenticated, sensitive embedded admin route) ===
+HTTP/1.1 302 
+Vary: Origin
+location: /app/calculator
+Date: Fri, 18 Sep 2026 09:14:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+
+=== GET /app/calculator (unauthenticated, sensitive embedded admin route) ===
+HTTP/1.1 410 
+Vary: Origin
+content-type: text/html
+Date: Fri, 18 Sep 2026 09:14:34 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="shopify-api-key" content="54ba785866ef1841cfa1f6e015f46bb4"/><link rel="modulepreload" href="/app/entry.client.tsx"/><link rel="modulepreload" href="/app/root.tsx"/><link rel="modulepreload" href="/app/routes/app.tsx"/><link rel="modulepreload" href="/app/routes/app.calculator.tsx"/><script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script><script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script></head><body><s-page heading="Something went wrong"><s-banner tone="critical" heading="Unexpected error"><p>Something went wrong loading this page. No details are shown here to avoid leaking internals — this event has been logged.</p></s-banner></s-page><script>((storageKey2, restoreKey) => {
+    if (!window.history.state || !window.history.state.key) {
+      let key = Math.random().toString(32).slice(2);
+      window.history.replaceState({ key }, "");
+    }
+    try {
+      let positions = JSON.parse(sessionStorage.getItem(storageKey2) || "{}");
+      let storedY = positions[restoreKey || window.history.state.key];
+      if (typeof storedY === "number") {
+        window.scrollTo(0, storedY);
+      }
+    } catch (error) {
+      console.error(error);
+      sessionStorage.removeItem(storageKey2);
+    }
+  })("react-router-scroll-positions", null)</script><script>window.__reactRouterContext = {"basename":"/","future":{"unstable_optimizeDeps":false,"v8_passThroughRequests":false,"v8_trailingSlashAwareDataRequests":false,"unstable_previewServerPrerendering":false,"v8_middleware":false,"v8_splitRouteModules":false,"v8_viteEnvironmentApi":false},"routeDiscovery":{"mode":"lazy","manifestPath":"/__manifest"},"ssr":true,"isSpaMode":false};window.__reactRouterContext.stream = new ReadableStream({start(controller){window.__reactRouterContext.streamController = controller;}}).pipeThrough(new TextEncoderStream());</script><script type="module" async="">import "/@id/__x00__virtual:react-router/inject-hmr-runtime";;
+import * as route0 from "/app/root.tsx";
+import * as route1 from "/app/routes/app.tsx";
+import * as route2 from "/app/routes/app.calculator.tsx";
+  window.__reactRouterManifest = {
+  "version": "0.0200759553822365",
+  "url": "/@id/__x00__virtual:react-router/browser-manifest",
+  "hmr": {
+    "runtime": "/@id/__x00__virtual:react-router/inject-hmr-runtime"
+  },
+  "entry": {
+    "module": "/app/entry.client.tsx",
+    "imports": []
+  },
+  "routes": {
+    "root": {
+      "id": "root",
+      "path": "",
+      "module": "/app/root.tsx",
+      "hasAction": false,
+      "hasLoader": true,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": true,
+      "hasErrorBoundary": true,
+      "imports": []
+    },
+    "routes/app": {
+      "id": "routes/app",
+      "parentId": "root",
+      "path": "app",
+      "module": "/app/routes/app.tsx",
+      "hasAction": false,
+      "hasLoader": true,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": true,
+      "hasErrorBoundary": false,
+      "imports": []
+    },
+    "routes/app.calculator": {
+      "id": "routes/app.calculator",
+      "parentId": "routes/app",
+      "path": "calculator",
+      "module": "/app/routes/app.calculator.tsx",
+      "hasAction": false,
+      "hasLoader": false,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": true,
+      "hasErrorBoundary": false,
+      "imports": []
+    },
+    "routes/app._index": {
+      "id": "routes/app._index",
+      "parentId": "routes/app",
+      "index": true,
+      "module": "/app/routes/app._index.tsx",
+      "hasAction": false,
+      "hasLoader": true,
+      "hasClientAction": false,
+      "hasClientLoader": false,
+      "hasClientMiddleware": false,
+      "hasDefaultExport": false,
+      "hasErrorBoundary": false,
+      "imports": []
+    }
+  }
+};
+  window.__reactRouterRouteModules = {"root":route0,"routes/app":route1,"routes/app.calculator":route2};
+
+import("/app/entry.client.tsx");</script><!--$--><script>window.__reactRouterContext.streamController.enqueue("[{\"_1\":2,\"_3\":-5,\"_4\":5},\"loaderData\",{\"_6\":11},\"actionData\",\"errors\",{\"_6\":7},\"root\",[\"ErrorResponse\",8,9,10],\"\",410,\"Gone\",{\"_12\":13},\"apiKey\",\"54ba785866ef1841cfa1f6e015f46bb4\"]\n");</script><!--$--><script>window.__reactRouterContext.streamController.close();</script><!--/$--><!--/$--></body></html>

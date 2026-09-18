@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.0.0",
+  "distribution_type": "public",
+  "api_version": "2026-07",
+  "commit_sha": "299328cd2288c7fbcef4511a41be6f2ee160988b",
+  "executed_at_utc": "2026-09-18T08:20:52Z",
+  "executor": "shopify-developer-agent (Claude Code, session eb096a7a-4ec3-43be-88fc-50dc6bb69768)",
+  "session_id": "eb096a7a-4ec3-43be-88fc-50dc6bb69768",
+  "local_gates": {
+    "lint": {
+      "status": "pass",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "output_ref": "app/.gates/lint.log",
+      "output_sha256": "e72c1208015c6b072aa4ce3e02d2ee597a32ecb372294a901d55b70f82915c67",
+      "detail": "eslint . --max-warnings=0. Produced by a manual equivalent of run-gates.py (same argv, same capture, same __GATE_EXIT__ contract) because run-gates.py's subprocess.run(shell=False) could not exec npm.cmd on this Windows environment (WinError 2 / exit 127 -- see remaining_warnings). The command actually ran and its real exit code is recorded."
+    },
+    "typecheck": {
+      "status": "pass",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "output_ref": "app/.gates/typecheck.log",
+      "output_sha256": "1bd14367104ff5e732216c63137c0dc0560b114e0012eba658ed7b35b365d5d9",
+      "detail": "react-router typegen && tsc --noEmit. Same manual-equivalent-invocation note as lint."
+    },
+    "tests": {
+      "status": "pass",
+      "command": "npm test",
+      "exit_code": 0,
+      "output_ref": "app/.gates/tests.log",
+      "output_sha256": "9fbedf9e21a4ad98e8d6091875ccc15a198bcee9501574cb7e0d13ae492a3783",
+      "detail": "vitest run -- 76 tests across 6 files, all passing. DB-dependent fitness tests are NOT included (no live Postgres in this environment) -- see tests/README.md and remaining_warnings."
+    },
+    "build": {
+      "status": "pass",
+      "command": "npm run build",
+      "exit_code": 0,
+      "output_ref": "app/.gates/build.log",
+      "output_sha256": "9072e81c2a2ed6b7a0a2e1a471ed62606995cc49e4b2fd3917a64a4956a4f054",
+      "detail": "react-router build (client + ssr). Placeholder SHOPIFY_API_KEY/SECRET/DATABASE_URL env values used -- see remaining_warnings."
+    }
+  },
+  "validations": [
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g3-app-pages-r2",
+      "conversation_id": "bbc5f338-a8fc-4e10-ae1b-cbd07ae1a748",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.calculator.tsx",
+          "sha256": "58290eea6b2e584a0cf5fa930d8d1135405790ce47edf2c1a3073ee4edb83206"
+        },
+        {
+          "path": "app/routes/app.results.tsx",
+          "sha256": "30433945320e6bfb4aaa0305f444ef87aaef0c3b087520f24a29ece26c26964e"
+        },
+        {
+          "path": "app/routes/app.history.tsx",
+          "sha256": "58ce4dcfb8fd2eb20c05e2763635e9e7b1071451a4ffb3853d1ca26a71d9e6ff"
+        },
+        {
+          "path": "app/routes/app.history.$id.tsx",
+          "sha256": "357ad84bf5e10168a7e436ea9e4f599148075e8d2ad725565176c366549703e5"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g3-scaffold/records/polaris-app-pages-record.json",
+        "sha256": "0947c7dfa5dea52f294b265c2577766de3b82be4ae35c39ca2e324eb323d36a3"
+      }
+    }
+  ],
+  "overall_status": "VALID",
+  "remaining_warnings": [
+    "run-gates.py itself failed on this Windows environment: subprocess.run(['npm','run',...], shell=False) cannot exec npm.cmd (WinError 2 / FileNotFoundError -> exit 127 for all four gates, output saved and reproducible). Gate logs referenced above were produced by a manual equivalent (identical argv, identical capture-and-__GATE_EXIT__-marker contract) run directly via a working shell, not by run-gates.py. Recommend patching run-gates.py for Windows (e.g. shutil.which resolution or an explicit cmd /c wrapper) as a follow-up -- not something this developer agent is authorized to change unprompted.",
+    "check-dev-handoff.py's B12 project-binding step reads <--root>/project.json directly; this project's authoritative project.json lives at projects/expense-calculator/project.json, one level down. Verify the intended --root value (or the checker's expectation) before running it -- this may cause a 'missing project.json' rejection unrelated to the evidence's own correctness.",
+    "app/routes/app.tsx's <s-app-nav>/<s-link> navigation is an App Bridge web component (@shopify/app-bridge-types), not Polaris (@shopify/polaris-types) -- outside validate_component_codeblocks's stated scope for this tool. Confirmed current (app-home v1.1-rc, 2026-07) via a separate Dev MCP search_docs_chunks lookup instead; not represented in this evidence's validations[] because the schema's validator_type enum (graphql/polaris-component/theme) has no category for a docs-search-only confirmation. Flagged, not silently assumed.",
+    "customers/data_request (app/services/compliance/customers-data-request.service.ts) has NO decided outbound-delivery transport to the store owner -- nothing in spec.md/architecture-packet.md/any ADR specifies one. Needs an RFC/ADR before G-Review; documented as a KNOWN GAP in the file itself, not silently built around.",
+    "DB-integration tests (fitness-test-plan.md FT-02b/c, FT-05, FT-06, FT-07, FT-08, FT-08b, FT-09, FT-14, FT-15b, FT-17, FT-20) were not run -- no local Postgres/docker in this environment, per the task brief. The repository/service/worker code they would exercise (tenancy negative tests, HMAC 401, dedup, shop/redact table-enumeration + row-count assertions, append-only enforcement, session-restart survival, migration reversibility, 45-day sweeper) is written and structured for it; only the live DB round-trip is deferred to S1.2 against a real dev-store Postgres instance.",
+    "Only a lightweight static approximation of FT-01/FT-03/FT-04/FT-10/FT-11b exists (tests/architecture/*.test.ts). The full fitness-test suite in decisions/fitness-test-plan.md (29 checks) is not implemented in this scaffold and remains real M1-M5 QA/dev work.",
+    "shopify.app.toml is hand-authored (no Partner Dashboard/Shopify CLI credentials available in this environment -- OQ-2/OQ-3 still open). Must be reconciled against `shopify app config link` / CLI-generated config before first real deploy.",
+    "Placeholder SHOPIFY_API_KEY/SHOPIFY_API_SECRET/DATABASE_URL values were used in .env (gitignored, not committed) to make lint/typecheck/build/test runnable in this environment. Real credentials must come through the WebDesk credentials-handoff channel (OQ-3), never hard-coded or logged.",
+    "The initial commit deliberately excludes .claude/, projects/, and sow-spec.md (the plugin/planning workspace) -- only the app scaffold itself was staged. This is a developer judgment call, not a silent one: flagged for PM/orchestrator confirmation of the intended repo boundary before this becomes a pushed GitHub repo (OQ-2)."
+  ],
+  "live_store_items": [
+    "Confirm the compliance_topics / [[webhooks.subscriptions]] TOML shape in shopify.app.toml against the Shopify-CLI-resolved schema for api_version 2026-07 (ADR-0002 verify-at-build).",
+    "Confirm token-exchange install + session persistence end-to-end against a real dev store, including a server restart to prove session survival (S1.1 acceptance criteria, ADR-0007 FT-15b).",
+    "Confirm webhook HMAC verification and delivery timing against Shopify's real webhook sender (1s connect / 5s total budget, ADR-0001/ADR-0002).",
+    "Confirm whether the installed @shopify/shopify-app-react-router major line (^3.0.0, installed 3.0.0) already defaults future.expiringOfflineAccessTokens on (ADR-0007 verify-at-build item).",
+    "Run db/migrations/20260918120000-initial-schema.cjs against a real Postgres dev-store instance and confirm CREATE EXTENSION pgcrypto is permitted by the hosting provider (data-model.md §10) -- not run anywhere yet, per the task brief.",
+    "Run an axe-core accessibility pass once M2/M3 build the real interactive calculator/results pages (DESIGN-NOTES.md §6, ADR-0004 FT-19a) -- the current M1 pages are static placeholders with minimal a11y surface to test."
+  ]
+}

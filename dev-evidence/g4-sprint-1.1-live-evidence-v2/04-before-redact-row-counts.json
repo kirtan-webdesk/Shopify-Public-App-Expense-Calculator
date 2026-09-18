@@ -1,0 +1,8 @@
+{
+  "shop": 1,
+  "expense_rule": 1,
+  "calculation": 1,
+  "calculation_line_item": 1,
+  "webhook_event": 1,
+  "shopify_sessions": 0
+}

@@ -1,0 +1,18 @@
+Note: this file is intentionally NOT a clean insert result. It captures an
+attempt, made between the two drain-worker diagnostic runs, to insert a SECOND
+correctly-shaped shop/redact inbox row by first looking up the test shop's id.
+That lookup returned no row:
+
+  ERROR Cannot read properties of undefined (reading 'id')
+
+This was expected once understood in hindsight: the background drain worker
+had, in the interim (while other evidence-gathering commands were running),
+already succeeded in fully processing the FIRST direct-inbox-insert row
+(webhook_id "wsa-test-live-redact-0003-directinsert") after the session row
+seeded in 10-seed-session-row.json became available to it — so the `shop` row
+no longer existed by the time this second-insert attempt ran. See
+13-sql-trace-redact-sequence.log for the full statement-by-statement trace
+proving exactly when and how that first row was processed, and
+12-after-redact-row-counts.json / 14-compliance-audit-log-final.json for the
+resulting state. No second insert was needed once this was understood, so
+this script was not re-run against a fresh shop.

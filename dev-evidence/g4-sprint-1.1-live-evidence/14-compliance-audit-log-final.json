@@ -1,0 +1,19 @@
+[
+  {
+    "id": "bfc7a409-5d13-4f2a-b109-320782841106",
+    "shop_domain": "wsa-qa-g4-live-evidence-test.myshopify.com",
+    "webhook_id": "wsa-test-live-redact-0003-directinsert",
+    "topic": "shop/redact",
+    "outcome": "completed",
+    "reason": null,
+    "deleted_row_counts": {
+      "shop": 1,
+      "calculation": 1,
+      "expense_rule": 1,
+      "webhook_event": 1,
+      "shopify_sessions": 1,
+      "calculation_line_item": 1
+    },
+    "occurred_at": "2026-09-18T09:21:11.128Z"
+  }
+]

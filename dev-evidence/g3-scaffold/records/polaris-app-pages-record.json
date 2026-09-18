@@ -1,0 +1,20 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g3-app-pages-r2",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "conversation_id": "bbc5f338-a8fc-4e10-ae1b-cbd07ae1a748",
+    "validated_input_sha256": [
+      "58290eea6b2e584a0cf5fa930d8d1135405790ce47edf2c1a3073ee4edb83206",
+      "30433945320e6bfb4aaa0305f444ef87aaef0c3b087520f24a29ece26c26964e",
+      "58ce4dcfb8fd2eb20c05e2763635e9e7b1071451a4ffb3853d1ca26a71d9e6ff",
+      "357ad84bf5e10168a7e436ea9e4f599148075e8d2ad725565176c366549703e5"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=bbc5f338-a8fc-4e10-ae1b-cbd07ae1a748) run against the byte-exact content of the four M1 scaffold route-component files (app/routes/app.calculator.tsx, app/routes/app.results.tsx, app/routes/app.history.tsx, app/routes/app.history.$id.tsx; content verified identical to the committed files via sha256 before and after submission). All four returned SUCCESS. Found components: s-page, s-section, s-banner, s-number-field, s-button, s-link. This was revision 2 of the calculator/results/history-detail artifacts: revision 1 caught two real defects that were fixed before this run — s-page has no backAction prop (the mockup's guess; fixed to the real <s-link slot=\"breadcrumb-actions\"> pattern) and s-text-field has no `type` prop (fixed to the dedicated s-number-field component). Not covered by this tool/call: <s-app-nav>/<s-link> navigation in app/routes/app.tsx, which is an App Bridge web component (@shopify/app-bridge-types), not a Polaris component (@shopify/polaris-types) -- out of this validator's stated scope. That component was instead confirmed current (app-home v1.1-rc, 2026-07) via a separate search_docs_chunks lookup in the same conversation; see the developer handoff prose for the reasoning, since the evidence schema's validator_type enum has no slot for a docs-lookup-only confirmation.",
+      "errors": []
+    }
+  }
+}

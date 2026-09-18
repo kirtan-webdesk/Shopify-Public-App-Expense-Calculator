@@ -1,0 +1,15 @@
+=== FINAL RE-CONFIRMATION (post-redact) ===
+=== GET /healthz ===
+status: 200
+body: ok
+
+=== GET /app/calculator (unauthenticated) ===
+status: 410
+
+=== POST /webhooks/shop-redact — HMAC header MISSING entirely ===
+status: 400
+body: 
+
+=== POST /webhooks/customers-redact — HMAC header MISSING entirely ===
+status: 400
+body: 

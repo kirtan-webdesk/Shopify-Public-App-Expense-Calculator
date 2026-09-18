@@ -1,0 +1,14 @@
+
+=== POST /webhooks/shop-redact — HMAC header MISSING entirely ===
+status: 400 Bad Request
+response body: ""
+
+=== POST /webhooks/shop-redact — HMAC header present but INVALID ===
+status: 401 Unauthorized
+response body: ""
+
+=== POST /webhooks/shop-redact — CORRECTLY SIGNED (real shop/redact for seeded test shop) ===
+status: 500 
+response body: "Unexpected Server Error\n\nSequelizeDatabaseError: new row for relation \"webhook_event\" violates check constraint \"chk_webhook_event_topic\""
+
+(correctly-signed request used X-Shopify-Webhook-Id=wsa-test-live-redact-0003 for later inbox lookup)

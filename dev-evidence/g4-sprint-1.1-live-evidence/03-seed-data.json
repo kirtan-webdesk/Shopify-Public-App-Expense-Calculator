@@ -1,0 +1,31 @@
+{
+  "shop": {
+    "id": "2491572b-25a1-4ea9-bace-07cceeef2d77",
+    "shop_domain": "wsa-qa-g4-live-evidence-test.myshopify.com",
+    "installed_at": "2026-09-18T09:13:57.043Z"
+  },
+  "expense_rule": {
+    "id": "8250bc21-d060-40f7-b5d7-85c7446e96cf",
+    "category_key": "marketing",
+    "rule_type": "percentage",
+    "rate_basis_points": 1500
+  },
+  "calculation": {
+    "id": "2164d4e9-a9cf-43b4-8405-e40e95d9b186",
+    "revenue_minor": "1000000",
+    "currency_code": "USD",
+    "total_expenses_minor": "150000",
+    "net_amount_minor": "850000"
+  },
+  "calculation_line_item": {
+    "id": "37537256-862f-4579-ab91-76ec3f6b4e7e",
+    "category_key": "marketing",
+    "computed_amount_minor": "150000"
+  },
+  "webhook_event_seed": {
+    "id": "2bc9b3f1-04a2-44e4-abc4-afcc95a939b3",
+    "webhook_id": "wsa-test-seed-app-uninstalled-0001",
+    "topic": "app/uninstalled",
+    "processed_at": "2026-09-18T09:13:57.043Z"
+  }
+}

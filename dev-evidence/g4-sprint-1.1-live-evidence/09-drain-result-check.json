@@ -1,0 +1,10 @@
+[
+  {
+    "id": "b8527b34-a8f8-4d0a-973d-4e46b60ee376",
+    "webhook_id": "wsa-test-live-redact-0003-directinsert",
+    "topic": "shop/redact",
+    "processed_at": null,
+    "attempts": 3,
+    "last_error": "syntax error at or near \")\""
+  }
+]

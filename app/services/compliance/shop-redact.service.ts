@@ -54,8 +54,22 @@ export async function handleShopRedact(
   // committed by the caller, the whole claim transaction still rolls back
   // together (see app/workers/drain-worker.ts), so a partial delete is not
   // left committed.
+  //
+  // BUG-2 fix (G4-sprint-1.1 live evidence, 00-SUMMARY.md §4 "Defect B"):
+  // @shopify/shopify-app-session-storage-postgresql's deleteSessions(ids)
+  // builds `WHERE "id" IN (${ids.join(', ')})` with no guard for an empty
+  // array, so deleteSessions([]) is a Postgres syntax error
+  // ("syntax error at or near ')'"), not a harmless no-op — confirmed live
+  // against Postgres. This is the NORMAL case for shop/redact: app/uninstalled
+  // (app-uninstalled.service.ts) already deletes every session row for the
+  // shop immediately on uninstall, and shop/redact fires ~48h later
+  // (ADR-0008) once sessions are already empty. Deleting zero sessions is a
+  // no-op the app can simply skip, rather than trying to make the library
+  // accept an empty array.
   const sessions = await sessionStorageInstance.findSessionsByShop(shopDomain);
-  await sessionStorageInstance.deleteSessions(sessions.map((s) => s.id));
+  if (sessions.length > 0) {
+    await sessionStorageInstance.deleteSessions(sessions.map((s) => s.id));
+  }
 
   await recordComplianceOutcome(
     {

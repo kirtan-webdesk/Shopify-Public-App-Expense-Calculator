@@ -1,0 +1,8 @@
+=== POST /webhooks/shop-redact — HMAC header present but INVALID ===
+status: 401
+response body: ""
+
+=== POST /webhooks/shop-redact — CORRECTLY SIGNED (real shop/redact for seeded test shop) ===
+status: 200
+response body: ""
+
