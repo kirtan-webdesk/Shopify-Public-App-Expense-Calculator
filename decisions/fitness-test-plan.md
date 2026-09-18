@@ -4,7 +4,7 @@
 |---|---|
 | **Status** | PROPOSED — pending G1.5 approval (Tech lead). Not self-approved. |
 | **Date** | 2026-09-17 · architect-agent |
-| **Enforces** | ADR-0001 … ADR-0008 (`./`) |
+| **Enforces** | ADR-0001 … ADR-0008 (`./`); ADR-0009/ADR-0010 (§9 transcription below, G1.5-revision) |
 | **Runs at** | every PR (CI, blocking) **and** at **G5** per milestone (evidence in the QA report) |
 
 An architectural decision that nothing checks is a preference. Every test below
@@ -68,6 +68,23 @@ cited in each G5 QA report.
 | **FT-19** | Chart and table render identical numbers from one fixture; the five mandated edge states (zero revenue, all-zero, single non-zero category, sub-1% slice, rounding residual) render without throwing | vitest component test | ADR-0004 | G5 / M3 |
 | **FT-19a** | The results view passes an automated accessibility check; the data table is present and reachable independently of the SVG | axe-core in component test | ADR-0004 | G5 / M3 |
 | **FT-20** | Sweeper: a shop with `uninstalled_at` beyond the window is purged; one inside the window is not; reinstall inside the window restores configuration | vitest | ADR-0008 | G5 / M1 |
+| **FT-21** | No recurring in-process scheduler anywhere in the server bundle: zero `setInterval(` at module scope, no import of a worker-bootstrap module from `entry.server`, and `app/workers/bootstrap.server.ts` does not exist | custom AST check (ts-morph) + dependency-cruiser | ADR-0009 D1 | G5 / M1 |
+| **FT-22** | `/api/cron/tick` with no / wrong bearer returns **401** and performs **zero DB writes** (asserted by row counts before and after); with `CRON_SECRET` unset it fails **closed** | vitest integration | ADR-0009 D5 | G5 / M1 |
+| **FT-23** | Resumability: with `N+1` pending rows and a budget allowing `N`, the tick returns 200 cleanly and the remaining row is still `processed_at IS NULL` **and claimable** (no claimed-but-unprocessed limbo) | vitest integration | ADR-0009 D4 | G5 / M1 |
+| **FT-24** | No webhook route awaits drain work inline: the drain is reached only via `scheduleAfterResponse(`, and FT-06's `<500ms with work still pending` assertion holds | custom AST check + existing FT-06 | ADR-0009 D2, ADR-0002 §1 | G5 / M1 |
+| **FT-25** | Deploy-config check: `vercel.json` declares the cron schedule for `/api/cron/tick`; `CRON_SECRET` is referenced and not literal; the function region env matches the DB region env | custom check over `vercel.json` + env manifest | ADR-0009 D3, ADR-0010 | G5 / M1 |
+| **FT-26** | Sequelize `pool.max` is within the serverless bound, and the production connection string is the **pooled** endpoint | custom check | ADR-0010 | G5 / M1 |
+| **FT-27** | `job_heartbeat` is written by the tick, and `/healthz` reports `cronStale` — with **no timestamp, no count, no shop identifier** in the body (extends FT-18) | vitest | ADR-0009 D6 | G5 / M1 |
+
+FT-21–27 transcribed from ADR-0009 §9 (G1.5-revision, 2026-09-18) — the
+serverless webhook/cron mechanism that supersedes ADR-0001's hosting class and
+ADR-0002 §4's in-process worker. FT-06, FT-07, FT-08, FT-08b, FT-09 and FT-20
+stand unchanged in intent but are now re-pointed at the new invocation path
+(the cron tick + `scheduleAfterResponse` continuation) rather than the retired
+in-process interval worker. ADR-0009's three production alerts
+(`cronStale` dead-man's switch, re-tuned unprocessed-`webhook_event`-age
+threshold, sweeper-deletion alert) extend §3 below and are not separately
+numbered as fitness tests.
 
 ---
 
@@ -80,9 +97,9 @@ They are an input to **G5.5** (observability + runbooks), not a substitute for i
 |---|---|---|
 | Webhook endpoint p95 response time | > 750ms | Early warning that ack is drifting toward the 1s/5s budget — the R1 signal if a sleeping tier is ever chosen (ADR-0001) |
 | Webhook endpoint 5xx rate | any sustained | Delivery failures accumulate toward subscription removal |
-| Inbox rows unprocessed > 15 min, or `attempts` at cap | any | **The worker is dead while the endpoint still returns 200** — the specific failure mode ADR-0002's split introduces |
-| 45-day sweeper purged ≥ 1 shop | any | A `shop/redact` delivery was lost (R2) — a GDPR near-miss that must not be silent |
-| Unexpected instance restart / OOM | any | ADR-0001 single-instance health |
+| `cronStale === true` on `/healthz` (external uptime check) | any | **Dead-man's switch** — the cron tick is the only guaranteed drain path since ADR-0009 retired the in-process worker; if it stops ticking, `webhook_event` rows go unprocessed silently (ADR-0009 D6) |
+| Oldest unprocessed `webhook_event` age | > `max(2 × cron interval, 30 min)` — **re-tuned** from the prior 15 min threshold | **The drain is dead while the endpoint still returns 200** — the specific failure mode ADR-0002's split introduces, re-tuned for the cron-tick cadence (ADR-0002, ADR-0009 D6) |
+| 45-day sweeper purged ≥ 1 shop | any | A `shop/redact` delivery was lost (R2) — a GDPR near-miss that must not be silent (ADR-0008 R2) |
 | Application error rate | baseline + deviation | General |
 
 ---
@@ -107,7 +124,7 @@ They are an input to **G5.5** (observability + runbooks), not a substitute for i
 
 | Milestone | Tests coming into force |
 |---|---|
-| **M1 Foundation** | FT-01, 02a/b/c, 03, 04, 05, 06, 07, 08, 08b, 09, 10, 11a/b/c, 12, 12b, 15a/b, 17, 18, 20 |
+| **M1 Foundation** | FT-01, 02a/b/c, 03, 04, 05, 06, 07, 08, 08b, 09, 10, 11a/b/c, 12, 12b, 15a/b, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27 (FT-21–27 added at G1.5-revision, ADR-0009, 2026-09-18) |
 | **M2 Configuration** | FT-02b extended to rule entities; FT-13a/b/e as money types land |
 | **M3 Engine + Results** | FT-13c, 13d, 19, 19a |
 | **M4 Save + History** | FT-14a, 14b, 14c |
