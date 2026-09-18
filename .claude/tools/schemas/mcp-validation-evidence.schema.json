@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://webdesksolution.ca/schemas/mcp-validation-evidence.schema.json",
+  "title": "Shopify Dev MCP validation evidence",
+  "description": "Structured, verifiable evidence that a shopify-developer validation was performed through the plugin-scoped Shopify Dev MCP tools. Field names use what the Claude Code runtime actually provides (session id; the tool_use event id, e.g. 'toolu_...'; the tool name); the server's learn_shopify_api returns the conversationId. Nothing here is developer prose — the checker recomputes file hashes and matches the reviewed commit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "distribution_type", "api_version", "commit_sha",
+    "executed_at_utc", "executor", "local_gates", "validations",
+    "overall_status", "remaining_warnings", "live_store_items"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "distribution_type": { "enum": ["public", "custom", "extension-only"] },
+    "api_version": { "type": "string", "pattern": "^[0-9]{4}-(01|04|07|10)$" },
+    "commit_sha": { "type": "string", "pattern": "^[0-9a-f]{7,40}$",
+      "description": "The exact commit the validation ran against; the checker rejects a mismatch with the reviewed build (stale/reused evidence)." },
+    "executed_at_utc": { "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$" },
+    "executor": { "type": "string", "minLength": 3,
+      "description": "Executor identity or Claude Code session identifier." },
+    "session_id": { "type": "string" },
+    "local_gates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["lint", "typecheck", "tests", "build"],
+      "properties": {
+        "lint": { "$ref": "#/$defs/gate" },
+        "typecheck": { "$ref": "#/$defs/gate" },
+        "tests": { "$ref": "#/$defs/gate" },
+        "build": { "$ref": "#/$defs/gate" }
+      }
+    },
+    "validations": { "type": "array", "items": { "$ref": "#/$defs/validation" } },
+    "overall_status": { "enum": ["VALID", "INVALID", "BLOCKED"] },
+    "remaining_warnings": { "type": "array", "items": { "type": "string" } },
+    "live_store_items": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "command", "exit_code", "output_sha256", "output_ref"],
+      "description": "A local gate result must record the command, its exit code, and a REFERENCE (output_ref) to the captured output file plus its SHA-256. The checker recomputes the file hash and matches it — a typed status alone is not execution proof.",
+      "properties": {
+        "status": { "enum": ["pass", "fail", "skip"] },
+        "command": { "type": "string", "minLength": 4,
+          "description": "The exact command run; blank or no-op commands (true/false/:) are rejected by the checker." },
+        "exit_code": { "type": "integer" },
+        "output_ref": { "type": "string",
+          "description": "Relative path (inside the project root) to the captured output of this gate." },
+        "output_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the file at output_ref (verified by the checker)." },
+        "detail": { "type": "string" }
+      }
+    },
+    "hashed_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "record_ref": {
+      "type": "object", "additionalProperties": false,
+      "description": "Reference to a structured MCP validation record (mcp-validation-record.schema.json) plus its SHA-256. Free-text is NOT accepted; the checker loads and schema-validates the record and binds its single event object's fields to this validation. This is a consistency-checked validation record, not an authenticated capture of a live Claude Code MCP call — that remains the mandatory interactive cold-session test.",
+      "required": ["record_ref", "sha256"],
+      "properties": {
+        "record_ref": { "type": "string",
+          "description": "Relative path (inside the project root) to the structured validation record (JSON)." },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the record file at record_ref (verified by the checker)." }
+      }
+    },
+    "validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mcp_tool", "tool_call_ref", "validator_type", "validated_files", "status", "record"],
+      "properties": {
+        "mcp_tool": {
+          "type": "string",
+          "pattern": "^mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__[a-z_]+$",
+          "description": "Fully plugin-scoped MCP tool name; a bare or mis-scoped name fails this pattern." },
+        "tool_call_ref": {
+          "type": "string", "minLength": 3,
+          "description": "The actual tool-call event identifier the runtime provides (the tool_use block id, e.g. 'toolu_...'), or a transcript event id." },
+        "conversation_id": { "type": "string",
+          "description": "The Shopify Dev MCP conversationId (returned by learn_shopify_api) when present." },
+        "validator_type": { "enum": ["graphql", "polaris-component", "theme"] },
+        "validated_files": {
+          "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/hashed_file" } },
+        "status": { "enum": ["VALID", "INVALID", "BLOCKED"] },
+        "record": { "$ref": "#/$defs/record_ref" }
+      }
+    }
+  }
+}

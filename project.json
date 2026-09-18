@@ -1,0 +1,694 @@
+{
+  "project": {
+    "id": "a5a82bd7-4bdb-44ee-8278-7fda97dd638c",
+    "name": "expense-calculator",
+    "client_slug": "expense-calculator",
+    "project_type": "app-build",
+    "build_context": "shopify-app",
+    "stage": "sprint-qa",
+    "current_gate": "G4-sprint-1.1",
+    "schema_version": "1.0.0",
+    "shopify": {
+      "distribution": "public",
+      "api_version": "2026-07",
+      "scopes": [],
+      "protected_scopes": false,
+      "app_pricing": {
+        "model": "free"
+      },
+      "data_ownership": "dedicated",
+      "jobs_ownership": "app",
+      "hosting": "tbd",
+      "extensions": [],
+      "built_for_shopify": false
+    },
+    "created_at": "2026-09-17T17:55:22Z",
+    "updated_at": "2026-09-18T09:58:10Z",
+    "version": 18,
+    "status": "active",
+    "repository": {
+      "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
+      "default_branch": "main"
+    }
+  },
+  "tech_stack": {
+    "runtime": "node@22",
+    "framework": "react-router-7",
+    "ui": "polaris-web-components",
+    "database": "postgresql",
+    "orm": "sequelize",
+    "session_storage": "postgresql",
+    "auth": "token-exchange",
+    "admin_api": "graphql",
+    "billing": "app-pricing",
+    "queue": "app-host"
+  },
+  "gates": [
+    {
+      "id": "G0.5",
+      "type": "grooming",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T17:55:22Z",
+      "approver": "pm",
+      "notes": "Grooming opened by orchestrator at project init. sow-spec.md present at repo root as unverified reference input (foreign format, not plugin-native) \u2014 PM to treat as background only, not as authoritative pre-filled intake, and to run this plugin's own G0.5 grooming process in full. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:02:16Z. OQ-5 (internal-vs-external classification): CONFIRMED INTERNAL \u2014 no external client entity; FLAG-004 blocklist treated as moot/non-authoritative, neither webdeskinc.com address is a verified real contact and neither is to be used. OQ-9 (plan_tier 'basic'): CONFIRMED as internal WebDesk engagement-tier metadata, NOT a functional constraint requiring the app to operate within Shopify's merchant-facing Basic plan limits. OQ-10 (revenue source): CONFIRMED merchant-entered \u2014 protected_scopes stays false, scopes=[], G-PCD to record 'skipped' at the appropriate gate. Remaining open questions (OQ-1,2,3,4,6,7,8) NOT yet answered \u2014 tracked forward, several block later gates (G1.5/G3/M2/G2) individually, none block advancing past G0.5.",
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-17T18:02:16Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G0",
+      "type": "spec-validation",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:08:23Z",
+      "sla_hours": null,
+      "approver": "system",
+      "decided_by": "system",
+      "decided_at": "2026-09-17T18:08:23Z",
+      "decision": "CONFIRM",
+      "notes": "Auto spec-validation. spec.md frontmatter checked for internal consistency against project.json v3: g0.5-confirmed fields (client_classification=internal, plan_tier note, protected_scopes=false, scopes=[], app_pricing.model=free, data_ownership=dedicated, api_version=2026-07) all match. No contradictions found. No human decision required for this gate type.",
+      "escalation_log": []
+    },
+    {
+      "id": "G1",
+      "type": "plan-estimate",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:08:23Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-19T18:08:23Z",
+      "approver": "PM lead (named approver TBD \u2014 OQ-7 unanswered; role-based approval by project stakeholder in the interim)",
+      "ticket_id": "EXPCALC-G1-EST-001",
+      "notes": "Independent bottom-up estimate: 225-390 engineering hours across 5 milestones (M1 Foundation 34-52, M2 Configuration 44-70, M3 Engine+Results 40-62, M4 Save+History 26-42, M5 Hardening+Launch 48-78; engineering subtotal 192-304) plus gate/coordination lines (G1.5 8-16, G-Schema 6-12, G2 8-36, PM shepherding 10-20). Confidence: LOW - no estimation spreadsheet or historical actuals; OQ-1 (hosting) and OQ-8 (design path) sit directly on cost drivers; OQ-4 (default rates) unfinalised. Ranges, not points. The source doc's 250hr lump sum was NOT used as an input and sits at ~20th percentile of the derived range. Planning figure ~300hr with contingency to 390. Conditional gates determined: G1.5 FIRES (triggers: estimate >80hr AND undecided non-trivial hosting; runs before G-Schema), G-Schema FIRES (always), G2 FIRES (reduced-UI candidate pending OQ-8), G-PCD SKIPPED (reason: no protected order/customer scopes requested - confirmed at G0.5). TIMELINE: target 2026-10-20 is NOT achievable as a launch date - RENEGOTIATE recommended. Recommended submission-readiness range: 2026-10-24 to 2026-11-27 (2 devs) or 2026-11-17 to 2026-12-29 (1 dev), assuming build start 2026-09-22 and OQ-1/4/7/8 answered within the week. Launch = submission date + Shopify review (external, G6, no internal SLA, no committed date; one resubmission cycle budgeted). Artifact: projects/expense-calculator/spec.md sections 11-12. Estimate authored by pm-agent; pm-agent is NOT the approver. sla_hours=48 is nominal - OQ-6 (timezone) unanswered so no confirmed local SLA frame; America/Toronto not assumed. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:10:12Z. Launch-date renegotiation accepted in principle (2026-10-20 dropped as a launch commitment; submission-readiness target to be finalized). Hosting (OQ-1) explicitly deferred to G1.5 by the approver, not answered now \u2014 architect to recommend at G1.5, human confirms there.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-17T18:10:12Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G1.5",
+      "type": "architecture-review",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:10:12Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-19T18:10:12Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "G1.5 fires per gates.md triggers: estimate 225-390hr (>80hr) AND hosting undecided (project.shopify.hosting=tbd, OQ-1 explicitly deferred to this gate by the approver at G1). Architect to: (1) recommend long-running vs serverless hosting with webhook-delivery/cold-start reasoning, (2) confirm GraphQL cost/rate-limit strategy is NOT needed (no bulk ops, no high-volume queries expected for a calculator app - verify), (3) confirm billing architecture is trivial (app_pricing.model=free, no usage meters), (4) produce initial ADRs and a fitness-test plan feeding G-Schema next. data_ownership=dedicated and jobs_ownership=app already confirmed at G0.5, not reopened here unless architect finds cause. | ARCHITECT PROPOSAL (PROPOSED, not approved \u2014 awaiting Tech lead decision): hosting = long-running always-on Node (min instances=1), NOT serverless \u2014 key driver is shop/redact webhook reliability (arrives ~48h post-uninstall on a provably cold container under serverless) plus ack-fast-then-work-async pattern via an in-process durable inbox (ADR-0002), avoiding an added queue/durable-function primitive. Provider/plan/region left human-owned (shortlist: Render or DigitalOcean App Platform preferred, Fly.io acceptable only with auto-stop disabled; free/sleeping tiers disqualified - reintroduces cold start; Vercel/Netlify/Cloudflare Workers/raw Lambda rejected class). GraphQL cost/rate-limit strategy CONFIRMED not needed (verified against every D1-D16 deliverable; only candidate admin.graphql call removed entirely by ADR-0006 making currency merchant-configured \u2014 zero Admin API dependency). Billing CONFIRMED trivial (no App Pricing integration in V1). Auth/session CONFIRMED default (token-exchange, Postgres session storage, expiringOfflineAccessTokens=true). 8 ADRs + architecture-packet.md + fitness-test-plan.md (29 checks, npm run fitness, blocking PR check) written to projects/expense-calculator/decisions/. G-Schema handoff flagged: no FK from calculation_line_item to expense_rule (value snapshot only), category_key stable string not row id, engine_version on calculations, append-only history, shop_id denormalized onto every tenant table, webhook_event inbox table + shop.uninstalled_at, ON DELETE CASCADE + asserted row-count redaction. Risk R2 flagged: shop/redact never-delivered scenario -> 45-day safety sweeper added (ADR-0008), sweeper firing = alert not routine. No RFCs raised; unverifiable platform specifics (webhook retry thresholds, shop-field scope reqs, compliance_topics TOML shape) marked verify-at-build in packet \u00a79. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:02:32Z. Architecture baseline accepted: long-running always-on Node hosting, 8 ADRs, fitness-test plan.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:02:32Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G-Schema",
+      "type": "schema-approval",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-18T07:02:32Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-20T07:02:32Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "Data model + session storage review, dedicated-DB path (data_ownership=dedicated, not shared-saas -> no shared-data contract needed, this is a real schema review not a contract review). Fires per gates.md: 'Always (a datastore always exists)'. Reviewing structural design BEFORE any migration runs, per architect's G1.5 handoff notes in decisions/architecture-packet.md \u00a78: no FK from calculation line items to expense rules (value-snapshot only), category_key as stable string not row id, append-only calculation history, engine_version on calculations, shop_id denormalized onto every tenant table, webhook_event inbox table (unique index on webhook_id for dedup) + shop.uninstalled_at, cascade-delete + asserted row-count verification on redaction, session storage table (shopify_sessions) library-managed with no app columns. Routed to shopify-developer to produce data-model.md + draft migration DDL for review; no migration to be applied against any real database until this gate passes. | DEVELOPER PROPOSAL (PROPOSED, not approved - awaiting Tech lead decision): 7 tables (shop, expense_rule, calculation, calculation_line_item, webhook_event, compliance_audit_log, shopify_sessions[library-managed]). No expense_category table - recommended code constant EXPENSE_CATEGORIES keyed by category_key instead (avoids seed drift + the 'undeleteable global row' problem under GDPR redaction), backed by a DB CHECK constraint as runtime backstop. All 12 architect constraints from G1.5 satisfied: no FK line-items->rules (value snapshot), stable category_key, engine_version on calculations, append-only (BEFORE UPDATE trigger + DELETE still allowed for redaction cascade), currency per calculation, shop_id denormalized on every tenant table, webhook_event inbox with unique webhook_id dedup, shop.uninstalled_at, cascade-delete + row-count-assertion redaction, money as BIGINT minor units / INTEGER basis-point rates (no float columns), PostgreSQLSessionStorage confirmed with zero app-owned columns on shopify_sessions. 3 judgment calls flagged for Tech lead review (not silent decisions): (1) compliance_audit_log intentionally has NO shop_id - survives shop deletion as GDPR evidence trail, looks like a violation of the shop_id-everywhere rule but is a deliberate exception; (2) webhook_event.shop_id is NOT NULL, late-delivery-after-redaction edge case handled by repository-layer skip rather than nullable column; (3) possible tension between FT-08's literal 'zero webhook_event rows' wording and ADR-0002's delete-last-or-mark-then-purge guidance for the redact handler's own in-flight row - flagged before a fitness test gets written against an ambiguous spec. Artifacts: decisions/data-model.md (full schema + reasoning + ER-as-text), decisions/migrations/00000000000001-initial-schema.js (DRAFT/UNAPPLIED, reversible up/down, syntax-checked only, never run against any database - none exists yet, no npm project scaffolded). Shopify Dev MCP validation not run: task was generic PostgreSQL/Sequelize DDL with no Admin GraphQL/Polaris/webhook-handler code - orchestrator concurs this falls outside the MCP-evidence requirement for this specific deliverable (no commit, no PR, no Code-Review/QA routing - this is a Human design-gate artifact, not implementation). | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:12:13Z. Schema baseline accepted as proposed (7 tables, code-constant categories, all 3 flagged judgment calls accepted as proposed defaults - no override given).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:12:13Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G2",
+      "type": "design-approval",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-18T07:12:13Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-20T07:12:13Z",
+      "approver": "Design lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "Polaris web-components UX approval. Always fires for a public app with an operational merchant UI (this app is admin-embedded, chart-heavy calculator - not background-only). OQ-8 (design path) was open at G0.5/G1: source doc budgeted 0/0 mockup revisions, which does not waive G2 - designer to produce a working HTML/Polaris mockup per this plugin's standard process. Data model confirmed at G-Schema (7 tables: shop, expense_rule, calculation, calculation_line_item, webhook_event, compliance_audit_log, shopify_sessions) - UI must reflect: calculator input form across 10 expense categories (rule types: percentage/fixed/formula), results view with donut/pie chart (ADR-0004: hand-rolled inline SVG, no charting library, always-rendered accessible data table as primary), save/history list + detail view rendering STORED snapshot values (never recomputes - history must visually communicate 'this is a point-in-time snapshot'). App Bridge required in <head> of every page (Built-for-Shopify/Web-Vitals requirement). Navigation via s-app-nav/s-link. WCAG validation required. | DESIGNER PROPOSAL (PROPOSED, not approved - awaiting Design lead decision): 4 HTML/Polaris mockup screens in design/mockup/ (calculator.html, results.html, history.html, history-detail.html) + assets/ + design/DESIGN-NOTES.md handoff doc. Confirmed: Polaris web components throughout (no Polaris React), App Bridge in <head> of all 4 pages, s-app-nav/s-link navigation, WCAG 2.1 AA addressed structurally (axe-core run itself deferred to G3/G5 per FT-19a - not yet executed). Results screen follows ADR-0004: accessible data table always-rendered as primary, hand-rolled inline SVG donut (stacked stroke-dasharray, no charting lib) as supplementary. History-detail signals frozen snapshot via 4 layered mechanisms (banner, lock-icon Snapshot badge + engine_version shown, zero editable controls, no Save button present at all). 6 judgment calls flagged for Design lead in DESIGN-NOTES.md \u00a74: (1) 10 categories as native details/summary disclosures not a flat table; (2) Calculate runs on unsaved form state (safe per snapshot data model); (3) currency selector inline on calculator screen, no separate Settings screen; (4) 'Duplicate as new calculation' action added on history-detail - NOT in spec, flagged accept/reject; (5) results.html has a boxed dev-only fixture-data-swap dropdown for reviewing ADR-0004 chart states - explicitly must be stripped before G3 build, not shippable; (6) formula rule-type options are visible placeholders pending OQ-4 (default rates still unconfirmed) - illustrative only. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:39:45Z. Mockup accepted with all 6 defaults standing (no explicit override given on #4/#5/#6 - developer must still strip the dev-only fixture-swap dropdown (#5) before scaffold ships, that instruction is unconditional regardless of silence on the other judgment calls).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:39:45Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G3",
+      "type": "scaffold-verification",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-18T07:39:45Z",
+      "sla_hours": 24,
+      "expires_at": "2026-09-19T07:39:45Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim); Auto+spot-check",
+      "notes": "Scaffold verification. shopify-developer to stand up the real app skeleton: React Router 7 + @shopify/shopify-app-react-router, Polaris web components + App Bridge in <head> (per G2-confirmed mockups in design/mockup/, with the dev-only fixture-swap dropdown on results.html STRIPPED - not shippable), token-exchange auth, PostgreSQLSessionStorage, apply the G-Schema-confirmed migration (decisions/migrations/00000000000001-initial-schema.js) as the FIRST real migration run against an actual dev database, shopify.app.toml configured per api_version=2026-07 and compliance_topics for the 4 mandatory webhooks (customers/data_request, customers/redact, shop/redact, app/uninstalled), hosting target = long-running always-on Node per ADR-0001 (provider/region still OQ-1, local Shopify CLI dev loop for now). Still-blocking open questions for full build: OQ-2 (GitHub repo), OQ-3 (credentials handoff protocol), OQ-4 (default expense-rate/formula sign-off - blocks real M2 config data, not scaffold itself). | AUTOMATED CHECK PASSED (check-dev-handoff.py exit 0, HANDOFF OK) after a workspace-layout correction (project.json relocated to repo root - see audit_log 'workspace_layout_corrected'). Developer delivered G3 scaffold + M1 Foundation (commit 299328c). AWAITING Tech lead spot-check confirmation - the deterministic gate passed but this is still a Human-approved gate, not self-closing. 4 items flagged for human decision (see audit_log 'g3_scaffold_m1_foundation_delivered' flags_for_human_decision), none of which block a spot-check CONFIRM by themselves. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T08:59:11Z. Spot-check accepted on top of the passing automated check-dev-handoff.py result.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T08:59:11Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G4-sprint-1.1",
+      "type": "sprint-qa",
+      "scope": "M1-Foundation",
+      "status": "open",
+      "opened_at": "2026-09-18T08:59:11Z",
+      "sla_hours": 24,
+      "expires_at": "2026-09-19T08:59:11Z",
+      "approver": "QA lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "First sprint QA, covering the M1 Foundation work delivered at G3 (commit 299328c). QA is read-only: reviews dev-evidence/g3-scaffold/ artifacts (MCP validation evidence, local gate logs) and the actual source (auth, session storage, webhook handlers, repository/tenancy layer, route-auth-matrix test) - does not run tests itself. Checks: GraphQL contract (N/A by design - zero Admin GraphQL calls per ADR-0006, verify that claim is actually true in code, not just asserted), webhook compliance (HMAC verification, idempotency/dedup via webhook_event unique index, GDPR shop/redact ACTUALLY deletes with asserted row counts, customers/data_request acks correctly even though delivery-transport is flagged as an open gap), auth (route-auth-matrix - no unauthenticated sensitive route), billing (N/A - free app, no App Pricing integration), security (no credentials in responses/logs, scopes=[] is maximally least-privilege). DB-integration tests needing a live Postgres were explicitly deferred by the developer - QA to confirm that's correctly disclosed as deferred, not silently missing. | QA VERDICT: BLOCKED (not PASS, not FAIL) - report at qa-reports/G4-sprint-1.1.md. Code-level review found no P1/P2 defects (GraphQL-zero-dependency verified by grep, HMAC+dedup+real-deletion code confirmed by direct read, route-auth-matrix confirmed correct by direct read, billing N/A confirmed clean, App Bridge-in-head confirmed). BLOCKED strictly because no live Postgres exists in this environment to produce the mandatory redact-then-query evidence (FT-08/FT-08b) or a runtime route-probe transcript - infrastructure gap, not a code defect, and honestly disclosed by the developer in 3 independent places. F3 (P3): .env contains a realistic-format (non-placeholder) Shopify key/secret - flagged for rotation (SECURITY NOTE: QA's report echoed the literal secret value in plaintext, exposing it into this session/transcript - orchestrator instructed the human to rotate it via Partner Dashboard regardless of whether it was 'real'; future QA delegations instructed to flag secret-format findings by pattern only, never echo literal values). Awaiting human decision: (a) stand up a real local/dev Postgres so full evidence can be gathered before CONFIRM, or (b) explicit logged override carrying the live-DB evidence obligation forward to G5. | LIVE EVIDENCE GATHERED against a real local Postgres (dev-evidence/g4-sprint-1.1-live-evidence/, start at 00-SUMMARY.md). F2 (auth probe) RESOLVED CLEAN: no unauthenticated/bad-HMAC request ever returned 200 with sensitive content. F1 (redact-then-query) surfaced 2 NEW P1 DEFECTS invisible from source review alone - exactly why live evidence was required, not a source-review substitute: BUG-1 (P1): authenticate.webhook() normalizes topic (shop/redact -> SHOP_REDACT) but a DB CHECK constraint expects the literal 'shop/redact' string - a correctly-HMAC-signed live webhook request returns 500 on ALL FOUR webhook routes, not just shop/redact. BUG-2 (P1): shop-redact.service.ts calls sessionStorageInstance.deleteSessions([]) unconditionally; the session-storage library builds 'WHERE id IN ()' with no empty-array guard, causing a Postgres syntax error that rolls back the ENTIRE redact transaction. Since app/uninstalled (fires immediately on uninstall) already deletes all sessions, and shop/redact fires ~48h later per the designed lifecycle, EVERY REAL SHOP following the normal uninstall path hits this crash - GDPR hard-deletion currently cannot complete for any real merchant. BUG-3 (P3, note): webhook_event's ON DELETE CASCADE deletes the in-flight row anyway when shop is deleted, making the code's 'mark processed_at, do not delete' comment dead/inaccurate (harmless side effect: it does produce the literal zero-rows FT-08 wants, by accident not design). Deletion topology CONFIRMED CORRECT once reached: real before/after row counts, all tenant tables 1->0, compliance_audit_log recorded outcome=completed with asserted counts. NO SOURCE FIXES applied (no-auto-fix rule) - awaiting explicit human fix command per project rules. Gate remains BLOCKED, now for defects found rather than missing infrastructure - infrastructure blocker is CLEARED. | BUG-1 + BUG-2 FIXED, commit 6f5525affa752b9646fd9e91e0094abcb3fedead. BUG-1: new app/services/webhook-topic.service.ts reads raw X-Shopify-Topic header instead of authenticate.webhook()'s internally-normalized topic field, applied consistently across all 4 webhook routes (verified by direct diff review, not just developer claim). BUG-2: shop-redact service now guards deleteSessions() with sessions.length>0. shopify.app.toml separately reconciled: confirmed via .shopify/project.json (gitignored) tied to a real linked dev store (wds55.myshopify.com) - consistent with a genuine shopify app config link/dev run, not fabrication. Real Shopify CLI (v4.8.0) config validate --json returned valid:true before and after. Per real shopify.dev docs, compliance_topics is only documented as a per-[[webhooks.subscriptions]] field - removed a redundant top-level compliance_topics array present in both old and CLI-relinked versions, kept the 4 correct per-subscription entries, restored ADR/architecture explanatory comments. App URL: SHOPIFY_APP_URL and application_url both set to http://localhost:3000 per human request - EXPLICITLY CAVEATED (by developer and orchestrator) that Shopify's servers cannot reach a bare localhost for real OAuth/webhook delivery; only valid for same-machine direct-HTTP test probes. A real install on any store needs a public HTTPS tunnel via `shopify app dev`. FRESH LIVE EVIDENCE (dev-evidence/g4-sprint-1.1-live-evidence-v2/): correctly-signed shop/redact webhook with a shop that has ZERO sessions (the exact prior-crash case) -> 200 (was 500), drained successfully, compliance_audit_log outcome=completed, all 6 tenant tables 1->0. Auth probes re-confirmed unchanged (healthz 200, unauth app-route 410, missing-HMAC webhook 400, bad-HMAC webhook 401). GATES: typecheck/tests(77)/build clean; lint FAILS but solely on a pre-existing, untracked, OUT-OF-SCOPE file (decisions/migrations/00000000000001-initial-schema.js, 'module is not defined' no-undef) not part of this diff - not a regression from this fix, needs cleanup separately. run-gates.py again failed on Windows (same known WinError 2 issue, F4 from earlier), manually reproduced with SHA-256-bound logs. MCP validation N/A - backend webhook/session/config work only, no GraphQL/Polaris/theme touched, reasoning explicit. NEW FINDING (not fixed, not authorized): app-uninstalled.service.ts has the IDENTICAL unguarded deleteSessions([]) pattern BUG-2 fixed elsewhere - not triggered live yet, found by code reading, flagged for human fix-decision (see next audit entry). | QA RE-VERIFICATION (independent, not trusting developer self-report): BUG-1 and BUG-2 CONFIRMED GENUINELY FIXED via direct source read of all 4 webhook routes + shop-redact.service.ts AND cross-referenced live-evidence-v2 (200 replacing 500, zero-session-shop redaction completes with full 1->0 deletion across all 6 tenant tables). NEW P1 CONFIRMED TRUE by independent read: BUG-4 in app-uninstalled.service.ts - identical unguarded deleteSessions([]) pattern, CONFIRMED WORSE than BUG-2 because drain-worker.ts dispatches handleAppUninstalled WITHOUT the shared claim transaction shop-redact uses, so markShopUninstalled can commit independently before deleteSessions throws, leaving a half-committed state + a webhook_event row retrying forever. Gate remains BLOCKED - cannot PASS with an open P1 (QA rule 1), even though the two originally authorized bugs are verified closed. Also confirmed: lint failure genuinely unrelated to fix commit (decisions/ fully untracked in git status, file never committed). New P4s: F7 (CLI-validate claim not backed by a captured artifact), evidence artifacts don't self-embed commit SHA (tightened before G5). RECOMMENDED PATH: human authorizes BUG-4 fix (same length>0 guard pattern), developer fixes + produces live-evidence-v3 on app/uninstalled with a zero-session shop, QA re-verifies once more - then PASS_WITH_FLAGS is achievable (F3/F5/F7/lint-cleanup carried forward as disclosed non-blocking items).",
+      "escalation_log": []
+    }
+  ],
+  "budget": {
+    "token_used": 0,
+    "token_cap": 0,
+    "hours_burned": 0,
+    "hours_budget": 0
+  },
+  "audit_log": [
+    {
+      "timestamp": "2026-09-17T17:55:22Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "project_initialized",
+      "details": {
+        "client_slug": "expense-calculator",
+        "project_type": "app-build",
+        "note": "Scaffolded via init-project.sh. Reference doc projects/../sow-spec.md found at repo root \u2014 flagged for PM review at grooming, not trusted as authoritative."
+      },
+      "project_version_before": 0,
+      "project_version_after": 1
+    },
+    {
+      "timestamp": "2026-09-17T18:00:15Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "g0.5_grooming_findings_recorded",
+      "details": {
+        "by": "pm",
+        "protected_scopes_determination": "false \u2014 revenue is merchant-entered, no order/customer scope requested; G-PCD expected to record skipped at G1",
+        "app_pricing_model": "recurring+usage -> free (V1 has no billing)",
+        "schema_note": "tech_stack.billing enum is schema-locked to 'app-pricing' only; free-tier recorded via shopify.app_pricing.model=free instead",
+        "spec_ref": "projects/expense-calculator/spec.md",
+        "open_questions_count": 10,
+        "gate_status": "G0.5 remains OPEN pending human decision (PM/stakeholder) \u2014 not self-approved"
+      },
+      "project_version_before": 1,
+      "project_version_after": 2
+    },
+    {
+      "timestamp": "2026-09-17T18:02:16Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G0.5",
+        "decision": "CONFIRM",
+        "answers": {
+          "OQ-5": "internal \u2014 no external client",
+          "OQ-9": "internal engagement tier, not a functional Shopify-plan constraint",
+          "OQ-10": "revenue stays merchant-entered; protected_scopes=false confirmed"
+        },
+        "recorded_by": "orchestrator"
+      },
+      "project_version_before": 2,
+      "project_version_after": 3
+    },
+    {
+      "timestamp": "2026-09-17T18:08:23Z",
+      "actor": "system",
+      "actor_type": "system",
+      "action": "gate_auto_passed",
+      "details": {
+        "gate": "G0",
+        "type": "spec-validation"
+      },
+      "project_version_before": 3,
+      "project_version_after": 4
+    },
+    {
+      "timestamp": "2026-09-17T18:08:23Z",
+      "actor": "pm-agent",
+      "actor_type": "agent",
+      "action": "g1_plan_estimate_produced",
+      "details": {
+        "ticket_id": "EXPCALC-G1-EST-001",
+        "hours_low": 225,
+        "hours_high": 390,
+        "confidence": "low",
+        "conditional_gates": {
+          "G1.5": "fires",
+          "G-Schema": "fires",
+          "G2": "fires",
+          "G-PCD": "skipped"
+        },
+        "timeline_recommendation": "RENEGOTIATE 2026-10-20",
+        "spec_status": "g0.5-confirmed"
+      },
+      "project_version_before": 3,
+      "project_version_after": 4
+    },
+    {
+      "timestamp": "2026-09-17T18:10:12Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G1",
+        "decision": "CONFIRM",
+        "note": "hosting deferred to G1.5"
+      },
+      "project_version_before": 4,
+      "project_version_after": 5
+    },
+    {
+      "timestamp": "2026-09-17T18:10:12Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G1.5",
+        "type": "architecture-review",
+        "triggers": [
+          "estimate>80hr",
+          "hosting-undecided"
+        ]
+      },
+      "project_version_before": 4,
+      "project_version_after": 5
+    },
+    {
+      "timestamp": "2026-09-17T18:22:09Z",
+      "actor": "architect",
+      "actor_type": "agent",
+      "action": "g1.5_architecture_review_proposed",
+      "details": {
+        "hosting_recommendation": "long-running always-on Node, not serverless",
+        "adrs": [
+          "ADR-0001",
+          "ADR-0002",
+          "ADR-0003",
+          "ADR-0004",
+          "ADR-0005",
+          "ADR-0006",
+          "ADR-0007",
+          "ADR-0008"
+        ],
+        "fitness_test_count": 29,
+        "graphql_cost_strategy_needed": false,
+        "billing_architecture": "trivial - free, no App Pricing integration",
+        "status": "PROPOSED - awaiting Tech lead decision, not self-approved"
+      },
+      "project_version_before": 5,
+      "project_version_after": 6
+    },
+    {
+      "timestamp": "2026-09-18T07:02:32Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G1.5",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 6,
+      "project_version_after": 7
+    },
+    {
+      "timestamp": "2026-09-18T07:02:32Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G-Schema",
+        "type": "schema-approval"
+      },
+      "project_version_before": 6,
+      "project_version_after": 7
+    },
+    {
+      "timestamp": "2026-09-18T07:11:06Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "g_schema_data_model_proposed",
+      "details": {
+        "tables": [
+          "shop",
+          "expense_rule",
+          "calculation",
+          "calculation_line_item",
+          "webhook_event",
+          "compliance_audit_log",
+          "shopify_sessions"
+        ],
+        "expense_category_recommendation": "code constant, not a table",
+        "artifacts": [
+          "decisions/data-model.md",
+          "decisions/migrations/00000000000001-initial-schema.js"
+        ],
+        "flagged_judgment_calls": 3,
+        "mcp_validation": "not applicable - generic Postgres/Sequelize DDL, no Shopify API surface touched",
+        "status": "PROPOSED - awaiting Tech lead decision, not self-approved, no migration applied anywhere"
+      },
+      "project_version_before": 7,
+      "project_version_after": 8
+    },
+    {
+      "timestamp": "2026-09-18T07:12:13Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G-Schema",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 8,
+      "project_version_after": 9
+    },
+    {
+      "timestamp": "2026-09-18T07:12:13Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G2",
+        "type": "design-approval"
+      },
+      "project_version_before": 8,
+      "project_version_after": 9
+    },
+    {
+      "timestamp": "2026-09-18T07:20:22Z",
+      "actor": "designer",
+      "actor_type": "agent",
+      "action": "g2_mockup_proposed",
+      "details": {
+        "screens": [
+          "calculator.html",
+          "results.html",
+          "history.html",
+          "history-detail.html"
+        ],
+        "location": "design/mockup/",
+        "constraints_met": [
+          "polaris-web-components",
+          "app-bridge-in-head",
+          "s-app-nav-navigation",
+          "wcag-structural"
+        ],
+        "outstanding": "axe-core run deferred to G3/G5 (FT-19a)",
+        "flagged_for_decision": [
+          "duplicate-as-new-calculation action (not in spec)",
+          "dev-only fixture-swap dropdown must be stripped before G3"
+        ],
+        "status": "PROPOSED - awaiting Design lead decision, not self-approved"
+      },
+      "project_version_before": 9,
+      "project_version_after": 10
+    },
+    {
+      "timestamp": "2026-09-18T07:39:45Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G2",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 10,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T07:39:45Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G3",
+        "type": "scaffold-verification"
+      },
+      "project_version_before": 10,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T08:26:38Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "workspace_layout_corrected",
+      "details": {
+        "problem": "project.json (and the rest of the planning workspace) was originally scaffolded under projects/expense-calculator/ via init-project.sh's default --out ./projects. This is a multi-project layout, but the plugin's own tooling (check-dev-handoff.py) and its single-flagship-app data model assume project.json lives at the repo root (${CLAUDE_PROJECT_DIR}). The developer correctly scaffolded the app at repo root per instruction; the mismatch was the orchestrator's project-init choice, not a developer error.",
+        "fix": "Copied (not moved - a destructive mv was blocked by the sandbox's irreversible-local-destruction guard) audit-log.jsonl, CLAUDE.md, decisions/, design/, HANDOFF.md, listing-assets/, observability/, project.json, project.json.versions/, qa-reports/, review-readiness/, rfcs/, spec.md from projects/expense-calculator/ to repo root. THIS FILE (root project.json) is now the single source of truth going forward. The old copy at projects/expense-calculator/project.json is STALE/SUPERSEDED as of this write and must not be read or written by any agent from this point on.",
+        "outstanding": "The stale duplicate directory projects/expense-calculator/ still exists on disk (copy, not move) - deletion requires explicit human confirmation since destructive operations are sandbox-gated. Flagged to the human in the G3 gate presentation.",
+        "verified": "check-dev-handoff.py re-run with --root pointed at repo root after the copy: exit 0, HANDOFF OK (see next audit entry)."
+      },
+      "project_version_before": 11,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T08:26:38Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "g3_scaffold_m1_foundation_delivered",
+      "details": {
+        "commit_sha": "299328cd2288c7fbcef4511a41be6f2ee160988b",
+        "scope": "React Router 7 scaffold + M1 Foundation: auth (token-exchange), PostgreSQLSessionStorage wiring, repository-layer tenancy (ADR-0003), G-Schema migration ported to Sequelize-CLI convention (not run - no live DB in this environment), 4 compliance webhooks with real deletion logic (customers/data_request, customers/redact, shop/redact, app/uninstalled) via a durable webhook_event inbox + drain worker + 45-day sweeper (ADR-0002/0008), shopify.app.toml (api_version=2026-07, scopes=[], compliance_topics), route-auth-matrix test, static M1 shell ports of the 4 confirmed G2 mockup screens (no M2-M4 business logic).",
+        "mcp_evidence": "dev-evidence/g3-scaffold/mcp-validation-evidence.json",
+        "local_gates": "lint/typecheck/test(76)/build all pass (exit 0) - tools/scripts/run-gates.py itself failed on this Windows environment (subprocess shell=False cannot exec npm.cmd), developer manually reproduced the identical log/__GATE_EXIT__ contract and disclosed the substitution rather than hiding it - flagged as a plugin cross-platform gap.",
+        "flags_for_human_decision": [
+          "customers/data_request has no specified delivery-transport mechanism anywhere in spec/architecture - needs an RFC before G-Review",
+          "initial git commit deliberately excludes .claude/, dev-evidence/, sow-spec.md, and the old projects/ dir - correct call pending OQ-2 (repo destination), needs confirmation",
+          "DB-integration fitness tests (FT-02b/c, FT-05-09, FT-14, FT-15b, FT-17, FT-20) deferred to first sprint with a live Postgres dev-store",
+          "shopify.app.toml hand-authored, no Partner/CLI credentials available here - must reconcile via `shopify app config link` before first real deploy"
+        ]
+      },
+      "project_version_before": 11,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T08:26:38Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g3-scaffold/DEVELOPER-HANDOFF.md",
+        "commit": "299328cd2288c7fbcef4511a41be6f2ee160988b",
+        "root": ".",
+        "result": "EXIT 0 - HANDOFF OK: distribution=public, overall=VALID, commit matches, 1 validation VALID (polaris-component, validate_component_codeblocks), all 4 local gates (lint/typecheck/tests/build) pass with matching output hashes and __GATE_EXIT__ binding, project.json distribution/api_version match confirmed.",
+        "first_attempt": "First run (before the workspace-layout fix) REJECTED: missing project.json in reviewed project root - this was the trigger for the layout correction above, not a defect in the developer's evidence."
+      },
+      "project_version_before": 11,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T08:59:11Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G3",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 12,
+      "project_version_after": 13
+    },
+    {
+      "timestamp": "2026-09-18T08:59:11Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G4-sprint-1.1",
+        "type": "sprint-qa",
+        "scope": "M1-Foundation"
+      },
+      "project_version_before": 12,
+      "project_version_after": 13
+    },
+    {
+      "timestamp": "2026-09-18T09:04:33Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_sprint_qa_verdict",
+      "details": {
+        "gate": "G4-sprint-1.1",
+        "commit_sha": "299328cd2288c7fbcef4511a41be6f2ee160988b",
+        "verdict": "BLOCKED",
+        "reason": "Webhook Compliance and Auth modules lack mandatory live-evidence artifacts (redact-then-query DB dump, route-probe transcript) - no seeded dev-store/Postgres available in this environment. Source-level review found the code correct and the gaps accurately, consistently disclosed - not a code defect, not hidden, but cannot be marked PASS per GDPR-verification rule.",
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "module-blocking-evidence",
+            "module": "webhook-compliance",
+            "summary": "No FT-08/FT-08b redact-then-query artifact against a live DB"
+          },
+          {
+            "id": "F2",
+            "severity": "module-blocking-evidence",
+            "module": "auth",
+            "summary": "No route-probe transcript against a running server"
+          },
+          {
+            "id": "F3",
+            "severity": "P3",
+            "module": "security",
+            "summary": ".env contains realistic-format (non-placeholder) Shopify key/secret; gitignored, not committed; VALUE WAS ECHOED IN QA'S REPORT TEXT - flagged to human for rotation"
+          },
+          {
+            "id": "F4",
+            "severity": "P4",
+            "module": "process",
+            "summary": "run-gates.py fails on Windows; developer substitution accurately disclosed"
+          },
+          {
+            "id": "F5",
+            "severity": "P4",
+            "module": "process",
+            "summary": "No CI workflow exists yet; local-gate evidence is developer-self-produced"
+          },
+          {
+            "id": "F6",
+            "severity": "note",
+            "module": "webhook-compliance",
+            "summary": "customers/data_request delivery-transport gap real and accurately disclosed; needs RFC before G-Review"
+          }
+        ],
+        "modules_pass": [
+          "graphql-contract",
+          "billing-na",
+          "app-bridge-in-head",
+          "polaris-a11y-na-this-sprint"
+        ],
+        "modules_blocked": [
+          "webhook-compliance",
+          "auth-live-probe"
+        ],
+        "report_ref": "qa-reports/G4-sprint-1.1.md"
+      },
+      "project_version_before": 13,
+      "project_version_after": 14
+    },
+    {
+      "timestamp": "2026-09-18T09:26:21Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "live_evidence_gathered_bugs_found",
+      "details": {
+        "gate": "G4-sprint-1.1",
+        "infra_blocker": "CLEARED - real local Postgres 18.1 confirmed reachable, migration applied for the first time (exit 0), 6 tables confirmed via information_schema",
+        "f2_auth_probe": "RESOLVED CLEAN - unauthenticated /app -> 302, /app/calculator -> 410, webhook missing HMAC -> 400, webhook wrong HMAC -> 401. No sensitive 200 without auth.",
+        "f1_redact_then_query": "Deletion topology confirmed correct (1->0 across all 6 tenant tables) ONCE bugs below are worked around - but as shipped, real shops cannot complete redaction",
+        "new_defects": [
+          {
+            "id": "BUG-1",
+            "severity": "P1",
+            "summary": "authenticate.webhook() topic normalization (shop/redact->SHOP_REDACT) mismatches a DB CHECK constraint expecting literal 'shop/redact' - correctly-signed live webhook returns 500 on all 4 webhook routes"
+          },
+          {
+            "id": "BUG-2",
+            "severity": "P1",
+            "summary": "shop-redact.service.ts calls sessionStorageInstance.deleteSessions([]) unconditionally - empty array produces 'WHERE id IN ()', Postgres syntax error, rolls back the entire redact transaction. Hits every real shop since app/uninstalled already clears sessions before shop/redact fires 48h later - GDPR hard-deletion currently broken for all real merchants"
+          },
+          {
+            "id": "BUG-3",
+            "severity": "P3",
+            "summary": "webhook_event ON DELETE CASCADE deletes the in-flight row anyway, making the 'mark processed_at not delete' code comment dead/inaccurate - harmless, produces correct FT-08 result by accident"
+          }
+        ],
+        "fix_applied": false,
+        "evidence_ref": "dev-evidence/g4-sprint-1.1-live-evidence/ (00-SUMMARY.md through 15-final-cleanup.log)",
+        "rule_followed": "no-auto-fix - developer did not fix, surfaced only, awaiting explicit human fix command"
+      },
+      "project_version_before": 14,
+      "project_version_after": 15
+    },
+    {
+      "timestamp": "2026-09-18T09:50:19Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "bug1_bug2_fixed_verified_live",
+      "details": {
+        "commit_sha": "6f5525affa752b9646fd9e91e0094abcb3fedead",
+        "bug1_fix": "app/services/webhook-topic.service.ts - reads raw X-Shopify-Topic header, applied to all 4 webhook routes",
+        "bug2_fix": "shop-redact.service.ts - guards deleteSessions() call with sessions.length > 0",
+        "config_reconciliation": "shopify.app.toml relinked to real dev store (wds55.myshopify.com), CLI-validated (valid:true), redundant top-level compliance_topics array removed per real docs, per-subscription compliance_topics kept, explanatory comments restored",
+        "app_url_change": "SHOPIFY_APP_URL and application_url set to http://localhost:3000 per human request - CAVEATED: only valid for same-machine test probes, not real Shopify-initiated calls, needs a public HTTPS tunnel for real install/webhook testing",
+        "live_evidence_v2": "dev-evidence/g4-sprint-1.1-live-evidence-v2/ - correctly-signed shop/redact webhook on a zero-session shop returns 200 (was 500), full tenant-table deletion confirmed 1->0, auth probes re-confirmed",
+        "gates": "typecheck/tests(77)/build clean; lint fails only on pre-existing out-of-scope file decisions/migrations/00000000000001-initial-schema.js, not a regression",
+        "new_finding_unfixed": "app-uninstalled.service.ts has the same unguarded deleteSessions([]) pattern as BUG-2 - not yet triggered live, not authorized to fix, needs human decision"
+      },
+      "project_version_before": 15,
+      "project_version_after": 16
+    },
+    {
+      "timestamp": "2026-09-18T09:54:47Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_sprint_qa_reverification_verdict",
+      "details": {
+        "gate": "G4-sprint-1.1",
+        "commit_sha": "6f5525affa752b9646fd9e91e0094abcb3fedead",
+        "verdict": "BLOCKED",
+        "reason": "BUG-1 and BUG-2 independently confirmed genuinely fixed via direct source read and live evidence-v2. Independent read of app-uninstalled.service.ts confirms a new, real, OPEN P1 (BUG-4): identical unguarded deleteSessions([]) call, not wrapped in the drain worker's claim transaction - worse blast radius than BUG-2. Gate cannot PASS with an open P1.",
+        "findings": [
+          {
+            "id": "BUG-1",
+            "status": "VERIFIED_FIXED"
+          },
+          {
+            "id": "BUG-2",
+            "status": "VERIFIED_FIXED"
+          },
+          {
+            "id": "BUG-4",
+            "severity": "P1",
+            "status": "OPEN",
+            "summary": "app-uninstalled.service.ts has the same unguarded deleteSessions([]) pattern as BUG-2, worse blast radius (no shared transaction) - confirmed by direct read, not yet fixed, not yet authorized"
+          },
+          {
+            "id": "F3",
+            "severity": "P3",
+            "status": "unchanged",
+            "summary": ".env realistic-format secret, still flagged for rotation, not re-printed by QA this cycle"
+          },
+          {
+            "id": "F5",
+            "severity": "P4",
+            "status": "unchanged",
+            "summary": "evidence remains developer-self-produced, no CI, no self-embedded commit SHA in artifacts"
+          },
+          {
+            "id": "F7",
+            "severity": "P4",
+            "status": "new",
+            "summary": "shopify.app.toml CLI-validate claim asserted in prose only, no captured artifact"
+          }
+        ],
+        "path_to_clear": "Human authorizes fix for BUG-4 (same length>0 guard pattern as BUG-2), developer fixes + produces live-evidence-v3 exercising app/uninstalled on a zero-session shop, QA re-verifies once more."
+      },
+      "project_version_before": 16,
+      "project_version_after": 17
+    },
+    {
+      "timestamp": "2026-09-18T09:58:10Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "oq2_answered_hosting_conflict_raised",
+      "details": {
+        "OQ-2_repo": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git - remote 'origin' added locally, NOT pushed yet",
+        "open_subquestion": "is 'kirtan-webdesk' an internal WebDesk-controlled account, or does it reopen the OQ-5 external-contact question (kirtan@webdeskinc.com was a prior on-file external contact before the project was reconfirmed internal at G0.5)? Awaiting one-line confirmation.",
+        "new_conflict_raised": "Human proposed deploying to Vercel (free account, already connected to the above repo on Vercel's side). This directly contradicts ADR-0001 (G1.5-confirmed hosting decision), which named Vercel specifically as part of the rejected class - Vercel has no always-on process model, and the durable webhook-inbox drain-worker + 45-day GDPR sweeper (ADR-0002/0008), just verified working live via 2 rounds of bug-fixing, depend on a continuously-running process that would not run on Vercel. Orchestrator did NOT silently comply or silently refuse - flagged the concrete technical conflict and asked the human to explicitly choose: (a) formally override ADR-0001 and have the architect redesign the drain/sweeper mechanism around Vercel Cron Functions, or (b) use an always-on host for the app and Vercel for something else. Also noted no free tier survives ADR-0001's own disqualification of sleeping free tiers - the $0-budget constraint genuinely collides with the always-on-for-GDPR-reliability requirement.",
+        "gate_impact": "Does not block current G4-sprint-1.1 BUG-4 decision (unrelated). Would require a G1.5 REVISE/RENEGOTIATE or a logged human override if Vercel is chosen, before any deploy work is delegated to shopify-developer."
+      },
+      "project_version_before": 17,
+      "project_version_after": 18
+    }
+  ],
+  "lock": {
+    "locked": false,
+    "locked_by": null
+  },
+  "rfcs": [],
+  "health_score": null,
+  "shared_data_contract": null
+}

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expense Calculator — Calculator</title>
+
+  <!--
+    App Bridge in <head> of EVERY page, before anything else that
+    depends on it. Loaded from the Shopify CDN so the app always
+    picks up the latest App Bridge (App Store Req 2.2.3) — do not
+    vendor or pin this file. Required for Shopify to collect Web
+    Vitals (Built-for-Shopify post-launch performance gate).
+    VERIFY AT BUILD: current CDN path/version.
+  -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%" />
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+
+  <!-- Polaris web components (CDN). Never Polaris React (archived). -->
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <!-- App Bridge navigation — s-app-nav / s-link, not a custom sidebar. -->
+  <s-app-nav>
+    <s-link href="./calculator.html">Calculator</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <!--
+    App Bridge contextual save bar for the rule-configuration edits
+    below. This is the App Bridge primitive for "unsaved changes",
+    not a bespoke sticky footer — it matches Admin and is what
+    review expects. VERIFY AT BUILD: exact element/attribute names
+    for the resolved app-bridge.js version (ui-save-bar shown here
+    per current App Bridge convention).
+  -->
+  <ui-save-bar id="rule-changes-save-bar">
+    <button variant="primary" id="save-rule-changes">Save</button>
+    <button id="discard-rule-changes">Discard</button>
+  </ui-save-bar>
+
+  <s-page heading="Expense Calculator">
+    <div class="mockup-shell">
+
+      <s-section>
+        <s-banner tone="info" heading="Revenue is entered manually">
+          <p>
+            This app never reads your store's real sales figures — you
+            type in a revenue amount and it's used only for this
+            estimate. See <s-link href="#">why</s-link>.
+          </p>
+        </s-banner>
+      </s-section>
+
+      <s-section heading="Revenue">
+        <div class="rule-row__field-group">
+          <s-text-field
+            label="Revenue amount"
+            name="revenue"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            details="Enter the revenue figure you want to run this estimate against."
+          ></s-text-field>
+          <s-select label="Currency" name="currency" details="Set once; used to format every calculation.">
+            <s-option value="USD" selected>USD — US Dollar</s-option>
+            <s-option value="CAD">CAD — Canadian Dollar</s-option>
+            <s-option value="EUR">EUR — Euro</s-option>
+            <s-option value="GBP">GBP — British Pound</s-option>
+          </s-select>
+        </div>
+      </s-section>
+
+      <s-section heading="Expense category rules">
+        <p class="rule-row__at-a-glance" style="margin-block-end: var(--p-space-300, 12px);">
+          10 categories. Each one has a rule type (percentage of revenue,
+          fixed amount, or a predefined formula) and can be turned off
+          without deleting its configuration.
+        </p>
+
+        <div class="rule-list">
+
+          <!-- 1. Cost of Goods -->
+          <details class="rule-row" open>
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Cost of Goods</span>
+              <span class="rule-row__at-a-glance">32.5% of revenue</span>
+              <label class="visually-hidden" for="enabled-cost_of_goods">Enable Cost of Goods rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-cost_of_goods" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Cost of Goods</legend>
+                <label><input type="radio" name="type-cost_of_goods" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-cost_of_goods" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-cost_of_goods" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="32.5"
+                  data-role="percent-value" id="percent-cost_of_goods" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-cost_of_goods" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-cost_of_goods">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 2. Marketing -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Marketing</span>
+              <span class="rule-row__at-a-glance">8% of revenue</span>
+              <label class="visually-hidden" for="enabled-marketing">Enable Marketing rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-marketing" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Marketing</legend>
+                <label><input type="radio" name="type-marketing" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-marketing" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-marketing" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="8"
+                  data-role="percent-value" id="percent-marketing" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-marketing" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-marketing">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 3. Platform Fees -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Platform Fees</span>
+              <span class="rule-row__at-a-glance">2.9% of revenue</span>
+              <label class="visually-hidden" for="enabled-platform_fees">Enable Platform Fees rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-platform_fees" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Platform Fees</legend>
+                <label><input type="radio" name="type-platform_fees" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-platform_fees" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-platform_fees" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="2.9"
+                  data-role="percent-value" id="percent-platform_fees" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-platform_fees" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-platform_fees">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 4. Payment Processing -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Payment Processing</span>
+              <span class="rule-row__at-a-glance">2.6% of revenue</span>
+              <label class="visually-hidden" for="enabled-payment_processing">Enable Payment Processing rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-payment_processing" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Payment Processing</legend>
+                <label><input type="radio" name="type-payment_processing" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-payment_processing" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-payment_processing" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="2.6"
+                  data-role="percent-value" id="percent-payment_processing" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-payment_processing" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-payment_processing">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 5. Shipping -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Shipping</span>
+              <span class="rule-row__at-a-glance">$450.00 fixed</span>
+              <label class="visually-hidden" for="enabled-shipping">Enable Shipping rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-shipping" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Shipping</legend>
+                <label><input type="radio" name="type-shipping" value="percentage" data-role="rule-type" /> Percentage of revenue</label>
+                <label><input type="radio" name="type-shipping" value="fixed" data-role="rule-type" checked /> Fixed amount</label>
+                <label><input type="radio" name="type-shipping" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage" hidden>
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="0"
+                  data-role="percent-value" id="percent-shipping" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed">
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="450.00"
+                  data-role="fixed-value" id="fixed-shipping" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-shipping">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 6. Apps/Software -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Apps/Software</span>
+              <span class="rule-row__at-a-glance">$120.00 fixed</span>
+              <label class="visually-hidden" for="enabled-apps_software">Enable Apps/Software rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-apps_software" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Apps/Software</legend>
+                <label><input type="radio" name="type-apps_software" value="percentage" data-role="rule-type" /> Percentage of revenue</label>
+                <label><input type="radio" name="type-apps_software" value="fixed" data-role="rule-type" checked /> Fixed amount</label>
+                <label><input type="radio" name="type-apps_software" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage" hidden>
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="0"
+                  data-role="percent-value" id="percent-apps_software" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed">
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="120.00"
+                  data-role="fixed-value" id="fixed-apps_software" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-apps_software">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 7. Payroll (demonstrates the formula rule type) -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Payroll</span>
+              <span class="rule-row__at-a-glance">18% of revenue</span>
+              <label class="visually-hidden" for="enabled-payroll">Enable Payroll rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-payroll" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Payroll</legend>
+                <label><input type="radio" name="type-payroll" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-payroll" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-payroll" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="18"
+                  data-role="percent-value" id="percent-payroll" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-payroll" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-payroll">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+                <p style="color: var(--p-color-text-secondary, #616161); font-size: 0.8125rem;">
+                  The exact formula set is pending sign-off (OQ-4) — options above are
+                  placeholders for layout only.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <!-- 8. Overhead -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Overhead</span>
+              <span class="rule-row__at-a-glance">$300.00 fixed</span>
+              <label class="visually-hidden" for="enabled-overhead">Enable Overhead rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-overhead" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Overhead</legend>
+                <label><input type="radio" name="type-overhead" value="percentage" data-role="rule-type" /> Percentage of revenue</label>
+                <label><input type="radio" name="type-overhead" value="fixed" data-role="rule-type" checked /> Fixed amount</label>
+                <label><input type="radio" name="type-overhead" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage" hidden>
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="0"
+                  data-role="percent-value" id="percent-overhead" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed">
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="300.00"
+                  data-role="fixed-value" id="fixed-overhead" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-overhead">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 9. Taxes -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Taxes</span>
+              <span class="rule-row__at-a-glance">6% of revenue</span>
+              <label class="visually-hidden" for="enabled-taxes">Enable Taxes rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-taxes" checked />
+            </summary>
+            <div class="rule-row__body">
+              <s-banner tone="warning" heading="Estimate only">
+                <p>This is not tax or legal advice. It's a rough estimate based on your own assumption.</p>
+              </s-banner>
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Taxes</legend>
+                <label><input type="radio" name="type-taxes" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-taxes" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-taxes" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="6"
+                  data-role="percent-value" id="percent-taxes" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-taxes" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-taxes">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+          <!-- 10. Misc -->
+          <details class="rule-row">
+            <summary class="rule-row__summary">
+              <svg class="rule-row__chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              <span class="rule-row__title">Misc</span>
+              <span class="rule-row__at-a-glance">1.5% of revenue</span>
+              <label class="visually-hidden" for="enabled-misc">Enable Misc rule</label>
+              <input type="checkbox" data-role="enabled-toggle" id="enabled-misc" checked />
+            </summary>
+            <div class="rule-row__body">
+              <fieldset style="border:0; padding:0; margin:0;">
+                <legend class="visually-hidden">Rule type for Misc</legend>
+                <label><input type="radio" name="type-misc" value="percentage" data-role="rule-type" checked /> Percentage of revenue</label>
+                <label><input type="radio" name="type-misc" value="fixed" data-role="rule-type" /> Fixed amount</label>
+                <label><input type="radio" name="type-misc" value="formula" data-role="rule-type" /> Formula</label>
+              </fieldset>
+              <div class="rule-row__field-group" data-group="percentage">
+                <s-text-field label="Percentage" type="number" min="0" step="0.01" value="1.5"
+                  data-role="percent-value" id="percent-misc" suffix="%"></s-text-field>
+                <p class="field-error" data-error-for="percent-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="fixed" hidden>
+                <s-text-field label="Fixed amount" type="number" min="0" step="0.01" value="0"
+                  data-role="fixed-value" id="fixed-misc" prefix="$"></s-text-field>
+                <p class="field-error" data-error-for="fixed-value" aria-live="polite"></p>
+              </div>
+              <div class="rule-row__field-group" data-group="formula" hidden>
+                <s-select label="Formula" data-role="formula-value" id="formula-misc">
+                  <s-option value="__placeholder_a">Tiered by revenue band (app-defined)</s-option>
+                  <s-option value="__placeholder_b">Per-unit average (app-defined)</s-option>
+                </s-select>
+              </div>
+            </div>
+          </details>
+
+        </div>
+      </s-section>
+
+      <s-section>
+        <div style="display:flex; justify-content:flex-end; gap: var(--p-space-300, 12px);">
+          <s-button variant="primary" href="./results.html">Calculate</s-button>
+        </div>
+        <p style="color: var(--p-color-text-secondary, #616161); font-size: 0.8125rem; text-align:right;">
+          Uses the rule values shown above, including any unsaved edits — save your
+          rules first if you want to reuse these values next time.
+        </p>
+      </s-section>
+
+    </div>
+  </s-page>
+
+  <script src="./assets/mockup.js" defer></script>
+</body>
+</html>

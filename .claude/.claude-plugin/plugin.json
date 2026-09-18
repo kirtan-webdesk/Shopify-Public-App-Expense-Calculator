@@ -1,0 +1,17 @@
+{
+  "name": "webdesk-shopify-apps",
+  "version": "0.1.8-beta.6",
+  "description": "Delivery + development system for Shopify public App Store apps: gated lifecycle from grooming through App Store submission, launch, and maintenance. React Router 7 + Polaris web components + App Bridge, Admin GraphQL 2026-07, Shopify App Pricing, mandatory compliance webhooks, protected customer data.",
+  "author": {
+    "name": "WebDesk Solution"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "shopify",
+    "shopify-app",
+    "app-store",
+    "react-router",
+    "polaris",
+    "app-bridge"
+  ]
+}

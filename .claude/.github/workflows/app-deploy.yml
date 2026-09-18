@@ -1,0 +1,34 @@
+name: App Deploy (NON-PRODUCTION TEMPLATE — do not use as-is)
+# This is a NON-PRODUCTION scaffold. It intentionally fails until a real deploy
+# target + health-check + rollback are wired for the project's chosen hosting.
+# Failures are never masked. In shared-SaaS data ownership the app owns NO
+# migrations — the migrate step is skipped (the SaaS platform owns schema).
+on:
+  workflow_dispatch:
+    inputs:
+      data_ownership:
+        description: "dedicated | shared-saas"
+        required: true
+        default: "dedicated"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging   # protected environment; configure reviewers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: "npm" }
+      - run: npm ci
+      - run: npm run build
+      - name: Migrate (skipped in shared-SaaS — app owns no migrations)
+        if: ${{ github.event.inputs.data_ownership != 'shared-saas' }}
+        run: npm run migrate
+      - name: Deploy (NON-PRODUCTION placeholder — fails on purpose until wired)
+        run: |
+          echo "No production deploy target configured for this template." >&2
+          exit 1
+      - name: Health check (failure is NOT masked)
+        run: ./scripts/health-check.sh
+      - name: Rollback on failure (failure is NOT masked)
+        if: failure()
+        run: ./scripts/rollback.sh

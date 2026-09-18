@@ -1,0 +1,422 @@
+{
+  "project": {
+    "id": "a5a82bd7-4bdb-44ee-8278-7fda97dd638c",
+    "name": "expense-calculator",
+    "client_slug": "expense-calculator",
+    "project_type": "app-build",
+    "build_context": "shopify-app",
+    "stage": "scaffolding",
+    "current_gate": "G3",
+    "schema_version": "1.0.0",
+    "shopify": {
+      "distribution": "public",
+      "api_version": "2026-07",
+      "scopes": [],
+      "protected_scopes": false,
+      "app_pricing": {
+        "model": "free"
+      },
+      "data_ownership": "dedicated",
+      "jobs_ownership": "app",
+      "hosting": "tbd",
+      "extensions": [],
+      "built_for_shopify": false
+    },
+    "created_at": "2026-09-17T17:55:22Z",
+    "updated_at": "2026-09-18T07:39:45Z",
+    "version": 11,
+    "status": "active"
+  },
+  "tech_stack": {
+    "runtime": "node@22",
+    "framework": "react-router-7",
+    "ui": "polaris-web-components",
+    "database": "postgresql",
+    "orm": "sequelize",
+    "session_storage": "postgresql",
+    "auth": "token-exchange",
+    "admin_api": "graphql",
+    "billing": "app-pricing",
+    "queue": "app-host"
+  },
+  "gates": [
+    {
+      "id": "G0.5",
+      "type": "grooming",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T17:55:22Z",
+      "approver": "pm",
+      "notes": "Grooming opened by orchestrator at project init. sow-spec.md present at repo root as unverified reference input (foreign format, not plugin-native) \u2014 PM to treat as background only, not as authoritative pre-filled intake, and to run this plugin's own G0.5 grooming process in full. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:02:16Z. OQ-5 (internal-vs-external classification): CONFIRMED INTERNAL \u2014 no external client entity; FLAG-004 blocklist treated as moot/non-authoritative, neither webdeskinc.com address is a verified real contact and neither is to be used. OQ-9 (plan_tier 'basic'): CONFIRMED as internal WebDesk engagement-tier metadata, NOT a functional constraint requiring the app to operate within Shopify's merchant-facing Basic plan limits. OQ-10 (revenue source): CONFIRMED merchant-entered \u2014 protected_scopes stays false, scopes=[], G-PCD to record 'skipped' at the appropriate gate. Remaining open questions (OQ-1,2,3,4,6,7,8) NOT yet answered \u2014 tracked forward, several block later gates (G1.5/G3/M2/G2) individually, none block advancing past G0.5.",
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-17T18:02:16Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G0",
+      "type": "spec-validation",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:08:23Z",
+      "sla_hours": null,
+      "approver": "system",
+      "decided_by": "system",
+      "decided_at": "2026-09-17T18:08:23Z",
+      "decision": "CONFIRM",
+      "notes": "Auto spec-validation. spec.md frontmatter checked for internal consistency against project.json v3: g0.5-confirmed fields (client_classification=internal, plan_tier note, protected_scopes=false, scopes=[], app_pricing.model=free, data_ownership=dedicated, api_version=2026-07) all match. No contradictions found. No human decision required for this gate type.",
+      "escalation_log": []
+    },
+    {
+      "id": "G1",
+      "type": "plan-estimate",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:08:23Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-19T18:08:23Z",
+      "approver": "PM lead (named approver TBD \u2014 OQ-7 unanswered; role-based approval by project stakeholder in the interim)",
+      "ticket_id": "EXPCALC-G1-EST-001",
+      "notes": "Independent bottom-up estimate: 225-390 engineering hours across 5 milestones (M1 Foundation 34-52, M2 Configuration 44-70, M3 Engine+Results 40-62, M4 Save+History 26-42, M5 Hardening+Launch 48-78; engineering subtotal 192-304) plus gate/coordination lines (G1.5 8-16, G-Schema 6-12, G2 8-36, PM shepherding 10-20). Confidence: LOW - no estimation spreadsheet or historical actuals; OQ-1 (hosting) and OQ-8 (design path) sit directly on cost drivers; OQ-4 (default rates) unfinalised. Ranges, not points. The source doc's 250hr lump sum was NOT used as an input and sits at ~20th percentile of the derived range. Planning figure ~300hr with contingency to 390. Conditional gates determined: G1.5 FIRES (triggers: estimate >80hr AND undecided non-trivial hosting; runs before G-Schema), G-Schema FIRES (always), G2 FIRES (reduced-UI candidate pending OQ-8), G-PCD SKIPPED (reason: no protected order/customer scopes requested - confirmed at G0.5). TIMELINE: target 2026-10-20 is NOT achievable as a launch date - RENEGOTIATE recommended. Recommended submission-readiness range: 2026-10-24 to 2026-11-27 (2 devs) or 2026-11-17 to 2026-12-29 (1 dev), assuming build start 2026-09-22 and OQ-1/4/7/8 answered within the week. Launch = submission date + Shopify review (external, G6, no internal SLA, no committed date; one resubmission cycle budgeted). Artifact: projects/expense-calculator/spec.md sections 11-12. Estimate authored by pm-agent; pm-agent is NOT the approver. sla_hours=48 is nominal - OQ-6 (timezone) unanswered so no confirmed local SLA frame; America/Toronto not assumed. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-17T18:10:12Z. Launch-date renegotiation accepted in principle (2026-10-20 dropped as a launch commitment; submission-readiness target to be finalized). Hosting (OQ-1) explicitly deferred to G1.5 by the approver, not answered now \u2014 architect to recommend at G1.5, human confirms there.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-17T18:10:12Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G1.5",
+      "type": "architecture-review",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-17T18:10:12Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-19T18:10:12Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "G1.5 fires per gates.md triggers: estimate 225-390hr (>80hr) AND hosting undecided (project.shopify.hosting=tbd, OQ-1 explicitly deferred to this gate by the approver at G1). Architect to: (1) recommend long-running vs serverless hosting with webhook-delivery/cold-start reasoning, (2) confirm GraphQL cost/rate-limit strategy is NOT needed (no bulk ops, no high-volume queries expected for a calculator app - verify), (3) confirm billing architecture is trivial (app_pricing.model=free, no usage meters), (4) produce initial ADRs and a fitness-test plan feeding G-Schema next. data_ownership=dedicated and jobs_ownership=app already confirmed at G0.5, not reopened here unless architect finds cause. | ARCHITECT PROPOSAL (PROPOSED, not approved \u2014 awaiting Tech lead decision): hosting = long-running always-on Node (min instances=1), NOT serverless \u2014 key driver is shop/redact webhook reliability (arrives ~48h post-uninstall on a provably cold container under serverless) plus ack-fast-then-work-async pattern via an in-process durable inbox (ADR-0002), avoiding an added queue/durable-function primitive. Provider/plan/region left human-owned (shortlist: Render or DigitalOcean App Platform preferred, Fly.io acceptable only with auto-stop disabled; free/sleeping tiers disqualified - reintroduces cold start; Vercel/Netlify/Cloudflare Workers/raw Lambda rejected class). GraphQL cost/rate-limit strategy CONFIRMED not needed (verified against every D1-D16 deliverable; only candidate admin.graphql call removed entirely by ADR-0006 making currency merchant-configured \u2014 zero Admin API dependency). Billing CONFIRMED trivial (no App Pricing integration in V1). Auth/session CONFIRMED default (token-exchange, Postgres session storage, expiringOfflineAccessTokens=true). 8 ADRs + architecture-packet.md + fitness-test-plan.md (29 checks, npm run fitness, blocking PR check) written to projects/expense-calculator/decisions/. G-Schema handoff flagged: no FK from calculation_line_item to expense_rule (value snapshot only), category_key stable string not row id, engine_version on calculations, append-only history, shop_id denormalized onto every tenant table, webhook_event inbox table + shop.uninstalled_at, ON DELETE CASCADE + asserted row-count redaction. Risk R2 flagged: shop/redact never-delivered scenario -> 45-day safety sweeper added (ADR-0008), sweeper firing = alert not routine. No RFCs raised; unverifiable platform specifics (webhook retry thresholds, shop-field scope reqs, compliance_topics TOML shape) marked verify-at-build in packet \u00a79. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:02:32Z. Architecture baseline accepted: long-running always-on Node hosting, 8 ADRs, fitness-test plan.",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:02:32Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G-Schema",
+      "type": "schema-approval",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-18T07:02:32Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-20T07:02:32Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "Data model + session storage review, dedicated-DB path (data_ownership=dedicated, not shared-saas -> no shared-data contract needed, this is a real schema review not a contract review). Fires per gates.md: 'Always (a datastore always exists)'. Reviewing structural design BEFORE any migration runs, per architect's G1.5 handoff notes in decisions/architecture-packet.md \u00a78: no FK from calculation line items to expense rules (value-snapshot only), category_key as stable string not row id, append-only calculation history, engine_version on calculations, shop_id denormalized onto every tenant table, webhook_event inbox table (unique index on webhook_id for dedup) + shop.uninstalled_at, cascade-delete + asserted row-count verification on redaction, session storage table (shopify_sessions) library-managed with no app columns. Routed to shopify-developer to produce data-model.md + draft migration DDL for review; no migration to be applied against any real database until this gate passes. | DEVELOPER PROPOSAL (PROPOSED, not approved - awaiting Tech lead decision): 7 tables (shop, expense_rule, calculation, calculation_line_item, webhook_event, compliance_audit_log, shopify_sessions[library-managed]). No expense_category table - recommended code constant EXPENSE_CATEGORIES keyed by category_key instead (avoids seed drift + the 'undeleteable global row' problem under GDPR redaction), backed by a DB CHECK constraint as runtime backstop. All 12 architect constraints from G1.5 satisfied: no FK line-items->rules (value snapshot), stable category_key, engine_version on calculations, append-only (BEFORE UPDATE trigger + DELETE still allowed for redaction cascade), currency per calculation, shop_id denormalized on every tenant table, webhook_event inbox with unique webhook_id dedup, shop.uninstalled_at, cascade-delete + row-count-assertion redaction, money as BIGINT minor units / INTEGER basis-point rates (no float columns), PostgreSQLSessionStorage confirmed with zero app-owned columns on shopify_sessions. 3 judgment calls flagged for Tech lead review (not silent decisions): (1) compliance_audit_log intentionally has NO shop_id - survives shop deletion as GDPR evidence trail, looks like a violation of the shop_id-everywhere rule but is a deliberate exception; (2) webhook_event.shop_id is NOT NULL, late-delivery-after-redaction edge case handled by repository-layer skip rather than nullable column; (3) possible tension between FT-08's literal 'zero webhook_event rows' wording and ADR-0002's delete-last-or-mark-then-purge guidance for the redact handler's own in-flight row - flagged before a fitness test gets written against an ambiguous spec. Artifacts: decisions/data-model.md (full schema + reasoning + ER-as-text), decisions/migrations/00000000000001-initial-schema.js (DRAFT/UNAPPLIED, reversible up/down, syntax-checked only, never run against any database - none exists yet, no npm project scaffolded). Shopify Dev MCP validation not run: task was generic PostgreSQL/Sequelize DDL with no Admin GraphQL/Polaris/webhook-handler code - orchestrator concurs this falls outside the MCP-evidence requirement for this specific deliverable (no commit, no PR, no Code-Review/QA routing - this is a Human design-gate artifact, not implementation). | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:12:13Z. Schema baseline accepted as proposed (7 tables, code-constant categories, all 3 flagged judgment calls accepted as proposed defaults - no override given).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:12:13Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G2",
+      "type": "design-approval",
+      "scope": "project",
+      "status": "passed",
+      "opened_at": "2026-09-18T07:12:13Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-20T07:12:13Z",
+      "approver": "Design lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim)",
+      "notes": "Polaris web-components UX approval. Always fires for a public app with an operational merchant UI (this app is admin-embedded, chart-heavy calculator - not background-only). OQ-8 (design path) was open at G0.5/G1: source doc budgeted 0/0 mockup revisions, which does not waive G2 - designer to produce a working HTML/Polaris mockup per this plugin's standard process. Data model confirmed at G-Schema (7 tables: shop, expense_rule, calculation, calculation_line_item, webhook_event, compliance_audit_log, shopify_sessions) - UI must reflect: calculator input form across 10 expense categories (rule types: percentage/fixed/formula), results view with donut/pie chart (ADR-0004: hand-rolled inline SVG, no charting library, always-rendered accessible data table as primary), save/history list + detail view rendering STORED snapshot values (never recomputes - history must visually communicate 'this is a point-in-time snapshot'). App Bridge required in <head> of every page (Built-for-Shopify/Web-Vitals requirement). Navigation via s-app-nav/s-link. WCAG validation required. | DESIGNER PROPOSAL (PROPOSED, not approved - awaiting Design lead decision): 4 HTML/Polaris mockup screens in design/mockup/ (calculator.html, results.html, history.html, history-detail.html) + assets/ + design/DESIGN-NOTES.md handoff doc. Confirmed: Polaris web components throughout (no Polaris React), App Bridge in <head> of all 4 pages, s-app-nav/s-link navigation, WCAG 2.1 AA addressed structurally (axe-core run itself deferred to G3/G5 per FT-19a - not yet executed). Results screen follows ADR-0004: accessible data table always-rendered as primary, hand-rolled inline SVG donut (stacked stroke-dasharray, no charting lib) as supplementary. History-detail signals frozen snapshot via 4 layered mechanisms (banner, lock-icon Snapshot badge + engine_version shown, zero editable controls, no Save button present at all). 6 judgment calls flagged for Design lead in DESIGN-NOTES.md \u00a74: (1) 10 categories as native details/summary disclosures not a flat table; (2) Calculate runs on unsaved form state (safe per snapshot data model); (3) currency selector inline on calculator screen, no separate Settings screen; (4) 'Duplicate as new calculation' action added on history-detail - NOT in spec, flagged accept/reject; (5) results.html has a boxed dev-only fixture-data-swap dropdown for reviewing ADR-0004 chart states - explicitly must be stripped before G3 build, not shippable; (6) formula rule-type options are visible placeholders pending OQ-4 (default rates still unconfirmed) - illustrative only. | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-18T07:39:45Z. Mockup accepted with all 6 defaults standing (no explicit override given on #4/#5/#6 - developer must still strip the dev-only fixture-swap dropdown (#5) before scaffold ships, that instruction is unconditional regardless of silence on the other judgment calls).",
+      "escalation_log": [],
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-18T07:39:45Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G3",
+      "type": "scaffold-verification",
+      "scope": "project",
+      "status": "open",
+      "opened_at": "2026-09-18T07:39:45Z",
+      "sla_hours": 24,
+      "expires_at": "2026-09-19T07:39:45Z",
+      "approver": "Tech lead (role \u2014 named approver TBD, OQ-7 unanswered; project stakeholder in the interim); Auto+spot-check",
+      "notes": "Scaffold verification. shopify-developer to stand up the real app skeleton: React Router 7 + @shopify/shopify-app-react-router, Polaris web components + App Bridge in <head> (per G2-confirmed mockups in design/mockup/, with the dev-only fixture-swap dropdown on results.html STRIPPED - not shippable), token-exchange auth, PostgreSQLSessionStorage, apply the G-Schema-confirmed migration (decisions/migrations/00000000000001-initial-schema.js) as the FIRST real migration run against an actual dev database, shopify.app.toml configured per api_version=2026-07 and compliance_topics for the 4 mandatory webhooks (customers/data_request, customers/redact, shop/redact, app/uninstalled), hosting target = long-running always-on Node per ADR-0001 (provider/region still OQ-1, local Shopify CLI dev loop for now). Still-blocking open questions for full build: OQ-2 (GitHub repo), OQ-3 (credentials handoff protocol), OQ-4 (default expense-rate/formula sign-off - blocks real M2 config data, not scaffold itself).",
+      "escalation_log": []
+    }
+  ],
+  "budget": {
+    "token_used": 0,
+    "token_cap": 0,
+    "hours_burned": 0,
+    "hours_budget": 0
+  },
+  "audit_log": [
+    {
+      "timestamp": "2026-09-17T17:55:22Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "project_initialized",
+      "details": {
+        "client_slug": "expense-calculator",
+        "project_type": "app-build",
+        "note": "Scaffolded via init-project.sh. Reference doc projects/../sow-spec.md found at repo root \u2014 flagged for PM review at grooming, not trusted as authoritative."
+      },
+      "project_version_before": 0,
+      "project_version_after": 1
+    },
+    {
+      "timestamp": "2026-09-17T18:00:15Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "g0.5_grooming_findings_recorded",
+      "details": {
+        "by": "pm",
+        "protected_scopes_determination": "false \u2014 revenue is merchant-entered, no order/customer scope requested; G-PCD expected to record skipped at G1",
+        "app_pricing_model": "recurring+usage -> free (V1 has no billing)",
+        "schema_note": "tech_stack.billing enum is schema-locked to 'app-pricing' only; free-tier recorded via shopify.app_pricing.model=free instead",
+        "spec_ref": "projects/expense-calculator/spec.md",
+        "open_questions_count": 10,
+        "gate_status": "G0.5 remains OPEN pending human decision (PM/stakeholder) \u2014 not self-approved"
+      },
+      "project_version_before": 1,
+      "project_version_after": 2
+    },
+    {
+      "timestamp": "2026-09-17T18:02:16Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G0.5",
+        "decision": "CONFIRM",
+        "answers": {
+          "OQ-5": "internal \u2014 no external client",
+          "OQ-9": "internal engagement tier, not a functional Shopify-plan constraint",
+          "OQ-10": "revenue stays merchant-entered; protected_scopes=false confirmed"
+        },
+        "recorded_by": "orchestrator"
+      },
+      "project_version_before": 2,
+      "project_version_after": 3
+    },
+    {
+      "timestamp": "2026-09-17T18:08:23Z",
+      "actor": "system",
+      "actor_type": "system",
+      "action": "gate_auto_passed",
+      "details": {
+        "gate": "G0",
+        "type": "spec-validation"
+      },
+      "project_version_before": 3,
+      "project_version_after": 4
+    },
+    {
+      "timestamp": "2026-09-17T18:08:23Z",
+      "actor": "pm-agent",
+      "actor_type": "agent",
+      "action": "g1_plan_estimate_produced",
+      "details": {
+        "ticket_id": "EXPCALC-G1-EST-001",
+        "hours_low": 225,
+        "hours_high": 390,
+        "confidence": "low",
+        "conditional_gates": {
+          "G1.5": "fires",
+          "G-Schema": "fires",
+          "G2": "fires",
+          "G-PCD": "skipped"
+        },
+        "timeline_recommendation": "RENEGOTIATE 2026-10-20",
+        "spec_status": "g0.5-confirmed"
+      },
+      "project_version_before": 3,
+      "project_version_after": 4
+    },
+    {
+      "timestamp": "2026-09-17T18:10:12Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G1",
+        "decision": "CONFIRM",
+        "note": "hosting deferred to G1.5"
+      },
+      "project_version_before": 4,
+      "project_version_after": 5
+    },
+    {
+      "timestamp": "2026-09-17T18:10:12Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G1.5",
+        "type": "architecture-review",
+        "triggers": [
+          "estimate>80hr",
+          "hosting-undecided"
+        ]
+      },
+      "project_version_before": 4,
+      "project_version_after": 5
+    },
+    {
+      "timestamp": "2026-09-17T18:22:09Z",
+      "actor": "architect",
+      "actor_type": "agent",
+      "action": "g1.5_architecture_review_proposed",
+      "details": {
+        "hosting_recommendation": "long-running always-on Node, not serverless",
+        "adrs": [
+          "ADR-0001",
+          "ADR-0002",
+          "ADR-0003",
+          "ADR-0004",
+          "ADR-0005",
+          "ADR-0006",
+          "ADR-0007",
+          "ADR-0008"
+        ],
+        "fitness_test_count": 29,
+        "graphql_cost_strategy_needed": false,
+        "billing_architecture": "trivial - free, no App Pricing integration",
+        "status": "PROPOSED - awaiting Tech lead decision, not self-approved"
+      },
+      "project_version_before": 5,
+      "project_version_after": 6
+    },
+    {
+      "timestamp": "2026-09-18T07:02:32Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G1.5",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 6,
+      "project_version_after": 7
+    },
+    {
+      "timestamp": "2026-09-18T07:02:32Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G-Schema",
+        "type": "schema-approval"
+      },
+      "project_version_before": 6,
+      "project_version_after": 7
+    },
+    {
+      "timestamp": "2026-09-18T07:11:06Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "g_schema_data_model_proposed",
+      "details": {
+        "tables": [
+          "shop",
+          "expense_rule",
+          "calculation",
+          "calculation_line_item",
+          "webhook_event",
+          "compliance_audit_log",
+          "shopify_sessions"
+        ],
+        "expense_category_recommendation": "code constant, not a table",
+        "artifacts": [
+          "decisions/data-model.md",
+          "decisions/migrations/00000000000001-initial-schema.js"
+        ],
+        "flagged_judgment_calls": 3,
+        "mcp_validation": "not applicable - generic Postgres/Sequelize DDL, no Shopify API surface touched",
+        "status": "PROPOSED - awaiting Tech lead decision, not self-approved, no migration applied anywhere"
+      },
+      "project_version_before": 7,
+      "project_version_after": 8
+    },
+    {
+      "timestamp": "2026-09-18T07:12:13Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G-Schema",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 8,
+      "project_version_after": 9
+    },
+    {
+      "timestamp": "2026-09-18T07:12:13Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G2",
+        "type": "design-approval"
+      },
+      "project_version_before": 8,
+      "project_version_after": 9
+    },
+    {
+      "timestamp": "2026-09-18T07:20:22Z",
+      "actor": "designer",
+      "actor_type": "agent",
+      "action": "g2_mockup_proposed",
+      "details": {
+        "screens": [
+          "calculator.html",
+          "results.html",
+          "history.html",
+          "history-detail.html"
+        ],
+        "location": "design/mockup/",
+        "constraints_met": [
+          "polaris-web-components",
+          "app-bridge-in-head",
+          "s-app-nav-navigation",
+          "wcag-structural"
+        ],
+        "outstanding": "axe-core run deferred to G3/G5 (FT-19a)",
+        "flagged_for_decision": [
+          "duplicate-as-new-calculation action (not in spec)",
+          "dev-only fixture-swap dropdown must be stripped before G3"
+        ],
+        "status": "PROPOSED - awaiting Design lead decision, not self-approved"
+      },
+      "project_version_before": 9,
+      "project_version_after": 10
+    },
+    {
+      "timestamp": "2026-09-18T07:39:45Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G2",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 10,
+      "project_version_after": 11
+    },
+    {
+      "timestamp": "2026-09-18T07:39:45Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gate_opened",
+      "details": {
+        "gate": "G3",
+        "type": "scaffold-verification"
+      },
+      "project_version_before": 10,
+      "project_version_after": 11
+    }
+  ],
+  "lock": {
+    "locked": false,
+    "locked_by": null
+  },
+  "rfcs": [],
+  "health_score": null,
+  "shared_data_contract": null
+}

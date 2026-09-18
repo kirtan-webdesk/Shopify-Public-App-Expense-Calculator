@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expense Calculator — Results</title>
+
+  <!-- App Bridge in <head> — see calculator.html for the full rationale. -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%" />
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <s-app-nav>
+    <s-link href="./calculator.html">Calculator</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <!--
+    App Bridge modal for the save-confirmation step — <s-modal> per
+    the App Bridge primitive (not a bespoke dialog). Saving a
+    calculation is a meaningful, permanent action (D10/D11: it
+    freezes a snapshot), so it is confirmed rather than fired
+    directly from the button.
+    VERIFY AT BUILD: exact <s-modal> attribute/slot names.
+  -->
+  <s-modal id="save-calculation-modal" heading="Save this calculation?">
+    <p>
+      This creates a permanent record of today's revenue figure and the
+      rule values used to calculate it. It will <strong>not</strong>
+      update later if you edit your category rules — that's by design,
+      so past calculations stay comparable.
+    </p>
+    <s-button slot="primary-action" variant="primary" id="confirm-save-calculation">Save calculation</s-button>
+    <s-button slot="secondary-actions" id="cancel-save-calculation">Cancel</s-button>
+  </s-modal>
+
+  <s-page heading="Results" backAction="./calculator.html">
+    <div class="mockup-shell">
+
+      <!--
+        Design-review aid only — lets the G2 approver step through
+        every ADR-0004-mandated chart/table state without separate
+        pages. Not part of the merchant-facing product.
+      -->
+      <div class="design-review-aid">
+        <span class="design-review-aid__label">Design review aid — not part of the merchant UI</span>
+        <label for="preview-state-switcher">Preview state (ADR-0004 mandated states):</label>
+        <select id="preview-state-switcher">
+          <option value="typical" selected>Typical calculation</option>
+          <option value="zero-revenue">Zero revenue</option>
+          <option value="all-zero">All categories zero/disabled</option>
+          <option value="single-category">Exactly one non-zero category</option>
+          <option value="small-slices">Several slices under ~1%</option>
+        </select>
+      </div>
+
+      <s-section>
+        <div style="display:flex; flex-wrap:wrap; gap: var(--p-space-500, 20px); justify-content: space-between; align-items:flex-start;">
+          <div class="snapshot-readonly-field">
+            <span class="snapshot-readonly-field__label">Revenue</span>
+            <span class="snapshot-readonly-field__value" id="summary-revenue">—</span>
+          </div>
+          <div class="snapshot-readonly-field">
+            <span class="snapshot-readonly-field__label">Total expenses</span>
+            <span class="snapshot-readonly-field__value" id="summary-total-expenses">—</span>
+          </div>
+          <div class="snapshot-readonly-field">
+            <span class="snapshot-readonly-field__label">Net</span>
+            <span class="snapshot-readonly-field__value" id="summary-net">—</span>
+          </div>
+          <div>
+            <s-button variant="primary" id="save-calculation-btn">Save this calculation</s-button>
+          </div>
+        </div>
+      </s-section>
+
+      <s-section heading="Expense breakdown">
+        <div class="results-grid">
+
+          <!--
+            ADR-0004: the data table is the primary, always-rendered
+            representation and comes FIRST in DOM/reading order. The
+            chart is supplementary and lives second, both visually
+            (right column / below) and in the markup.
+          -->
+          <div>
+            <table class="data-table">
+              <caption>Per-category expense breakdown against the revenue figure above.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Rule applied</th>
+                  <th scope="col" class="numeric">Amount</th>
+                  <th scope="col" class="numeric">% of revenue</th>
+                </tr>
+              </thead>
+              <tbody id="results-table-body">
+                <!-- populated by assets/mockup.js from a fixture dataset -->
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">Total expenses</th>
+                  <td></td>
+                  <td class="numeric" id="results-table-total-amount"></td>
+                  <td class="numeric" id="results-table-total-pct"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="chart-panel" aria-hidden="false">
+            <div id="donut-chart-mount"><!-- hand-rolled inline SVG donut, ADR-0004 --></div>
+            <ul class="donut-legend" id="donut-legend"></ul>
+          </div>
+
+        </div>
+      </s-section>
+
+    </div>
+  </s-page>
+
+  <script src="./assets/mockup.js" defer></script>
+</body>
+</html>

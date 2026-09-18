@@ -1,0 +1,291 @@
+/*
+  expense-calculator — G2 mockup stylesheet
+  ------------------------------------------------------------------
+  This file is intentionally thin. The visual system IS Polaris:
+  colour, type, spacing, and component chrome come from the Polaris
+  web-components bundle (polaris.js) loaded in every page <head>.
+  Nothing here re-implements a competing design/token system.
+
+  What lives here:
+    1. Polaris *design tokens*, referenced as CSS custom properties
+       (var(--p-...)), for the handful of layout needs that aren't a
+       component on their own (the donut/legend layout, the rule
+       disclosure rows, the snapshot banner treatment, the native
+       accessible <table>).
+    2. Fallback values after each var() so this file previews
+       reasonably in a browser with no network access. The fallback
+       VALUES ARE NOT AUTHORITATIVE — the real values come from
+       whatever polaris.js ships at build time.
+
+  VERIFY AT BUILD: exact Polaris token names and values against the
+  polaris.js version resolved from the CDN at build time. Token names
+  below follow the long-standing Polaris naming convention
+  (--p-color-*, --p-space-*, --p-border-radius-*) but individual
+  tokens are versioned and Shopify does add/rename them.
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--p-color-bg, #f1f1f1);
+  color: var(--p-color-text, #1a1a1a);
+}
+
+/* ---------------------------------------------------------------
+   Layout: page content max-width, consistent with the Admin iframe
+   content column (Polaris <s-page> already constrains this in the
+   real component; this is a no-op safety net for the raw preview).
+------------------------------------------------------------------ */
+.mockup-shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--p-space-400, 16px);
+}
+
+/* ---------------------------------------------------------------
+   Design-review-only preview switcher (results.html).
+   Lets the G2 approver see every ADR-0004 mandated chart/table
+   state (zero revenue, all-zero, single-category, many small
+   slices) without navigating to separate pages. This control is a
+   MOCKUP AID, not a merchant-facing feature — flagged distinctly so
+   the developer does not carry it into the production build.
+------------------------------------------------------------------ */
+.design-review-aid {
+  border: 1px dashed var(--p-color-border-caution, #b98900);
+  background: var(--p-color-bg-surface-caution, #fff9ec);
+  border-radius: var(--p-border-radius-200, 8px);
+  padding: var(--p-space-300, 12px);
+  margin-block-end: var(--p-space-400, 16px);
+}
+.design-review-aid__label {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--p-color-text-caution, #7e5700);
+  display: block;
+  margin-block-end: var(--p-space-200, 8px);
+}
+
+/* ---------------------------------------------------------------
+   Results layout: accessible data table is the primary element and
+   is always full-width above the fold; the donut + legend is a
+   supplementary column that sits beside the table on wide viewports
+   and stacks below it at Admin's narrower embedded breakpoints.
+   ADR-0004: table first in DOM order, chart is supplementary.
+------------------------------------------------------------------ */
+.results-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--p-space-500, 20px);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .results-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  }
+}
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--p-space-300, 12px);
+  text-align: center;
+}
+
+.donut-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-150, 6px);
+  text-align: start;
+}
+.donut-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--p-space-200, 8px);
+  font-size: 0.8125rem;
+}
+.donut-legend__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+.donut-legend__label {
+  flex: 1 1 auto;
+  color: var(--p-color-text, #1a1a1a);
+}
+.donut-legend__value {
+  color: var(--p-color-text-secondary, #616161);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------
+   Accessible data table — native semantic HTML by deliberate
+   choice (ADR-0004 requires this be the always-rendered primary
+   representation; native table + scope + caption gives the
+   strongest accessibility guarantee without depending on whether a
+   Polaris "data table" web component exists / matches this shape at
+   build time — verify at build whether Polaris ships one and
+   consider swapping if its accessibility semantics are equal or
+   better).
+------------------------------------------------------------------ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.data-table caption {
+  text-align: start;
+  font-size: 0.8125rem;
+  color: var(--p-color-text-secondary, #616161);
+  margin-block-end: var(--p-space-200, 8px);
+}
+.data-table th,
+.data-table td {
+  text-align: start;
+  padding: var(--p-space-200, 8px) var(--p-space-300, 12px);
+  border-block-end: 1px solid var(--p-color-border, #e3e3e3);
+}
+.data-table th[scope="col"] {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--p-color-text-secondary, #616161);
+}
+.data-table td.numeric,
+.data-table th.numeric {
+  text-align: end;
+}
+.data-table tfoot td,
+.data-table tfoot th {
+  font-weight: 600;
+  border-block-end: none;
+  border-block-start: 2px solid var(--p-color-border, #e3e3e3);
+}
+.data-table__swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-inline-end: var(--p-space-150, 6px);
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------
+   Category rule rows (calculator.html) — native <details>/<summary>
+   used deliberately for the 10-category list: accessible and
+   keyboard-operable with zero custom JS required for open/close,
+   and it lets the merchant scan all 10 categories collapsed (each
+   summary shows the live rule-at-a-glance) before drilling in.
+------------------------------------------------------------------ */
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-200, 8px);
+}
+.rule-row {
+  border: 1px solid var(--p-color-border, #e3e3e3);
+  border-radius: var(--p-border-radius-200, 8px);
+  background: var(--p-color-bg-surface, #ffffff);
+  overflow: hidden;
+}
+.rule-row__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--p-space-300, 12px);
+  padding: var(--p-space-300, 12px) var(--p-space-400, 16px);
+  cursor: pointer;
+  list-style: none;
+}
+.rule-row__summary::-webkit-details-marker {
+  display: none;
+}
+.rule-row__summary:focus-visible {
+  outline: 2px solid var(--p-color-border-focus, #005bd3);
+  outline-offset: -2px;
+}
+.rule-row__chevron {
+  flex: 0 0 auto;
+  transition: transform 0.15s ease;
+  color: var(--p-color-icon, #8a8a8a);
+}
+.rule-row[open] .rule-row__chevron {
+  transform: rotate(90deg);
+}
+.rule-row__title {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+.rule-row__at-a-glance {
+  color: var(--p-color-text-secondary, #616161);
+  font-size: 0.8125rem;
+}
+.rule-row__body {
+  padding: 0 var(--p-space-400, 16px) var(--p-space-400, 16px);
+  border-block-start: 1px solid var(--p-color-border, #e3e3e3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-300, 12px);
+}
+.rule-row__field-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-space-300, 12px);
+  align-items: flex-end;
+}
+.field-error {
+  color: var(--p-color-text-critical, #b52125);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+.field-error:empty {
+  display: none;
+}
+
+/* ---------------------------------------------------------------
+   Frozen-snapshot signaling (history-detail.html)
+------------------------------------------------------------------ */
+.snapshot-banner {
+  display: flex;
+  gap: var(--p-space-300, 12px);
+  align-items: flex-start;
+}
+.snapshot-readonly-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.snapshot-readonly-field__label {
+  font-size: 0.75rem;
+  color: var(--p-color-text-secondary, #616161);
+}
+.snapshot-readonly-field__value {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.lock-icon {
+  display: inline-flex;
+  vertical-align: -3px;
+  margin-inline-end: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

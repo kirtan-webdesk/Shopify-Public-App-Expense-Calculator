@@ -1,0 +1,20 @@
+name: Plugin Validate
+on:
+  push:
+    paths: ["**/*.md", "**/*.json", ".claude-plugin/**", "skills/**", "agents/**", "tools/**", ".github/workflows/**"]
+  pull_request:
+    paths: ["**/*.md", "**/*.json", ".claude-plugin/**", "skills/**", "agents/**", "tools/**", ".github/workflows/**"]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pyyaml jsonschema
+      - name: Real YAML + reference validation (mandatory, no skip)
+        run: python3 tools/scripts/validate-plugin.py .
+      # `claude plugin validate` runs only where the Claude CLI is installed; kept optional here.
+      - name: Claude manifest validate (optional — CLI may be absent in CI)
+        run: |
+          if command -v claude >/dev/null 2>&1; then claude plugin validate . --strict; else echo "claude CLI not present in CI — skipped (run locally)"; fi

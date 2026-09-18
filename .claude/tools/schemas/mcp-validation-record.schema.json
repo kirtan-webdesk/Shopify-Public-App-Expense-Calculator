@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://webdesksolution.ca/schemas/mcp-validation-record.schema.json",
+  "title": "Shopify Dev MCP validation record (normalized consistency record)",
+  "description": "A structured record of ONE Dev MCP validation call, referenced by an evidence artifact. NORMALIZED CONSISTENCY RECORD — not an authenticated capture of the Claude Code runtime. The single authoritative status is result.status (there is no separate event.status); the checker binds the event's fields to the evidence (same tool-call id, scoped tool, validator input by SHA-256, exact status) and requires a VALID result to carry no blocking errors. Genuine runtime provenance is proven only by the mandatory interactive cold-session test.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_version", "event"],
+  "properties": {
+    "record_version": { "const": "1.0.0" },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_call_id", "tool", "validator_type", "validated_input_sha256", "result"],
+      "allOf": [
+        {
+          "if": { "properties": { "validator_type": { "const": "graphql" } } },
+          "then": { "required": ["conversation_id", "api"],
+            "description": "GraphQL validations must carry the Dev MCP conversationId and the Admin API surface." }
+        }
+      ],
+      "properties": {
+        "tool_call_id": { "type": "string", "minLength": 3,
+          "description": "Tool-call event id; must equal the evidence validation's tool_call_ref." },
+        "tool": { "type": "string",
+          "pattern": "^mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__[a-z_]+$",
+          "description": "Fully plugin-scoped MCP tool name; must equal the evidence validation's mcp_tool." },
+        "validator_type": { "enum": ["graphql", "polaris-component", "theme"] },
+        "api": { "type": "string", "minLength": 2,
+          "description": "The Dev MCP api surface for the call (e.g. 'admin' for Admin GraphQL)." },
+        "conversation_id": { "type": "string", "minLength": 3,
+          "description": "The Dev MCP conversationId (from learn_shopify_api); bound to the evidence for graphql." },
+        "validated_input_sha256": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "description": "SHA-256 of the actual validator input content; must equal the SHA-256 set of the evidence's validated_files." },
+        "result": {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "summary", "errors"],
+          "description": "The SINGLE authoritative result. status is an exact enum; a VALID result must have an empty errors array. summary is descriptive only and must not contradict status.",
+          "properties": {
+            "status": { "enum": ["VALID", "INVALID", "BLOCKED"] },
+            "summary": { "type": "string", "minLength": 1 },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["message"],
+                "properties": { "message": { "type": "string", "minLength": 1 }, "code": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

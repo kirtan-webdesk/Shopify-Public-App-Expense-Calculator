@@ -1,0 +1,53 @@
+{
+  "project": {
+    "id": "a62d40d4-e6b8-4296-b20d-c157045ed2d7",
+    "name": "fixture-public",
+    "client_slug": "fixture-public",
+    "project_type": "app-build",
+    "build_context": "shopify-app",
+    "stage": "grooming",
+    "current_gate": "G0.5",
+    "schema_version": "1.0.0",
+    "shopify": {
+      "distribution": "public",
+      "api_version": "2026-07",
+      "scopes": [],
+      "protected_scopes": false,
+      "app_pricing": {
+        "model": "recurring+usage"
+      },
+      "data_ownership": "dedicated",
+      "jobs_ownership": "app",
+      "hosting": "long-running",
+      "extensions": [],
+      "built_for_shopify": false
+    }
+  },
+  "tech_stack": {
+    "runtime": "node@22",
+    "framework": "react-router-7",
+    "ui": "polaris-web-components",
+    "database": "postgresql",
+    "orm": "sequelize",
+    "session_storage": "postgresql",
+    "auth": "token-exchange",
+    "admin_api": "graphql",
+    "billing": "app-pricing",
+    "queue": "app-host"
+  },
+  "gates": [],
+  "budget": {
+    "token_used": 0,
+    "token_cap": 0,
+    "hours_burned": 0,
+    "hours_budget": 0
+  },
+  "audit_log": [],
+  "lock": {
+    "locked": false,
+    "locked_by": null
+  },
+  "rfcs": [],
+  "health_score": null,
+  "shared_data_contract": null
+}
