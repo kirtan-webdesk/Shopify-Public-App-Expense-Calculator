@@ -1,0 +1,3 @@
+shop_rows_remaining,session_rows_remaining
+0,0
+(1 row)

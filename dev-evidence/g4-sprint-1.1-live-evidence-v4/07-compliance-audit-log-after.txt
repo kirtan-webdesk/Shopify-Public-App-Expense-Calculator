@@ -1,0 +1,4 @@
+webhook_id,topic,outcome,reason,deleted_row_counts,occurred_at
+sweeper-1f0d15ff-b4a3-48c9-bd0b-3cf863887232-1789727304592,shop/redact,completed,45-day safety sweeper — shop/redact was never observed for this shop,{"shop": 1, "calculation": 0, "expense_rule": 0, "webhook_event": 0, "shopify_sessions": 0, "calculation_line_item": 0},2026-09-18 15:58:24.606+05:30
+sweeper-95513085-325a-4a90-b643-7ce950193c33-1789727304671,shop/redact,completed,45-day safety sweeper — shop/redact was never observed for this shop,{"shop": 1, "calculation": 0, "expense_rule": 0, "webhook_event": 0, "shopify_sessions": 0, "calculation_line_item": 0},2026-09-18 15:58:24.673+05:30
+(2 rows)

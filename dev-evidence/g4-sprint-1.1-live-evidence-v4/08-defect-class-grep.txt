@@ -1,0 +1,9 @@
+app/services/compliance/app-uninstalled.service.ts:9:// BUG-4 fix: previously called sessionStorageInstance.deleteSessions(ids)
+app/services/compliance/app-uninstalled.service.ts:11:// in shop-redact.service.ts. deleteSessions([]) is a Postgres syntax error
+app/services/compliance/app-uninstalled.service.ts:16:// markShopUninstalled could commit independently before deleteSessions([])
+app/services/compliance/app-uninstalled.service.ts:38:    await sessionStorageInstance.deleteSessions(sessions.map((s) => s.id));
+app/services/compliance/shop-redact.service.ts:59:  // @shopify/shopify-app-session-storage-postgresql's deleteSessions(ids)
+app/services/compliance/shop-redact.service.ts:61:  // array, so deleteSessions([]) is a Postgres syntax error
+app/services/compliance/shop-redact.service.ts:71:    await sessionStorageInstance.deleteSessions(sessions.map((s) => s.id));
+app/workers/sweeper.ts:44:        // and BUG-4 (app-uninstalled.service.ts). deleteSessions([]) is a
+app/workers/sweeper.ts:53:          await sessionStorageInstance.deleteSessions(sessions.map((s) => s.id));

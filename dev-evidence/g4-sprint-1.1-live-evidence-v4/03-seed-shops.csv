@@ -1,0 +1,5 @@
+id,shop_domain,installed_at,uninstalled_at
+1f0d15ff-b4a3-48c9-bd0b-3cf863887232,wsa-qa-g4-bug5-live-evidence-v4-shopA.myshopify.com,2026-07-20 15:57:41.362945+05:30,2026-07-30 15:57:41.362945+05:30
+95513085-325a-4a90-b643-7ce950193c33,wsa-qa-g4-bug5-live-evidence-v4-shopB.myshopify.com,2026-07-25 15:57:41.362945+05:30,2026-07-30 15:57:41.362945+05:30
+(2 rows)
+INSERT 0 2

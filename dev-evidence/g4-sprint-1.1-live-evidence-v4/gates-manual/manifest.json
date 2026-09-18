@@ -1,0 +1,38 @@
+{
+  "root": "D:\\Projects\\Shopify Public App \u2014 Expense Calculator",
+  "note": "run-gates.py itself failed with WinError 2 (FileNotFoundError resolving 'npm' under Python subprocess shell=False on this native-Windows Python 3.14 install) before it could invoke any gate -- see gates/lint.log etc (exit 127, 'command not found'). Same environment limitation documented in dev-evidence/g4-sprint-1.1-live-evidence-v2/gates-manual/manifest.json and g4-sprint-1.1-live-evidence-v3/gates-manual/manifest.json, not a project defect, not new to this session. The commands below were run directly (same argv, shell=False equivalent via bash exec, real subprocess exit code) as a substitute, with the same __GATE_EXIT__ marker convention and SHA-256 binding.",
+  "gates": {
+    "lint": {
+      "gate": "lint",
+      "command": "npm run lint",
+      "exit_code": 1,
+      "status": "fail",
+      "output_ref": "dev-evidence/g4-sprint-1.1-live-evidence-v4/gates-manual/lint.log",
+      "output_sha256": "f2d672fee9fec08b7b4f62aaf52babdf211ee6299588081bd94204372d8bb644"
+    },
+    "typecheck": {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-1.1-live-evidence-v4/gates-manual/typecheck.log",
+      "output_sha256": "c995b2fcfa2359e3b7c1a9855200c6777993f0a953aacd19d0fe6d82b0d3d555"
+    },
+    "tests": {
+      "gate": "tests",
+      "command": "npm test",
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-1.1-live-evidence-v4/gates-manual/tests.log",
+      "output_sha256": "4663a7ace562966328a46e977a1ad3ee92ace1480a1f06259a49a3f99e143e1e"
+    },
+    "build": {
+      "gate": "build",
+      "command": "npm run build",
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-1.1-live-evidence-v4/gates-manual/build.log",
+      "output_sha256": "0dd913941dcc3d6df1838beec9cfbceabeafa2cb56634391b5fd249890016ab7"
+    }
+  }
+}
