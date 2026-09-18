@@ -15,8 +15,18 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 // never nested inside — the `layout("routes/app.tsx", ...)` block below, so
 // they never pick up authenticate.admin or any app-layout concern.
 // --------------------------------------------------------------------------
+//
+// Root "/" (routes/_index.tsx) is the bare `application_url` Shopify Admin's
+// iframe navigates to on the very first embedded load (before it ever knows
+// about /app) — see routes/_index.tsx for the full explanation (BUG fix:
+// "Invalid path /" on fresh embedded install). No Shopify auth call happens
+// there; it only redirects on into /app/calculator, preserving the query
+// string that authenticate.admin() and App Bridge need downstream.
+// --------------------------------------------------------------------------
 
 export default [
+  index("routes/_index.tsx"),
+
   route("healthz", "routes/healthz.tsx"),
 
   route("auth/*", "routes/auth.$.tsx"),
