@@ -1,0 +1,6 @@
+# Local non-production test database (expense_calculator_test on localhost:5432) - migration state and residue (masked)
+$ npx sequelize-cli db:migrate:status --env test
+up 20260918120000-initial-schema.cjs
+up 20260918130000-add-job-heartbeat.cjs
+$ residue check after the 3 DB runs:
+{ db: 'expense_calculator_test', shops: '0', rules: '0', calcs: '0' }

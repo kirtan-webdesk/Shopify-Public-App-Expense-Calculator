@@ -1,0 +1,11 @@
+ ✓ tests/db/expense-rule-seed-race.db.test.ts > first-load seed race (TWO independent Sequelize pools, real Postgres) > the two instances are genuinely independent pools on genuinely different backend connections 1444ms
+ × tests/db/expense-rule-seed-race.db.test.ts > first-load seed race (TWO independent Sequelize pools, real Postgres) > 5 fresh shops: both instances read 'no rules' first, then both seed — both succeed, exactly 10 default rows, no unique violation escapes 
+   → Validation error
+ × tests/db/expense-rule-seed-race.db.test.ts > first-load seed race (TWO independent Sequelize pools, real Postgres) > a rule the winner customised is kept: the loser's seed never overwrites it 149ms
+   → B SQL:
+Executing (9bf47946-1c3a-4aa4-9074-5933bac91923): UPDATE "expense_rule" SET "rate_basis_points"=$1,"updated_at"=$2 WHERE "id" = $3
+Executing (9bf47946-1c3a-4aa4-9074-5933bac91923): UPDATE "expense_rule" SET "enabled"=$1,"updated_at"=$2 WHERE "id" = $3
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+SequelizeUniqueConstraintError: Validation error
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)

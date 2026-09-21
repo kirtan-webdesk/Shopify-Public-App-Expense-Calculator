@@ -1,0 +1,27 @@
+# Guard demonstrations (all output masked; each refusal happens BEFORE any connection is opened)
+
+## 1) RUN_DB_TESTS=1, TEST_DATABASE_URL unset -> vitest tests/db
+Error: TEST_DATABASE_URL is not set. The DB test suites and `--env test` migrations read TEST_DATABASE_URL ONLY and never fall back to DATABASE_URL (which may be the production database). Create a separate test database/branch and set it — see tests/README.md and .env.example.
+ Test Files  3 failed (3)
+      Tests  no tests
+
+## 2) RUN_DB_TESTS=1, TEST_DATABASE_URL = production DATABASE_URL (from .env) -> vitest tests/db
+Error: REFUSING TO RUN: TEST_DATABASE_URL points at the same host + database as .env line 9 (DATABASE_URL) (host ep***(52) / db ne***(6)). DB tests and test migrations must use a separate database or branch — never production, staging or dev data. See tests/README.md.
+ Test Files  3 failed (3)
+      Tests  no tests
+
+## 3) sequelize-cli db:migrate:status --env test, TEST_DATABASE_URL = production DATABASE_URL
+ERROR: REFUSING TO RUN: TEST_DATABASE_URL points at the same host + database as environment variable DATABASE_URL (host ep***(52) / db ne***(6)). DB tests and test migrations must use a separate database or branch — never production, staging or dev data. See tests/README.md.
+
+## 4) sequelize-cli --env test, TEST_DATABASE_URL unset (DATABASE_URL present in .env, must NOT be used)
+ERROR: TEST_DATABASE_URL is not set. The DB test suites and `--env test` migrations read TEST_DATABASE_URL ONLY and never fall back to DATABASE_URL (which may be the production database). Create a separate test database/branch and set it — see tests/README.md and .env.example.
+
+## 5) TEST_DATABASE_URL = the commented-out local staging URL in .env (expense_calculator)
+Error: REFUSING TO RUN: TEST_DATABASE_URL points at the same host + database as .env line 6 (DATABASE_URL, commented out) (host lo***(9) / db ex***(18)). DB tests and test migrations must use a separate database or branch — never production, staging or dev data. See tests/README.md.
+
+## 6) default run, RUN_DB_TESTS unset -> DB suites skipped
+ ↓ tests/db/expense-rule-seed-race.db.test.ts (3 tests | 3 skipped)
+ ↓ tests/db/calculation-history.db.test.ts (22 tests | 22 skipped)
+ ↓ tests/db/shop-ensure.db.test.ts (15 tests | 15 skipped)
+ Test Files  3 skipped (3)
+      Tests  40 skipped (40)
