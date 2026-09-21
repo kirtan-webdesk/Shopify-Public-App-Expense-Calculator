@@ -1,0 +1,16 @@
+import { launch, reset, base } from "./lib.mjs";
+const browser = await launch(); await reset();
+const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 } });
+await ctx.addInitScript(() => { window.__toasts = []; window.shopify = { toast: { show: (m, o) => window.__toasts.push({ m }) } }; });
+const page = await ctx.newPage();
+await page.goto(base + "/app/rules", { waitUntil: "load" }); await page.waitForTimeout(2500);
+const dump = () => page.evaluate(() => ({ store: [...(window.__ruleStore?.values() ?? [])].filter((r) => ["shipping", "marketing"].includes(r.categoryKey)).map((r) => [r.categoryKey, r.enabled, r.fixedAmountMinor]), saveCount: window.__saveCount ?? 0 }));
+console.log("before", JSON.stringify(await dump()));
+await page.locator('s-switch[label="Marketing"] input').first().click(); await page.waitForTimeout(500);
+console.log("after switch click: hidden enabled-marketing:", await page.evaluate(() => !!document.querySelector('input[name="enabled-marketing"]')), "switch.checked:", await page.evaluate(() => document.querySelector('s-switch[label="Marketing"]').checked));
+const i = page.locator("#shipping-fixed input").first(); await i.click({ clickCount: 3 }); await i.fill("777.25"); await page.waitForTimeout(300);
+await page.evaluate(() => document.querySelector("form[data-save-bar]").requestSubmit()); await page.waitForTimeout(2000);
+console.log("after save", JSON.stringify(await dump()), await page.evaluate(() => window.__toasts.length));
+await page.evaluate(() => window.__router.navigate("/app/calculator")); await page.waitForTimeout(1500);
+console.log("calc summary", await page.evaluate(() => document.querySelector("s-table-body").textContent.replace(/\s+/g, " ").slice(0, 260)));
+await browser.close();

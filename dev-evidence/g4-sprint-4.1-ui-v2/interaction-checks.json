@@ -1,0 +1,161 @@
+{
+  "I1_currency": [
+    {
+      "url": "/app/calculator",
+      "run": 0,
+      "shown": "USD — US Dollar",
+      "posted": "USD"
+    },
+    {
+      "url": "/app/calculator",
+      "run": 1,
+      "shown": "USD — US Dollar",
+      "posted": "USD"
+    },
+    {
+      "url": "/app/calculator",
+      "run": 2,
+      "shown": "USD — US Dollar",
+      "posted": "USD"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=CAD",
+      "run": 0,
+      "shown": "CAD — Canadian Dollar",
+      "posted": "CAD"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=CAD",
+      "run": 1,
+      "shown": "CAD — Canadian Dollar",
+      "posted": "CAD"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=CAD",
+      "run": 2,
+      "shown": "CAD — Canadian Dollar",
+      "posted": "CAD"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=GBP",
+      "run": 0,
+      "shown": "GBP — British Pound",
+      "posted": "GBP"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=GBP",
+      "run": 1,
+      "shown": "GBP — British Pound",
+      "posted": "GBP"
+    },
+    {
+      "url": "/app/calculator?revenue=100&currency=GBP",
+      "run": 2,
+      "shown": "GBP — British Pound",
+      "posted": "GBP"
+    }
+  ],
+  "I2_revenue": {
+    "untouched": null,
+    "negative_live": "Revenue amount must be zero or greater.",
+    "comma_live": "Commas can only separate thousands, for example 1,234.50.",
+    "decimals_live": "Use at most 2 decimal places.",
+    "exponent_live": "Enter a plain number without an exponent, for example 100000 instead of 1e5.",
+    "valid_clears": null,
+    "empty_before_attempt": null,
+    "empty_after_click": "Enter a revenue amount.",
+    "url_after_empty_click": "http://localhost:5199/app/calculator",
+    "focus_after_failed_calculate": true,
+    "calculate_still_enabled": true,
+    "enter_key_calculates": true,
+    "calculate_ok_url": "http://localhost:5199/app/results?d=..."
+  },
+  "I2_errors": [],
+  "I3_rules": {
+    "initial_hidden": {
+      "enabledCount": 10,
+      "shipping": [
+        "fixed",
+        "450.00"
+      ],
+      "cogs": [
+        "percentage",
+        "32.50"
+      ]
+    },
+    "marketing_off": {
+      "enabledMarketingPosted": false,
+      "offBadges": 1
+    },
+    "edited": {
+      "shipping": "500",
+      "payrollType": "formula",
+      "payrollFormulaSelectShown": "Tiered by revenue band",
+      "payrollPercentFieldGone": true
+    },
+    "after_discard": {
+      "enabledMarketing": true,
+      "shipping": "450.00",
+      "payrollType": "percentage",
+      "typeSelectShown": "Percentage of revenue"
+    },
+    "after_save": {
+      "toasts": [
+        {
+          "m": "Rule changes saved",
+          "action": "Calculate"
+        }
+      ],
+      "url": "http://localhost:5199/app/rules",
+      "shippingField": "777.25",
+      "marketingSwitchChecked": false,
+      "errorBanner": false
+    },
+    "toast_onAction_navigates": true,
+    "after_toast_action_url": "http://localhost:5199/app/calculator"
+  },
+  "I3_errors": [],
+  "I4_saved_rules_used": {
+    "calculatorSummaryHasSaved": true,
+    "resultsRows": [
+      "Shipping$777.25 fixed$777.2577.7%"
+    ]
+  },
+  "I5_change_revenue": {
+    "href": "/app/calculator?revenue=1000.00&currency=USD",
+    "revenueField": "1000.00",
+    "currency": "USD — US Dollar"
+  },
+  "I6_rules_errors_reset": {
+    "inline_error_while_editing": "Enter a percentage of 0 or greater.",
+    "after_failed_save": {
+      "banner": "Nothing was saved. One category needs attention (every category needs a valid value, even one that is switched off):Marketing: Enter a percentage of 0 or greater. (this rule is off, but its value must still be valid so it can be switched on later)",
+      "toasts": 0
+    },
+    "focus_moved_to_invalid_field": true,
+    "banner_after_fix": false,
+    "after_reset_defaults": {
+      "enabledCount": 10,
+      "marketing": "8.00",
+      "toast": "Placeholder defaults loaded. Select Save to keep them.",
+      "bannerGone": true
+    },
+    "after_discard_of_reset": {
+      "marketingEnabled": true,
+      "marketing": "8.00"
+    }
+  },
+  "I6_errors": [],
+  "I7_history": {
+    "page1": {
+      "rows": 20,
+      "next": "/app/history?page=2",
+      "prevDisabled": true,
+      "text": "Page 1 of 3"
+    },
+    "page3": {
+      "rows": 5,
+      "nextDisabled": true
+    }
+  }
+}

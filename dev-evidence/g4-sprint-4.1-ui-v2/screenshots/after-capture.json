@@ -1,0 +1,58 @@
+{
+  "calculator": {
+    "errors": []
+  },
+  "results": {
+    "errors": []
+  },
+  "history-detail": {
+    "errors": []
+  },
+  "calculator-duplicate": {
+    "errors": []
+  },
+  "history": {
+    "errors": []
+  },
+  "results-zero": {
+    "errors": []
+  },
+  "results-exceed": {
+    "errors": []
+  },
+  "results-single": {
+    "errors": []
+  },
+  "results-small-slices": {
+    "errors": []
+  },
+  "results-all-off": {
+    "errors": []
+  },
+  "results-cad": {
+    "errors": []
+  },
+  "results-invalid-link": {
+    "errors": []
+  },
+  "results-no-calculation": {
+    "errors": []
+  },
+  "history-detail-404": {
+    "errors": [
+      "console: undefined"
+    ]
+  },
+  "history-empty": {
+    "errors": []
+  },
+  "history-page2": {
+    "errors": []
+  },
+  "rules": {
+    "errors": []
+  },
+  "calculator-errors": {
+    "errors": []
+  }
+}

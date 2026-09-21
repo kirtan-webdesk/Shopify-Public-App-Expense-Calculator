@@ -1,0 +1,24 @@
+grid
+  row "Category Rule applied Amount (USD) % of revenue"
+    none
+      none
+        columnheader "Category"
+          generic
+        columnheader "Rule applied"
+          generic
+        columnheader "Amount (USD)"
+          generic
+        columnheader "% of revenue"
+          generic
+  rowgroup
+    none
+      row "Cost of Goods 32.5% of revenue $16,250.00 32.5%"
+        none
+          none
+      row "Shipping $450.00 fixed $450.00 0.90%"
+        none
+          none
+      row "Total expenses $16,700.00 33.4%"
+        none
+          none
+roles present: grid,row,rowgroup,columnheader,gridcell

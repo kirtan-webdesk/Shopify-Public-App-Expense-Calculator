@@ -1,0 +1,18 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-4-1-call-6-saved-calculation-page",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "conversation_id": "b472436c-7028-40de-897e-8aad4a09352b",
+    "api": "polaris-app-home",
+    "validated_input_sha256": [
+      "a4c2259e90e5e540487a974a75f18b872e9f76b9b50d88a35c1b955f2bd6f5ea"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=b472436c-7028-40de-897e-8aad4a09352b), Overall Status VALID. Input: the byte-exact on-disk content of app/components/saved-calculation-page.tsx at commit 6a8657feda9d5855223a3ae4e3f2609a9c4490bf. Code block 1: SUCCESS. Found components: s-page, s-link, s-button, s-stack, s-banner, s-paragraph, s-section, s-badge, s-text.. Invoked by driving the plugin-pinned server @shopify/dev-mcp@1.14.5 over stdio (harness MCP tools were not exposed to this session); raw response in records/mcp-raw-validator-output.json.",
+      "errors": []
+    }
+  }
+}

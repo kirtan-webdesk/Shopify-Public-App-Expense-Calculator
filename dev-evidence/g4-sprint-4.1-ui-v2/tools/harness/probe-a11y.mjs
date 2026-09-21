@@ -1,0 +1,14 @@
+import { launch, fresh, reset } from "./lib.mjs";
+import { mkD } from "./mkd.mjs";
+const browser = await launch(); await reset();
+const d = mkD({ revenue: 5000000, items: [{ k: "cost_of_goods", rt: "p", rbp: 3250, amt: 1625000 }, { k: "shipping", rt: "f", fam: 45000, amt: 45000 }] });
+const { ctx, page } = await fresh(browser, "/app/results?d=" + d, 1000, { wait: 2500 });
+const cdp = await ctx.newCDPSession(page);
+await cdp.send("Accessibility.enable");
+const { nodes } = await cdp.send("Accessibility.getFullAXTree");
+const byId = new Map(nodes.map((n) => [n.nodeId, n]));
+const tableNode = nodes.find((n) => n.role?.value === "grid" || n.role?.value === "table");
+const show = (n, depth = 0, out = []) => { if (!n || depth > 5) return out; out.push("  ".repeat(depth) + (n.role?.value ?? "?") + (n.name?.value ? ` "${String(n.name.value).slice(0, 50)}"` : "")); for (const c of n.childIds ?? []) show(byId.get(c), depth + 1, out); return out; };
+console.log(tableNode ? show(tableNode).slice(0, 26).join("\n") : "no grid/table node in AX tree");
+console.log("roles present:", [...new Set(nodes.map((n) => n.role?.value))].filter((r) => /table|grid|row|cell|columnheader/.test(r)).join(","));
+await browser.close();
