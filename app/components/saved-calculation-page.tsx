@@ -1,37 +1,36 @@
 import type { SavedCalculationView } from "~/services/calculation-history.service";
-import { formatMoney, formatSavedAt } from "~/domain/presentation";
-import { ExpenseBreakdown, SummaryField } from "~/components/expense-breakdown";
+import { formatSavedAt } from "~/domain/presentation";
+import { ExpenseBreakdown, MetricTiles } from "~/components/expense-breakdown";
 
-// The saved-calculation detail page body (design/mockup/history-detail.html).
+// The saved-calculation detail page body (design/v2/history-detail.html).
 //
-// FROZEN-SNAPSHOT signals (G2 design note §4.4), all present here:
+// FROZEN-SNAPSHOT signals (G2 design note), layered so none relies on colour,
+// all present here:
 //   1. an explicit-copy banner at the very top, before any number, stating
 //      the save timestamp and that later rule edits are NOT reflected;
 //   2. a lock-icon "Snapshot" badge beside the stored engine_version;
-//   3. every value is plain text — there is NO form control, NO input, and NO
+//   3. every value is plain text - there is NO form control, NO input, and NO
 //      Save button anywhere on this page (the absence of an editable
 //      affordance is the WCAG-robust part of the signal; disabled inputs are
 //      an AA trap, so none are used);
 //   4. the only forward action is "Duplicate as new calculation", a plain
-//      link that loads these inputs into the calculator as a NEW, UNSAVED
-//      calculation — it cannot edit this record.
+//      link that starts a NEW, UNSAVED calculation from this snapshot's
+//      revenue and currency (J6) - it cannot edit this record.
 //
 // Everything rendered is a pure function of the `saved` prop, which the
 // service rebuilds from STORED columns only. This component performs no
-// calculation, reads no live rule, and has no data-fetching of its own —
+// calculation, reads no live rule, and has no data-fetching of its own -
 // which is what makes the FT-14a "byte-identical after live rules change"
 // test meaningful (it renders this component before and after).
 
-function LockIcon({ size }: { readonly size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden="true">
-      <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
-      <path d="M5 7V5a3 3 0 016 0v2" fill="none" stroke="currentColor" strokeWidth="1.3" />
-    </svg>
-  );
-}
-
-export function SavedCalculationPage({ saved }: { readonly saved: SavedCalculationView }) {
+export function SavedCalculationPage({
+  saved,
+  justSaved = false,
+}: {
+  readonly saved: SavedCalculationView;
+  /** True only on the redirect straight after Save (`?saved=1`). */
+  readonly justSaved?: boolean;
+}) {
   const { result } = saved;
   const savedAt = formatSavedAt(saved.savedAtIso);
 
@@ -40,65 +39,49 @@ export function SavedCalculationPage({ saved }: { readonly saved: SavedCalculati
       <s-link slot="breadcrumb-actions" href="/app/history">
         History
       </s-link>
+      {/* No primary action and no Save anywhere: the absence of an editable
+          affordance is part of the frozen signal. */}
+      <s-button slot="secondary-actions" href={`/app/calculator?from=${saved.id}`}>
+        Duplicate as new calculation
+      </s-button>
 
-      <s-section>
+      <s-stack gap="base">
+        {justSaved && (
+          <s-banner tone="success" heading="Calculation saved" dismissible>
+            <s-paragraph>It now appears in your History.</s-paragraph>
+          </s-banner>
+        )}
+
         <s-banner tone="info" heading="This is a saved snapshot">
-          <p>
-            <span className="lock-icon">
-              <LockIcon size={16} />
-            </span>
-            Saved <strong>{savedAt}</strong> using the revenue and rule values active at that
-            moment. If you&apos;ve changed your category rules since then, those changes are{" "}
-            <strong>not</strong> reflected below — this record won&apos;t change.{" "}
-            <s-link href="/app/calculator">View my current rules</s-link>
-          </p>
+          <s-paragraph>
+            Saved <strong>{savedAt}</strong> using the revenue and rule values active at that moment. If you&apos;ve
+            changed your rules since, those changes are <strong>not</strong> reflected here, and this record won&apos;t
+            change. <s-link href="/app/rules">View my current rules</s-link>
+          </s-paragraph>
         </s-banner>
-      </s-section>
 
-      <s-section>
-        <div className="snapshot-meta">
-          <s-badge tone="info">
-            <LockIcon size={12} />
-            Snapshot
-          </s-badge>
-          <span className="help-text">Engine version {saved.engineVersion}</span>
-        </div>
+        <s-section>
+          <s-stack gap="base">
+            <s-stack direction="inline" gap="small" alignItems="center">
+              <s-badge tone="info" icon="lock">
+                Snapshot
+              </s-badge>
+              <s-text color="subdued">Engine version {saved.engineVersion}</s-text>
+            </s-stack>
+            <MetricTiles
+              result={result}
+              labels={{ revenue: "Revenue (as saved)", total: "Total expenses (as saved)", net: "Net (as saved)" }}
+            />
+          </s-stack>
+        </s-section>
 
-        <div className="summary-row">
-          <SummaryField label="Revenue (as saved)" value={formatMoney(result.revenueMinor, result.currencyCode)} />
-          <SummaryField
-            label="Total expenses (as saved)"
-            value={formatMoney(result.totalExpensesMinor, result.currencyCode)}
+        <s-section heading="Expense breakdown, as saved">
+          <ExpenseBreakdown
+            result={result}
+            ruleColumnHeading="Rule applied (at save time)"
           />
-          <SummaryField
-            label="Net (as saved)"
-            value={formatMoney(result.netAmountMinor, result.currencyCode)}
-            negative={result.netAmountMinor < 0}
-          />
-          <SummaryField label="Currency" value={result.currencyCode} />
-        </div>
-      </s-section>
-
-      <s-section heading="Expense breakdown, as saved">
-        <ExpenseBreakdown
-          result={result}
-          caption="Category values as they were applied at save time — editing your current rules will not change these rows."
-          ruleColumnHeading="Rule applied (at save time)"
-        />
-      </s-section>
-
-      <s-section>
-        <div className="action-row">
-          <s-button href="/app/history">Back to history</s-button>
-          <s-button variant="primary" href={`/app/calculator?from=${saved.id}`}>
-            Duplicate as new calculation
-          </s-button>
-        </div>
-        <p className="help-text help-text--end">
-          Starts a fresh calculation pre-filled with these values — it won&apos;t edit this saved
-          record.
-        </p>
-      </s-section>
+        </s-section>
+      </s-stack>
     </s-page>
   );
 }

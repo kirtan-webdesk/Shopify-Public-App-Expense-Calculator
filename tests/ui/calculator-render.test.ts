@@ -1,23 +1,22 @@
-import { createElement, type ComponentType } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// DB-free tests of the calculator route (G4-sprint-3.5): the server-rendered
-// markup (currency/formula selects, hidden submitted values, checkbox label),
-// the action (revenue text validation, Save with a disabled blank row), the
-// app nav (rel="home") and the /app redirect. authenticate / the shop-context
-// service / every repository are stubbed BEFORE the route modules import.
+// DB-free tests of the Calculator route (G4-sprint-4.1, G2-revision v2):
+//   * server render: revenue + currency + a READ-ONLY summary of the saved rules
+//     (no editable rule anywhere on the page)
+//   * loader: saved rules, ?from= copies revenue + currency ONLY (J6), ?revenue=&currency=
+//   * action (J1): Calculate uses the SAVED rules and ignores any client-supplied rule value
+// authenticate / the shop-context service / every repository are stubbed BEFORE the route modules import.
 
 vi.mock("~/shopify.server", () => ({ authenticate: { admin: vi.fn() } }));
 vi.mock("~/services/shop-context.service", () => ({ requireShopContext: vi.fn() }));
 vi.mock("~/db/repositories/shop.repository", () => ({ findShopContextByDomain: vi.fn(), ensureShopContext: vi.fn() }));
-vi.mock("~/db/repositories/calculation.repository", () => ({
+const calcRepo = vi.hoisted(() => ({
   countCalculationsForShop: vi.fn(),
   findCalculationWithLineItems: vi.fn(),
   insertCalculationSnapshot: vi.fn(),
   listCalculationsForShop: vi.fn(),
 }));
+vi.mock("~/db/repositories/calculation.repository", () => calcRepo);
 const ruleRepo = vi.hoisted(() => ({
   listExpenseRulesForShop: vi.fn(),
   replaceExpenseRulesForShop: vi.fn(),
@@ -27,253 +26,400 @@ vi.mock("~/db/repositories/expense-rule.repository", () => ruleRepo);
 
 import { authenticate } from "~/shopify.server";
 import { requireShopContext } from "~/services/shop-context.service";
-import CalculatorPage, { action as calculatorAction } from "~/routes/app.calculator";
-import AppLayout from "~/routes/app";
-import { loader as appIndexLoader } from "~/routes/app._index";
+import CalculatorPage, { action as calculatorAction, loader as calculatorLoader } from "~/routes/app.calculator";
+import type { ExpenseRuleView } from "~/services/expense-rule.service";
+import { decodeCalculationResult } from "~/domain/calculation-transport";
 import { EXPENSE_CATEGORIES } from "~/domain/expense-categories";
 import { DEFAULT_EXPENSE_RULES } from "~/domain/expense-rule-defaults";
+import { buildDefaultResult } from "../helpers/calc-fixtures";
+import { countTags, openingTag, renderRoute } from "../helpers/render-route";
 
-const asComponent = (c: unknown) => c as ComponentType<Record<string, unknown>>;
 const ctx = { shopId: "11111111-1111-4111-8111-111111111111", shopDomain: "x.myshopify.com" };
 
-const rules = DEFAULT_EXPENSE_RULES.map((d) => {
-  const c = EXPENSE_CATEGORIES.find((x) => x.key === d.categoryKey)!;
-  return {
-    categoryKey: d.categoryKey,
-    categoryLabel: c.label,
-    sortOrder: c.sortOrder,
-    enabled: true,
-    ruleType: d.ruleType,
-    rateBasisPoints: d.rateBasisPoints,
-    fixedAmountMinor: d.fixedAmountMinor,
-    formulaKey: d.formulaKey,
-  };
-});
-
-async function renderCalculator(loaderData: unknown, url = "http://localhost/app/calculator"): Promise<string> {
-  const handler = createStaticHandler([{ path: "/app/calculator", loader: () => loaderData, Component: asComponent(CalculatorPage) }]);
-  const context = await handler.query(new Request(url));
-  if (context instanceof Response) throw new Error("unexpected redirect");
-  const router = createStaticRouter(handler.dataRoutes, context);
-  return renderToStaticMarkup(createElement(StaticRouterProvider, { router, context, hydrate: false }));
+function viewOf(overrides: Partial<Record<string, Partial<ExpenseRuleView>>> = {}): ExpenseRuleView[] {
+  return DEFAULT_EXPENSE_RULES.map((d) => {
+    const c = EXPENSE_CATEGORIES.find((x) => x.key === d.categoryKey)!;
+    return {
+      categoryKey: d.categoryKey,
+      categoryLabel: c.label,
+      sortOrder: c.sortOrder,
+      enabled: true,
+      ruleType: d.ruleType,
+      rateBasisPoints: d.rateBasisPoints,
+      fixedAmountMinor: d.fixedAmountMinor,
+      formulaKey: d.formulaKey,
+      ...(overrides[d.categoryKey] ?? {}),
+    };
+  });
+}
+/** What the repository returns (model-like rows) for the same rules. */
+function repoRows(views: readonly ExpenseRuleView[]) {
+  return views.map((v) => ({
+    categoryKey: v.categoryKey,
+    enabled: v.enabled,
+    ruleType: v.ruleType,
+    rateBasisPoints: v.rateBasisPoints,
+    fixedAmountMinor: v.fixedAmountMinor === null ? null : String(v.fixedAmountMinor),
+    formulaKey: v.formulaKey,
+  }));
 }
 
-/** The opening tag of the first element matching `tag` whose attributes contain `contains`. */
-function openingTag(html: string, tag: string, contains: string): string {
-  const re = new RegExp(`<${tag}\\b[^>]*>`, "g");
-  const found = (html.match(re) ?? []).find((t) => t.includes(contains));
-  if (!found) throw new Error(`no <${tag}> containing ${contains}`);
-  return found;
-}
+const NO_PREFILL = { prefill: null, carried: null };
+const render = (loaderData: unknown, url = "http://localhost/app/calculator") =>
+  renderRoute(CalculatorPage, loaderData, url);
 
-describe("/app/calculator server render", () => {
-  it("currency select: NO value attribute; the matching <s-option> carries `selected` (G2 pattern)", async () => {
-    const html = await renderCalculator({
-      rules,
-      prefill: { savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 5_000_000, currencyCode: "CAD" },
-    });
-    const select = openingTag(html, "s-select", 'label="Currency"');
-    expect(select).not.toMatch(/\svalue=/);
-    expect(select).not.toMatch(/\sname=/);
-    expect(openingTag(html, "s-option", 'value="CAD"')).toMatch(/\sselected(=|\s|>)/);
-    expect(openingTag(html, "s-option", 'value="USD"')).not.toMatch(/\sselected/);
-    expect(openingTag(html, "s-option", 'value="EUR"')).not.toMatch(/\sselected/);
-  });
-
-  it("defaults to USD selected and submits currency/revenue from hidden inputs carrying state", async () => {
-    const html = await renderCalculator({ rules, prefill: null });
-    expect(openingTag(html, "s-option", 'value="USD"')).toMatch(/\sselected/);
-    expect(html).toContain('<input type="hidden" name="currency" value="USD"/>');
-    expect(html).toContain('<input type="hidden" name="revenue" value="0.00"/>');
-  });
-
-  it("formula select has no value attribute either, and the option for the stored formula is `selected`", async () => {
-    const withFormula = rules.map((r) =>
-      r.categoryKey === "payroll"
-        ? { ...r, ruleType: "formula", rateBasisPoints: null, fixedAmountMinor: null, formulaKey: "base_fee_plus_marginal_percent" }
-        : r,
-    );
-    const html = await renderCalculator({ rules: withFormula, prefill: null });
-    const select = openingTag(html, "s-select", 'label="Formula"');
-    expect(select).not.toMatch(/\svalue=/);
-    expect(openingTag(html, "s-option", 'value="base_fee_plus_marginal_percent"')).toMatch(/\sselected/);
-    expect(openingTag(html, "s-option", 'value="tiered_by_revenue_band"')).not.toMatch(/\sselected/);
-  });
-
-  it("the currency code is shown next to the revenue and fixed-amount prefixes (USD and CAD are distinguishable)", async () => {
-    for (const currencyCode of ["USD", "CAD"]) {
-      const html = await renderCalculator({
-        rules,
-        prefill: { savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 100_000, currencyCode },
-      });
-      const revenue = openingTag(html, "s-number-field", 'label="Revenue amount"');
-      expect(revenue).toContain('prefix="$"');
-      expect(revenue).toContain(`suffix="${currencyCode}"`);
-      const fixed = openingTag(html, "s-number-field", 'label="Fixed amount"');
-      expect(fixed).toContain(`suffix="${currencyCode}"`);
+describe("/app/calculator server render (v2: revenue + currency + read-only rules summary)", () => {
+  it("contains NO editable rule control anywhere (the rules editor lives on /app/rules)", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    expect(html).not.toMatch(/<details|<summary|type="radio"|type="checkbox"/);
+    expect(html).not.toContain("data-save-bar");
+    expect(html).not.toMatch(/<s-switch|<s-number-field/);
+    for (const field of ["enabled", "type", "percent", "fixed", "formula"]) {
+      expect(html, `no ${field}- form field`).not.toContain(`name="${field}-`);
     }
+    // the only form fields are revenue and currency
+    const names = (html.match(/<input[^>]*\sname="([^"]+)"/g) ?? []).map((t) => /name="([^"]+)"/.exec(t)![1]);
+    expect(names.sort()).toEqual(["currency", "revenue"]);
   });
 
-  it("the revenue field has min=0 and shows no error for a valid initial value", async () => {
-    const html = await renderCalculator({ rules, prefill: null });
-    const revenue = openingTag(html, "s-number-field", 'label="Revenue amount"');
-    expect(revenue).toContain('min="0"');
-    expect(revenue).not.toContain("error=");
+  it("lists all 10 categories in order with the SAVED rule text; off rows show an Off badge and no rule", async () => {
+    const rules = viewOf({
+      marketing: { enabled: false },
+      payroll: { ruleType: "formula", rateBasisPoints: null, formulaKey: "tiered_by_revenue_band" },
+      shipping: { fixedAmountMinor: 99_900 },
+    });
+    const html = await render({ rules, ...NO_PREFILL });
+    const table = html.match(/<s-table>[\s\S]*<\/s-table>/)![0];
+    const rows = table.match(/<s-table-row>[\s\S]*?<\/s-table-row>/g) ?? [];
+    expect(rows).toHaveLength(10);
+    EXPENSE_CATEGORIES.forEach((c, i) => expect(rows[i]).toContain(`<s-table-cell>${c.label}</s-table-cell>`));
+    expect(rows[0]).toContain("32.5% of revenue");
+    expect(rows[4]).toContain("$999.00 fixed");
+    expect(rows[6]).toContain("Formula: Tiered by revenue band");
+    expect(rows[1]).toContain('<s-badge tone="neutral">Off</s-badge>');
+    expect(rows[1]).not.toContain("8% of revenue");
+    expect(html).toContain("9 of 10 categories on");
   });
 
-  it("the currency help text no longer claims the currency is 'set once'", async () => {
-    const html = await renderCalculator({ rules, prefill: null });
-    expect(html).not.toContain("Set once");
-    expect(html).toContain("It is not saved with your rules.");
+  it("labels the rates as placeholders (badge + sentence) and links to the rules page", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    expect(html).toContain('<s-badge tone="warning">Placeholder rates</s-badge>');
+    expect(html).toContain("illustrative placeholders");
+    expect(html).toContain("Calculate always uses your <strong>saved</strong> rules.");
+    expect((html.match(/href="\/app\/rules"/g) ?? []).length).toBeGreaterThanOrEqual(2); // header action + section link
   });
 
-  it("the per-category enable checkbox is labelled on the control itself, with no <label> nested in the summary", async () => {
-    const html = await renderCalculator({ rules, prefill: null });
-    expect(html).toContain('aria-label="Enable Cost of Goods rule"');
-    const summaries = html.match(/<summary[\s\S]*?<\/summary>/g) ?? [];
-    expect(summaries.length).toBe(10);
-    for (const s of summaries) expect(s).not.toContain("<label");
+  it("warns when every rule is off", async () => {
+    const all = viewOf();
+    const off = all.map((r) => ({ ...r, enabled: false }));
+    expect(await render({ rules: off, ...NO_PREFILL })).toContain("No expense rules are switched on");
+    expect(await render({ rules: all, ...NO_PREFILL })).not.toContain("No expense rules are switched on");
   });
 
-  it("the Calculate button is enabled and not loading at rest", async () => {
-    const html = await renderCalculator({ rules, prefill: null });
+  it("Calculate is the header primary action, enabled and not loading at rest", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
     const calc = (html.match(/<s-button\b[^>]*>Calculate<\/s-button>/) ?? [""])[0];
+    expect(calc).toContain('slot="primary-action"');
     expect(calc).toContain('variant="primary"');
     expect(calc).not.toContain("disabled");
     expect(calc).not.toContain("loading");
   });
 
-  it("the formula help text is currency-neutral (no hardcoded $)", async () => {
-    const withFormula = rules.map((r) =>
-      r.categoryKey === "payroll"
-        ? { ...r, ruleType: "formula", rateBasisPoints: null, fixedAmountMinor: null, formulaKey: "tiered_by_revenue_band" }
-        : r,
-    );
-    const html = await renderCalculator({ rules: withFormula, prefill: null });
-    const note = html.match(/<p class="help-text">PLACEHOLDER pattern[\s\S]*?<\/p>/)?.[0] ?? "";
-    expect(note).toContain("in the currency you selected");
-    expect(note).not.toContain("$");
+  it("R3 currency select: NO value/name attribute; the matching <s-option> carries `selected`; state posts via a hidden input", async () => {
+    const html = await render({
+      rules: viewOf(),
+      prefill: {
+        id: "3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b",
+        savedAtIso: "2026-09-17T09:14:00.000Z",
+        revenueMinor: 5_000_000,
+        currencyCode: "CAD",
+      },
+      carried: null,
+    });
+    const select = openingTag(html, "s-select", 'label="Currency"');
+    expect(select).not.toMatch(/\svalue=/);
+    expect(select).not.toMatch(/\sname=/);
+    expect(openingTag(html, "s-option", 'value="CAD"')).toMatch(/\sselected(=|\s|>)/);
+    for (const other of ["USD", "EUR", "GBP"]) {
+      expect(openingTag(html, "s-option", `value="${other}"`)).not.toMatch(/\sselected/);
+    }
+    expect(html).toContain('<input type="hidden" name="currency" value="CAD"/>');
+  });
+
+  it("defaults to USD; revenue starts blank (placeholder 0.00) with the currency code as its prefix", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    expect(openingTag(html, "s-option", 'value="USD"')).toMatch(/\sselected/);
+    expect(html).toContain('<input type="hidden" name="revenue" value=""/>');
+    const revenue = openingTag(html, "s-text-field", 'label="Revenue"');
+    expect(revenue).toContain('prefix="USD"');
+    expect(revenue).toContain('placeholder="0.00"');
+    expect(revenue).not.toContain("inputMode"); // s-text-field has no such prop (Dev MCP validator)
+    expect(revenue).not.toContain("error=");
+  });
+
+  it("states that revenue is entered manually as always-visible helper text (J3), not a dismissible banner", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    expect(html).toContain("You type this in yourself; the app never reads your store");
+    expect(html).not.toContain("Revenue is entered manually");
+  });
+
+  it("the currency help text no longer claims the currency is 'set once'", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    expect(html).not.toContain("Set once");
+    expect(html).toContain("Used for this calculation.");
+  });
+
+  it("the currency CODE is what distinguishes CAD from USD in the revenue prefix", async () => {
+    for (const currencyCode of ["USD", "CAD", "EUR", "GBP"]) {
+      const html = await render({ rules: viewOf(), prefill: null, carried: { revenueMinor: 100_000, currencyCode } });
+      expect(openingTag(html, "s-text-field", 'label="Revenue"')).toContain(`prefix="${currencyCode}"`);
+    }
+  });
+
+  it("Duplicate: pre-fills revenue + currency, says the RULES are the current saved ones, and links to the snapshot", async () => {
+    const id = "3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b";
+    const html = await render({
+      rules: viewOf(),
+      prefill: { id, savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 5_000_000, currencyCode: "EUR" },
+      carried: null,
+    });
+    expect(html).toContain("New calculation, pre-filled from a saved snapshot");
+    expect(html).toContain("Sep 17, 2026, 9:14 AM UTC");
+    expect(html).toContain("The rules are your current saved rules, not the ones in that snapshot");
+    expect(html).toContain(`href="/app/history/${id}"`);
+    expect(html).toContain('<input type="hidden" name="revenue" value="50000.00"/>');
+    expect(html).toContain('<input type="hidden" name="currency" value="EUR"/>');
+  });
+
+  it("no prefill banner without ?from=", async () => {
+    expect(await render({ rules: viewOf(), ...NO_PREFILL })).not.toContain("pre-filled from a saved snapshot");
+  });
+
+  it("an unsupported currency in the carried values falls back to USD, never a blank select", async () => {
+    const html = await render({ rules: viewOf(), prefill: null, carried: { revenueMinor: 100_000, currencyCode: null } });
+    expect(openingTag(html, "s-option", 'value="USD"')).toMatch(/\sselected/);
+    expect(countTags(html, "s-option")).toBe(4);
   });
 });
 
-describe("app nav (app.tsx)", () => {
-  async function renderLayout(): Promise<string> {
-    const handler = createStaticHandler([{ path: "/app", Component: asComponent(AppLayout) }]);
-    const context = await handler.query(new Request("http://localhost/app"));
-    if (context instanceof Response) throw new Error("unexpected redirect");
-    const router = createStaticRouter(handler.dataRoutes, context);
-    return renderToStaticMarkup(createElement(StaticRouterProvider, { router, context, hydrate: false }));
-  }
-
-  it("the calculator link is the app HOME (rel=home) and History is the only plain child link", async () => {
-    const html = await renderLayout();
-    const nav = html.match(/<s-app-nav>[\s\S]*<\/s-app-nav>/)?.[0] ?? "";
-    const links = nav.match(/<s-link\b[^>]*>/g) ?? [];
-    expect(links).toHaveLength(2);
-    expect(links.filter((l) => /\srel="home"/.test(l))).toHaveLength(1); // exactly one home link
-    expect(openingTag(nav, "s-link", 'href="/app/calculator"')).toContain('rel="home"');
-    expect(openingTag(nav, "s-link", 'href="/app/history"')).not.toContain("rel=");
-  });
-});
-
-describe("/app and / land on the calculator", () => {
-  it("/app redirects to /app/calculator and forwards the embedded-app query string unchanged", async () => {
-    const res = (await appIndexLoader({ request: new Request("http://localhost/app?host=abc&shop=x.myshopify.com&id_token=t") } as never)) as Response;
-    expect(res.status).toBe(302);
-    expect(res.headers.get("Location")).toBe("/app/calculator?host=abc&shop=x.myshopify.com&id_token=t");
-  });
-
-  it("/app with no query redirects to plain /app/calculator", async () => {
-    const res = (await appIndexLoader({ request: new Request("http://localhost/app") } as never)) as Response;
-    expect(res.headers.get("Location")).toBe("/app/calculator");
-  });
-});
-
-describe("/app/calculator action", () => {
+describe("/app/calculator loader", () => {
   beforeEach(() => {
     vi.mocked(authenticate.admin).mockReset();
     vi.mocked(authenticate.admin).mockResolvedValue({ session: { shop: ctx.shopDomain } } as never);
     vi.mocked(requireShopContext).mockReset();
     vi.mocked(requireShopContext).mockResolvedValue(ctx as never);
-    ruleRepo.replaceExpenseRulesForShop.mockReset();
-    ruleRepo.replaceExpenseRulesForShop.mockResolvedValue(undefined);
+    ruleRepo.listExpenseRulesForShop.mockReset();
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(repoRows(viewOf({ shipping: { fixedAmountMinor: 77_700 } })));
+    calcRepo.findCalculationWithLineItems.mockReset();
+    calcRepo.findCalculationWithLineItems.mockResolvedValue(null);
   });
 
-  function form(overrides: Record<string, string | null> = {}, intent = "calculate"): FormData {
-    const fd = new FormData();
-    fd.set("intent", intent);
-    fd.set("revenue", "1000.00");
-    fd.set("currency", "USD");
-    for (const d of DEFAULT_EXPENSE_RULES) {
-      fd.set(`enabled-${d.categoryKey}`, "on");
-      fd.set(`type-${d.categoryKey}`, d.ruleType);
-      fd.set(`percent-${d.categoryKey}`, d.rateBasisPoints === null ? "0.00" : (d.rateBasisPoints / 100).toFixed(2));
-      fd.set(`fixed-${d.categoryKey}`, d.fixedAmountMinor === null ? "0.00" : (d.fixedAmountMinor / 100).toFixed(2));
-      fd.set(`formula-${d.categoryKey}`, d.formulaKey ?? "tiered_by_revenue_band");
+  const load = (qs = "") =>
+    calculatorLoader({ request: new Request(`http://localhost/app/calculator${qs}`) } as never) as Promise<{
+      rules: ExpenseRuleView[];
+      prefill: { id: string; savedAtIso: string; revenueMinor: number; currencyCode: string } | null;
+      carried: { revenueMinor: number; currencyCode: string | null } | null;
+    }>;
+
+  it("returns the shop's SAVED rules, resolved through the authenticated shop context", async () => {
+    const data = await load();
+    expect(data.rules.find((r) => r.categoryKey === "shipping")!.fixedAmountMinor).toBe(77_700);
+    expect(ruleRepo.listExpenseRulesForShop).toHaveBeenCalledWith(ctx);
+    expect(data.prefill).toBeNull();
+    expect(data.carried).toBeNull();
+  });
+
+  it("?from=<id> copies revenue + currency ONLY - no rule value from the snapshot reaches the page", async () => {
+    const result = buildDefaultResult(5_000_000, "CAD");
+    calcRepo.findCalculationWithLineItems.mockResolvedValue({
+      calculation: {
+        id: "3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b",
+        createdAt: new Date("2026-09-17T09:14:00.000Z"),
+        engineVersion: result.engineVersion,
+        revenueMinor: String(result.revenueMinor),
+        currencyCode: "CAD",
+        totalExpensesMinor: String(result.totalExpensesMinor),
+        netAmountMinor: String(result.netAmountMinor),
+      },
+      lineItems: result.lineItems.map((li) => ({
+        categoryKey: li.categoryKey,
+        categoryLabelAtSave: li.categoryLabel,
+        sortOrder: li.sortOrder,
+        ruleTypeAtSave: li.ruleType,
+        rateBasisPointsAtSave: li.rateBasisPoints,
+        fixedAmountMinorAtSave: li.fixedAmountMinor === null ? null : String(li.fixedAmountMinor),
+        formulaKeyAtSave: li.formulaKey,
+        computedAmountMinor: String(li.computedAmountMinor),
+      })),
+    });
+    const data = await load("?from=3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b");
+    expect(data.prefill).toEqual({
+      id: "3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b",
+      savedAtIso: "2026-09-17T09:14:00.000Z",
+      revenueMinor: 5_000_000,
+      currencyCode: "CAD",
+    });
+    // the rules are still the SAVED ones (shipping 777.00), not the snapshot's (450.00)
+    expect(data.rules.find((r) => r.categoryKey === "shipping")!.fixedAmountMinor).toBe(77_700);
+  });
+
+  it("a malformed / nonexistent / other-shop ?from= yields the plain calculator, revealing nothing", async () => {
+    expect((await load("?from=not-a-uuid")).prefill).toBeNull();
+    expect((await load("?from=3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b")).prefill).toBeNull(); // repository: null
+  });
+
+  it("?revenue=&currency= (Change revenue) carries only values that pass the shared validators", async () => {
+    expect((await load("?revenue=1234.50&currency=EUR")).carried).toEqual({ revenueMinor: 123_450, currencyCode: "EUR" });
+    expect((await load("?revenue=0.00&currency=USD")).carried).toEqual({ revenueMinor: 0, currencyCode: "USD" });
+    expect((await load("?revenue=100&currency=JPY")).carried).toEqual({ revenueMinor: 10_000, currencyCode: null });
+    for (const bad of ["-5", "1,5", "1e5", "10.555", "abc", ""]) {
+      expect((await load(`?revenue=${encodeURIComponent(bad)}&currency=USD`)).carried, `revenue=${bad}`).toBeNull();
     }
-    for (const [k, v] of Object.entries(overrides)) {
-      if (v === null) fd.delete(k);
-      else fd.set(k, v);
-    }
-    return fd;
-  }
+  });
+});
+
+describe("/app/calculator action - Calculate uses the SAVED rules (J1)", () => {
+  beforeEach(() => {
+    vi.mocked(authenticate.admin).mockReset();
+    vi.mocked(authenticate.admin).mockResolvedValue({ session: { shop: ctx.shopDomain } } as never);
+    vi.mocked(requireShopContext).mockReset();
+    vi.mocked(requireShopContext).mockResolvedValue(ctx as never);
+    ruleRepo.listExpenseRulesForShop.mockReset();
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(repoRows(viewOf()));
+    ruleRepo.replaceExpenseRulesForShop.mockReset();
+    ruleRepo.seedExpenseRulesIfMissing.mockReset();
+  });
 
   const run = (fd: FormData) =>
     calculatorAction({ request: new Request("http://localhost/app/calculator", { method: "POST", body: fd }) } as never);
+  const form = (fields: Record<string, string>) => {
+    const fd = new FormData();
+    for (const [k, v] of Object.entries(fields)) fd.set(k, v);
+    return fd;
+  };
+  const resultOf = (res: unknown) => {
+    const location = (res as Response).headers.get("Location")!;
+    expect(location).toMatch(/^\/app\/results\?d=/);
+    return decodeCalculationResult(location.slice("/app/results?d=".length))!;
+  };
+  const amount = (r: ReturnType<typeof resultOf>, key: string) =>
+    r.lineItems.find((li) => li.categoryKey === key)?.computedAmountMinor;
 
-  it("Calculate with a valid revenue redirects to the results page", async () => {
-    const res = (await run(form())) as Response;
-    expect(res).toBeInstanceOf(Response);
+  it("redirects to Results with the calculation computed from the saved rules", async () => {
+    const res = (await run(form({ revenue: "1000.00", currency: "USD" }))) as Response;
     expect(res.status).toBe(302);
-    expect(res.headers.get("Location")).toMatch(/^\/app\/results\?d=/);
+    const result = resultOf(res);
+    expect(result.revenueMinor).toBe(100_000);
+    expect(result.lineItems).toHaveLength(10);
+    expect(amount(result, "cost_of_goods")).toBe(32_500); // 32.5% of $1,000.00
+    expect(amount(result, "shipping")).toBe(45_000);
+  });
+
+  it("uses the shop's saved values, not the placeholder defaults", async () => {
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(
+      repoRows(viewOf({ marketing: { rateBasisPoints: 1000 }, shipping: { fixedAmountMinor: 77_700 } })),
+    );
+    const result = resultOf(await run(form({ revenue: "1000.00", currency: "USD" })));
+    expect(amount(result, "marketing")).toBe(10_000);
+    expect(amount(result, "shipping")).toBe(77_700);
+  });
+
+  it("a saved DISABLED category is left out of the calculation", async () => {
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(repoRows(viewOf({ marketing: { enabled: false } })));
+    const result = resultOf(await run(form({ revenue: "1000.00", currency: "USD" })));
+    expect(result.lineItems.map((li) => li.categoryKey)).not.toContain("marketing");
+    expect(result.lineItems).toHaveLength(9);
+  });
+
+  it("IGNORES every client-supplied rule value: the old rule fields, dotted names, an intent, even a forged 'rules' blob", async () => {
+    const forged = form({
+      revenue: "1000.00",
+      currency: "USD",
+      intent: "calculate",
+      "enabled-cost_of_goods": "on",
+      "type-cost_of_goods": "fixed",
+      "fixed-cost_of_goods": "999999.00",
+      "percent-marketing": "99",
+      "type-marketing": "percentage",
+      "cost_of_goods.percent": "99",
+      "cost_of_goods.type": "fixed",
+      rules: JSON.stringify([{ categoryKey: "cost_of_goods", enabled: true, ruleType: "fixed", fixedAmountMinor: 1 }]),
+      rateBasisPoints: "9999",
+    });
+    const result = resultOf(await run(forged));
+    expect(amount(result, "cost_of_goods")).toBe(32_500); // saved 32.5%, not the forged fixed 999,999.00
+    expect(amount(result, "marketing")).toBe(8_000); // saved 8%, not 99%
+    expect(result.lineItems).toHaveLength(10);
+    const same = resultOf(await run(form({ revenue: "1000.00", currency: "USD" })));
+    expect(result).toEqual(same); // forged fields change nothing at all
+  });
+
+  it("client rule values also cannot switch a saved-off category ON or a saved-on one OFF", async () => {
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(repoRows(viewOf({ marketing: { enabled: false } })));
+    const result = resultOf(
+      await run(form({ revenue: "1000.00", currency: "USD", "enabled-marketing": "on", "enabled-cost_of_goods": "" })),
+    );
+    expect(result.lineItems.map((li) => li.categoryKey)).not.toContain("marketing");
+    expect(result.lineItems.map((li) => li.categoryKey)).toContain("cost_of_goods");
+  });
+
+  it("never writes rules: Calculate is read-only for the rules table", async () => {
+    await run(form({ revenue: "1000.00", currency: "USD", "type-shipping": "fixed", "fixed-shipping": "1.00" }));
+    expect(ruleRepo.replaceExpenseRulesForShop).not.toHaveBeenCalled();
+    expect(ruleRepo.seedExpenseRulesIfMissing).not.toHaveBeenCalled();
+  });
+
+  it("resolves the shop from the authenticated session, never from the request", async () => {
+    await run(form({ revenue: "10", currency: "USD", shop: "evil.myshopify.com", shopId: "22222222-2222-4222-8222-222222222222" }));
+    expect(requireShopContext).toHaveBeenCalledWith({ shop: ctx.shopDomain });
+    expect(ruleRepo.listExpenseRulesForShop).toHaveBeenCalledWith(ctx);
   });
 
   it("Calculate with revenue '0' is accepted (zero is a valid revenue)", async () => {
-    const res = (await run(form({ revenue: "0" }))) as Response;
+    const res = (await run(form({ revenue: "0", currency: "USD" }))) as Response;
     expect(res.status).toBe(302);
+    expect(resultOf(res).revenueMinor).toBe(0);
   });
 
   it("Calculate with revenue '-5' says 'zero or greater', not 'Enter a revenue amount.'", async () => {
-    const res = (await run(form({ revenue: "-5" }))) as { ok: boolean; revenueError?: string };
+    const res = (await run(form({ revenue: "-5", currency: "USD" }))) as unknown as { ok: boolean; revenueError?: string };
     expect(res.ok).toBe(false);
     expect(res.revenueError).toBe("Revenue amount must be zero or greater.");
   });
 
   it("Calculate with revenue '1,5' is rejected (not read as 15.00)", async () => {
-    const res = (await run(form({ revenue: "1,5" }))) as { ok: boolean; revenueError?: string };
-    expect(res.ok).toBe(false);
+    const res = (await run(form({ revenue: "1,5", currency: "USD" }))) as unknown as { revenueError?: string };
     expect(res.revenueError).toBe("Commas can only separate thousands, for example 1,234.50.");
   });
 
   it("Calculate with a blank revenue says 'Enter a revenue amount.'", async () => {
-    const res = (await run(form({ revenue: "" }))) as { revenueError?: string };
+    const res = (await run(form({ revenue: "", currency: "USD" }))) as unknown as { revenueError?: string };
     expect(res.revenueError).toBe("Enter a revenue amount.");
   });
 
-  it("Calculate with a blank currency returns a currencyError (rendered on the currency select)", async () => {
-    const res = (await run(form({ currency: "" }))) as { ok: boolean; currencyError?: string };
-    expect(res.ok).toBe(false);
-    expect(res.currencyError).toBe("Choose a supported currency.");
+  it("Calculate with a blank / unsupported currency returns a currencyError", async () => {
+    for (const currency of ["", "JPY"]) {
+      const res = (await run(form({ revenue: "100", currency }))) as unknown as { ok: boolean; currencyError?: string };
+      expect(res.ok).toBe(false);
+      expect(res.currencyError).toBe("Choose a supported currency.");
+    }
   });
 
-  it("Save with a category cleared AND unticked returns fieldErrors and writes nothing (was: NULL -> DB check violation -> 500)", async () => {
-    const res = (await run(
-      form({ "enabled-shipping": null, "type-shipping": "fixed", "fixed-shipping": "" }, "save"),
-    )) as { intent: string; ok: boolean; fieldErrors: Record<string, { fixedAmountMinor?: string }> };
-    expect(res.intent).toBe("save");
+  it("if the SAVED rules themselves are invalid the merchant is sent to the rules page, and nothing is calculated", async () => {
+    ruleRepo.listExpenseRulesForShop.mockResolvedValue(
+      repoRows(viewOf({ shipping: { fixedAmountMinor: null } })), // an enabled fixed rule with no amount
+    );
+    const res = (await run(form({ revenue: "100", currency: "USD" }))) as unknown as {
+      ok: boolean;
+      savedRulesInvalid: boolean;
+    };
     expect(res.ok).toBe(false);
-    expect(res.fieldErrors.shipping?.fixedAmountMinor).toBe("Enter an amount of 0 or greater.");
+    expect(res.savedRulesInvalid).toBe(true);
+  });
+
+  it("has no 'save' intent any more: rules are not writable through this route", async () => {
+    const res = (await run(form({ intent: "save", revenue: "100", currency: "USD" }))) as Response;
+    expect(res.status).toBe(302); // treated as Calculate; nothing was written
     expect(ruleRepo.replaceExpenseRulesForShop).not.toHaveBeenCalled();
-  });
-
-  it("Save with valid values writes the rules once and reports ok", async () => {
-    const res = (await run(form({}, "save"))) as { ok: boolean };
-    expect(res.ok).toBe(true);
-    expect(ruleRepo.replaceExpenseRulesForShop).toHaveBeenCalledTimes(1);
-  });
-
-  it("Save ignores the revenue/currency fields (they are not persisted)", async () => {
-    const res = (await run(form({ revenue: "-5", currency: "" }, "save"))) as { ok: boolean };
-    expect(res.ok).toBe(true);
   });
 });

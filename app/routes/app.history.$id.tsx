@@ -60,27 +60,23 @@ export default function HistoryDetailPage({ loaderData }: Route.ComponentProps) 
     }
   }, [justSaved]);
 
-  return <SavedCalculationPage saved={saved} />;
+  return <SavedCalculationPage saved={saved} justSaved={justSaved} />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error) && error.status === 404) {
+    // The same message for a nonexistent id, another shop's id and a malformed
+    // id: nothing here says which of the three it was.
     return (
       <s-page heading="Saved calculation">
         <s-link slot="breadcrumb-actions" href="/app/history">
           History
         </s-link>
-        <s-section>
-          <s-banner tone="warning" heading="Calculation not found">
-            <p>
-              This saved calculation does not exist. Return to your history to pick one of your
-              saved calculations.
-            </p>
-            <s-button slot="action" href="/app/history">
-              Back to history
-            </s-button>
-          </s-banner>
-        </s-section>
+        <s-banner tone="critical" heading="Saved calculation not found">
+          <s-paragraph>
+            It may have been removed, or the link is wrong. <s-link href="/app/history">Back to History</s-link>
+          </s-paragraph>
+        </s-banner>
       </s-page>
     );
   }
@@ -89,10 +85,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   return (
     <s-page heading="Something went wrong">
       <s-banner tone="critical" heading="Unexpected error">
-        <p>
+        <s-paragraph>
           Something went wrong loading this page. No details are shown here to avoid leaking
-          internals — this event has been logged.
-        </p>
+          internals - this event has been logged.
+        </s-paragraph>
       </s-banner>
     </s-page>
   );

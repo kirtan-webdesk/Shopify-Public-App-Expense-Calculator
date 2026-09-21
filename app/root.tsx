@@ -41,6 +41,8 @@ export function Layout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* WCAG 2.4.2: every document needs a title (axe "document-title", G4-sprint-4.1). */}
+        <title>Expense Calculator</title>
         {/* API-key meta MUST precede app-bridge.js — see shopify-app-scaffold skill. */}
         <meta name="shopify-api-key" content={apiKey} />
         <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>

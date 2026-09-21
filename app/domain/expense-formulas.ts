@@ -49,7 +49,7 @@ export const EXPENSE_FORMULAS = [
     placeholderNote:
       "PLACEHOLDER pattern: applies a single rate chosen by which illustrative revenue " +
       "band the entered revenue falls into (5% up to 10,000; 3.5% up to 50,000; 2% up " +
-      "to 250,000; 1% above that, in the currency you selected). Bands and rates are " +
+      "to 250,000; 1% above that, in the currency you calculate in). Bands and rates are " +
       "illustrative defaults, not real business figures.",
   },
   {
@@ -57,7 +57,7 @@ export const EXPENSE_FORMULAS = [
     label: "Base fee + marginal percentage above a threshold",
     placeholderNote:
       "PLACEHOLDER pattern: a flat base fee (25.00) plus 1% of revenue above an " +
-      "illustrative 20,000 threshold, in the currency you selected. Base fee, " +
+      "illustrative 20,000 threshold, in the currency you calculate in. Base fee, " +
       "threshold, and rate are illustrative defaults, not real business figures.",
   },
 ] as const satisfies readonly ExpenseFormulaDefinition[];

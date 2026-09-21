@@ -1,23 +1,20 @@
 /*
-  expense-calculator — app stylesheet (M2/M3)
+  expense-calculator - app stylesheet (G2-revision v2)
   ------------------------------------------------------------------
-  Ported from the G2-approved design/mockup/assets/styles.css. The
-  visual system IS Polaris: colour, type, spacing, and component
-  chrome come from the Polaris web-components bundle (polaris.js)
-  loaded in every page <head> (see app/root.tsx). This file only
-  covers layout needs that aren't a component on their own — the
-  donut/legend layout, the rule disclosure rows, and the native
-  accessible <table> (ADR-0004).
+  Layout, type, colour, spacing, tables, fields, banners, badges,
+  buttons and modals all come from the Polaris web components loaded
+  from the CDN in every page <head> (see app/root.tsx). This file only
+  covers what Polaris has no component for: the chart colour swatch,
+  the donut <svg> box and its legend list (ADR-0004) and tabular figures.
+  Responsive layouts are s-grid inside s-query-container, not CSS.
 
-  Deliberately NOT ported from the mockup: `.mockup-shell` (a no-op
-  preview-only width wrapper — <s-page> already constrains content
-  width for real) and `.design-review-aid*` (the G2 fixture-data-swap
-  dropdown, already stripped at G3 per project.json's explicit
-  instruction — never reintroduced).
+  Deliberately NOT here any more (deleted with the v2 migration): the
+  <details> rule rows, the native data table, the hand-rolled summary /
+  action rows and the native form-control styling - all replaced by
+  Polaris components (design/v2/DESIGN-NOTES-v2.md section 7, item 8).
 
-  VERIFY AT BUILD: exact Polaris token names/values against the
-  polaris.js version resolved from the CDN at build time — the
-  fallback values after each var() are not authoritative.
+  VERIFY AT BUILD: the --p-* token names against the polaris.js version
+  resolved from the CDN; the fallback after each var() is not authoritative.
 */
 
 * {
@@ -30,279 +27,52 @@ body {
   color: var(--p-color-text, #1a1a1a);
 }
 
-/* ---------------------------------------------------------------
-   Results layout: accessible data table is the primary element and
-   is always full-width above the fold; the donut + legend is a
-   supplementary column that sits beside the table on wide viewports
-   and stacks below it at Admin's narrower embedded breakpoints.
-   ADR-0004: table first in DOM order, chart is supplementary.
------------------------------------------------------------------- */
-.results-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--p-space-500, 20px);
-  align-items: start;
-}
-@media (min-width: 768px) {
-  .results-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
-  }
-}
-
-.chart-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--p-space-300, 12px);
-  text-align: center;
-}
-
-.donut-legend {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--p-space-150, 6px);
-  text-align: start;
-}
-.donut-legend li {
-  display: flex;
-  align-items: center;
-  gap: var(--p-space-200, 8px);
-  font-size: 0.8125rem;
-}
-.donut-legend__swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  flex: 0 0 auto;
-}
-.donut-legend__label {
-  flex: 1 1 auto;
-  color: var(--p-color-text, #1a1a1a);
-}
-.donut-legend__value {
-  color: var(--p-color-text-secondary, #616161);
+/* Keep amounts aligned in the metric tiles and table cells. */
+.tabular {
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------------------------------------------------------------
-   Accessible data table — native semantic HTML by deliberate choice
-   (ADR-0004 requires this be the always-rendered primary
-   representation).
------------------------------------------------------------------- */
-/* Wrapper that lets a wide table scroll sideways inside its own box instead of
-   pushing the whole page wider than a narrow Admin iframe. */
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-}
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-}
-.data-table caption {
-  text-align: start;
-  font-size: 0.8125rem;
-  color: var(--p-color-text-secondary, #616161);
-  margin-block-end: var(--p-space-200, 8px);
-}
-.data-table th,
-.data-table td {
-  text-align: start;
-  padding: var(--p-space-200, 8px) var(--p-space-300, 12px);
-  border-block-end: 1px solid var(--p-color-border, #e3e3e3);
-}
-.data-table th[scope="col"] {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--p-color-text-secondary, #616161);
-}
-.data-table td.numeric,
-.data-table th.numeric {
-  text-align: end;
-}
-.data-table tfoot td,
-.data-table tfoot th {
-  font-weight: 600;
-  border-block-end: none;
-  border-block-start: 2px solid var(--p-color-border, #e3e3e3);
-}
-.data-table__swatch {
+/* ---------------------------------------------------------------- chart -- */
+.swatch {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  margin-inline-end: var(--p-space-150, 6px);
-  vertical-align: middle;
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 3px;
+  margin-inline-end: 8px;
+  vertical-align: -1px;
+  flex: none;
+}
+/* The "left over (net)" part of a share-of-revenue ring. */
+.swatch--track {
+  background: #e3e3e3;
+  outline: 1px solid #8a8a8a;
+  outline-offset: -1px;
 }
 
-/* ---------------------------------------------------------------
-   Category rule rows (calculator page) — native <details>/<summary>
-   used deliberately for the 10-category list: accessible and
-   keyboard-operable with zero custom JS required for open/close.
------------------------------------------------------------------- */
-.rule-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--p-space-200, 8px);
+.donut {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 240px;
+  block-size: auto;
+  margin-inline: auto;
 }
-.rule-row {
-  border: 1px solid var(--p-color-border, #e3e3e3);
-  border-radius: var(--p-border-radius-200, 8px);
-  background: var(--p-color-bg-surface, #ffffff);
-  overflow: hidden;
-}
-.rule-row__summary {
-  display: flex;
-  align-items: center;
-  gap: var(--p-space-300, 12px);
-  padding: var(--p-space-300, 12px) var(--p-space-400, 16px);
-  cursor: pointer;
+
+.legend {
   list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.8125rem;
 }
-.rule-row__summary::-webkit-details-marker {
-  display: none;
+.legend li {
+  display: flex;
+  align-items: center;
 }
-.rule-row__summary:focus-visible {
-  outline: 2px solid var(--p-color-border-focus, #005bd3);
-  outline-offset: -2px;
-}
-.rule-row__chevron {
-  flex: 0 0 auto;
-  transition: transform 0.15s ease;
-  color: var(--p-color-icon, #8a8a8a);
-}
-.rule-row[open] > .rule-row__summary .rule-row__chevron {
-  transform: rotate(90deg);
-}
-.rule-row__title {
+.legend__label {
   flex: 1 1 auto;
-  font-weight: 600;
 }
-.rule-row__at-a-glance {
-  color: var(--p-color-text-secondary, #616161);
-  font-size: 0.8125rem;
-}
-.rule-row__at-a-glance--error {
-  color: var(--p-color-text-critical, #b52125);
-  font-weight: 600;
-}
-.rule-row__body {
-  padding: 0 var(--p-space-400, 16px) var(--p-space-400, 16px);
-  border-block-start: 1px solid var(--p-color-border, #e3e3e3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--p-space-300, 12px);
-}
-.rule-row__types {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--p-space-200, 8px) var(--p-space-400, 16px);
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-.rule-row__types label {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--p-space-100, 4px);
-}
-.rule-row__field-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--p-space-300, 12px);
-  align-items: flex-end;
-}
-/* Muted helper text under a control / block (replaces per-element inline styles). */
-.help-text {
-  color: var(--p-color-text-secondary, #616161);
-  font-size: 0.8125rem;
-  margin: 0;
-}
-.help-text--end {
-  text-align: end;
-  margin-block-start: var(--p-space-200, 8px);
-}
-.help-text--spaced {
-  margin-block-end: var(--p-space-300, 12px);
-}
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: var(--p-space-200, 8px);
-  margin-block-start: var(--p-space-400, 16px);
-}
-.snapshot-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--p-space-200, 8px);
-  margin-block-end: var(--p-space-300, 12px);
-}
-
-/* Read-only label/value pair used for the Revenue / Total / Net summary rows
-   (ported from the mockup's .snapshot-readonly-field). */
-.summary-field {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.summary-field__label {
-  font-size: 0.75rem;
-  color: var(--p-color-text-secondary, #616161);
-}
-.summary-field__value {
-  font-size: 1rem;
-  font-weight: 500;
+.legend__value {
   font-variant-numeric: tabular-nums;
-}
-.summary-field__value--negative {
-  color: var(--p-color-text-critical, #d82c0d);
-}
-.summary-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--p-space-500, 20px);
-  align-items: flex-start;
-}
-.summary-row--spread {
-  justify-content: space-between;
-}
-.action-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--p-space-300, 12px);
-}
-.lock-icon {
-  display: inline-flex;
-  vertical-align: -3px;
-  margin-inline-end: 4px;
-}
-
-.field-error {
-  color: var(--p-color-text-critical, #b52125);
-  font-size: 0.8125rem;
-  margin: 0;
-}
-.field-error:empty {
-  display: none;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  color: var(--p-color-text-secondary, #616161);
 }

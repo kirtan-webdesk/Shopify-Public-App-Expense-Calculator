@@ -7,11 +7,9 @@
 // on the history read path (FT-14b): a saved calculation is rendered purely
 // from its own stored columns.
 //
-// The one deliberate exception is `buildDuplicatePrefill`, which takes the
-// shop's CURRENT rules as an argument (supplied by the calculator loader, the
-// route that already owns them) so that categories which were disabled in the
-// snapshot still show sensible values in the new, unsaved calculation. That
-// function only shapes data it is handed; it does not query.
+// `getDuplicatePrefill` (Duplicate as new calculation) reads the snapshot
+// through the same tenant-scoped detail path and copies revenue + currency
+// only; it never touches expense rules.
 
 import type { CalculationLineItemModel } from "~/db/models/calculation-line-item.model";
 import type { CalculationModel } from "~/db/models/calculation.model";
@@ -28,7 +26,6 @@ import type { ExpenseCategoryKey } from "~/domain/expense-categories";
 import type { EngineLineItem, EngineResult } from "~/domain/expense-engine";
 import { isUuid } from "~/domain/ids";
 import { toMinorUnits } from "~/domain/money";
-import type { ExpenseRuleView } from "~/services/expense-rule.service";
 
 export const HISTORY_PAGE_SIZE = 20;
 
@@ -191,60 +188,37 @@ function toSavedCalculationView(
 }
 
 // --------------------------------------------------------------------------
-// Duplicate as new calculation (G2 default-accepted addition)
+// Duplicate as new calculation (G2-revision v2, J6)
 // --------------------------------------------------------------------------
 
 export interface DuplicatePrefill {
+  readonly id: string;
   readonly savedAtIso: string;
   readonly revenueMinor: number;
   readonly currencyCode: string;
-  /** The calculator's rule rows: every category the snapshot applied is
-   * enabled with the snapshot's rule; every category it did not apply is
-   * disabled (its value fields come from the shop's current rules). */
-  readonly rules: readonly ExpenseRuleView[];
 }
 
 /**
- * Loads a saved snapshot's inputs for the calculator as a NEW, UNSAVED
- * calculation. Returns null for a malformed / missing / other-shop id (the
- * calculator then simply renders its normal state — same no-oracle rule as
- * the detail page). Read-only: nothing is written, and the saved record is
- * never modified.
+ * Loads a saved snapshot's revenue and currency for the Calculator as a NEW,
+ * UNSAVED calculation. ONLY those two inputs are copied (J6): the rules used
+ * are always the shop's current SAVED rules, never the snapshot's, so no rule
+ * value is ever carried from a snapshot into a calculation.
+ *
+ * Returns null for a malformed / missing / other-shop id (the Calculator then
+ * simply renders its normal state - same no-oracle rule as the detail page).
+ * Read-only: nothing is written and the saved record is never modified.
  */
-export async function getDuplicatePrefill(
-  ctx: ShopContext,
-  id: string,
-  currentRules: readonly ExpenseRuleView[],
-): Promise<DuplicatePrefill | null> {
+export async function getDuplicatePrefill(ctx: ShopContext, id: string): Promise<DuplicatePrefill | null> {
   const saved = await getSavedCalculation(ctx, id);
   if (!saved) return null;
-  return buildDuplicatePrefill(saved, currentRules);
+  return buildDuplicatePrefill(saved);
 }
 
-export function buildDuplicatePrefill(
-  saved: SavedCalculationView,
-  currentRules: readonly ExpenseRuleView[],
-): DuplicatePrefill {
-  const appliedByCategory = new Map(saved.result.lineItems.map((li) => [li.categoryKey, li]));
-  const rules: ExpenseRuleView[] = currentRules.map((live) => {
-    const applied = appliedByCategory.get(live.categoryKey);
-    if (!applied) return { ...live, enabled: false };
-    return {
-      ...live,
-      enabled: true,
-      ruleType: applied.ruleType,
-      // Only the value that was actually applied is taken from the snapshot;
-      // the inactive fields keep the shop's current values, exactly as the
-      // calculator keeps them across a rule-type toggle.
-      rateBasisPoints: applied.ruleType === "percentage" ? applied.rateBasisPoints : live.rateBasisPoints,
-      fixedAmountMinor: applied.ruleType === "fixed" ? applied.fixedAmountMinor : live.fixedAmountMinor,
-      formulaKey: applied.ruleType === "formula" ? applied.formulaKey : live.formulaKey,
-    };
-  });
+export function buildDuplicatePrefill(saved: SavedCalculationView): DuplicatePrefill {
   return {
+    id: saved.id,
     savedAtIso: saved.savedAtIso,
     revenueMinor: saved.result.revenueMinor,
     currencyCode: saved.result.currencyCode,
-    rules,
   };
 }

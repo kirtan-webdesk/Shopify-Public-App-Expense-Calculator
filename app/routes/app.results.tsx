@@ -5,30 +5,31 @@ import { authenticate } from "~/shopify.server";
 import { requireShopContext } from "~/services/shop-context.service";
 import { saveCalculationFromTransport } from "~/services/calculation-history.service";
 import { decodeCalculationResult } from "~/domain/calculation-transport";
-import { formatMoney } from "~/domain/presentation";
-import { ExpenseBreakdown, SummaryField } from "~/components/expense-breakdown";
+import { minorUnitsToInputString } from "~/domain/presentation";
+import { ExpenseBreakdown, MetricTiles } from "~/components/expense-breakdown";
 
 // --------------------------------------------------------------------------
-// /app/results — M3 results view + M4 "Save this calculation" (D10).
+// /app/results - M3 results view + M4 "Save calculation" (D10), G2-revision v2
+// (design/v2/results.html).
 //
-// Ports design/mockup/results.html (G2-confirmed): the accessible data table
-// is the PRIMARY, always-rendered representation (ADR-0004) and the inline
-// SVG donut is supplementary — both live in app/components/expense-breakdown
-// and are shared with the saved-calculation detail page. The mockup's
-// dev-only fixture-data-swap dropdown was stripped at G3 and is NOT
-// reintroduced here.
+// The accessible breakdown table is the PRIMARY, always-rendered
+// representation (ADR-0004) and the inline SVG donut is supplementary - both
+// live in app/components/expense-breakdown and are shared with the
+// saved-calculation detail page.
 //
 // The loader does NOT read from the database: the result it renders comes
-// from the `d` query parameter the calculator's "Calculate" action produced
-// (app/domain/calculation-transport.ts) — a non-persisted live preview.
+// from the `d` query parameter the Calculator's "Calculate" action produced
+// (app/domain/calculation-transport.ts) - a non-persisted preview computed
+// from the shop's SAVED rules (J1). A missing `d` is the "no calculation yet"
+// state; a `d` that does not decode is the "this link isn't valid" state -
+// neither is a crash.
 //
 // Saving is a POST to this route's action, confirmed through an <s-modal>
-// (the mockup's save-confirmation step; saving is permanent, so it is
-// confirmed rather than fired directly). The action NEVER persists the
-// transported amounts: saveCalculationFromTransport re-validates the inputs,
-// recomputes with the pure engine, and rejects a payload whose amounts do
-// not match. The shop identity comes from the authenticated session, never
-// from the form.
+// (saving is permanent, so it is confirmed rather than fired directly). The
+// action NEVER persists the transported amounts: saveCalculationFromTransport
+// re-validates the inputs, recomputes with the pure engine, and rejects a
+// payload whose amounts do not match. The shop identity comes from the
+// authenticated session, never from the form.
 // --------------------------------------------------------------------------
 
 const SAVE_MODAL_ID = "save-calculation-modal";
@@ -38,9 +39,12 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const encoded = url.searchParams.get("d");
   const result = encoded ? decodeCalculationResult(encoded) : null;
-  // `encoded` is handed back only when it decoded — it is what the Save form
+  // "none": nothing was asked for. "invalid": a `d` came in but does not decode
+  // (incomplete, tampered, unsupported currency).
+  const linkState: "ok" | "none" | "invalid" = result ? "ok" : encoded ? "invalid" : "none";
+  // `encoded` is handed back only when it decoded - it is what the Save form
   // posts, so the server re-verifies exactly the calculation the merchant saw.
-  return { result, encoded: result ? encoded : null };
+  return { result, encoded: result ? encoded : null, linkState };
 }
 
 interface SaveActionError {
@@ -67,46 +71,75 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function ResultsPage({ loaderData }: Route.ComponentProps) {
-  const { result, encoded } = loaderData;
+  const { result, encoded, linkState } = loaderData;
   const actionData = useActionData<typeof action>() as SaveActionError | undefined;
   const navigation = useNavigation();
   const isSaving = navigation.state === "submitting";
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Results is a sub-page of the Calculator, so it gets a breadcrumb back, not a nav entry.
   if (!result || !encoded) {
     return (
       <s-page heading="Results">
         <s-link slot="breadcrumb-actions" href="/app/calculator">
           Calculator
         </s-link>
-        <s-section>
-          <s-banner tone="info" heading="No calculation yet">
-            <p>
-              Run a calculation from the Calculator page to see results here. Nothing is saved
-              automatically — this page only shows the most recent Calculate you ran.
-            </p>
+        {linkState === "invalid" ? (
+          <s-banner tone="critical" heading="This results link isn't valid">
+            <s-paragraph>
+              The link is incomplete or was changed, so the calculation can&apos;t be shown.{" "}
+              <s-link href="/app/calculator">Run a new calculation</s-link>
+            </s-paragraph>
           </s-banner>
-        </s-section>
+        ) : (
+          <s-banner tone="info" heading="No calculation yet">
+            <s-paragraph>
+              Run a calculation from the Calculator to see results here. Nothing is saved automatically; this
+              page only shows the calculation you just ran.{" "}
+              <s-link href="/app/calculator">Go to Calculator</s-link>
+            </s-paragraph>
+          </s-banner>
+        )}
       </s-page>
     );
   }
+
+  // "Change revenue" returns to a FILLED form: revenue and currency travel back as
+  // query parameters (the Calculator re-validates both; neither is trusted).
+  const changeRevenueHref =
+    `/app/calculator?revenue=${encodeURIComponent(minorUnitsToInputString(result.revenueMinor))}` +
+    `&currency=${encodeURIComponent(result.currencyCode)}`;
+  const expensesExceedRevenue = result.revenueMinor > 0 && result.totalExpensesMinor > result.revenueMinor;
 
   return (
     <s-page heading="Results">
       <s-link slot="breadcrumb-actions" href="/app/calculator">
         Calculator
       </s-link>
+      <s-button
+        slot="primary-action"
+        variant="primary"
+        commandFor={SAVE_MODAL_ID}
+        command="--show"
+        loading={isSaving}
+        disabled={isSaving}
+      >
+        Save calculation
+      </s-button>
+      <s-button slot="secondary-actions" href={changeRevenueHref}>
+        Change revenue
+      </s-button>
 
       {/* Save-confirmation modal (App Bridge/Polaris <s-modal>, not a bespoke
           dialog). The primary action hides the modal and submits the hidden
           form below; the form is outside the modal so it exists regardless of
           the modal's own rendering. */}
       <s-modal id={SAVE_MODAL_ID} heading="Save this calculation?">
-        <p>
-          This creates a permanent record of today&apos;s revenue figure and the rule values used
-          to calculate it. It will <strong>not</strong> update later if you edit your category
-          rules — that&apos;s by design, so past calculations stay comparable.
-        </p>
+        <s-paragraph>
+          This creates a permanent record of this revenue figure and the rule values used to calculate it. It
+          will <strong>not</strong> change later if you edit your rules. That is by design, so past calculations
+          stay comparable.
+        </s-paragraph>
         <s-button
           slot="primary-action"
           variant="primary"
@@ -128,58 +161,59 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
         <input type="hidden" name="d" value={encoded} />
       </Form>
 
-      {actionData && !actionData.ok && (
-        <s-section>
+      <s-stack gap="base">
+        {actionData && !actionData.ok && (
           <s-banner tone="critical" heading="Calculation not saved">
-            <p>{actionData.message}</p>
+            <s-paragraph>{actionData.message}</s-paragraph>
           </s-banner>
-        </s-section>
-      )}
+        )}
 
-      <s-section>
-        <s-banner tone="warning" heading="Estimate only — not saved yet">
-          <p>
-            This is a live preview using the rule values from the Calculator page, including any
-            unsaved edits. Select <strong>Save this calculation</strong> to keep a permanent
-            snapshot of it in your history. Any rule you have not edited still uses its
-            illustrative placeholder default, so treat the figures below as an estimate.
-          </p>
+        {/* Always present: not saved yet + placeholder-rate labelling (approved product rules). */}
+        <s-banner tone="warning" heading="Estimate only, not saved yet">
+          <s-paragraph>
+            This estimate uses your <strong>saved</strong> rules. Their starting rates are illustrative
+            placeholders until you change them, so treat the figures as a rough estimate. Select{" "}
+            <strong>Save calculation</strong> to keep a permanent snapshot in History.{" "}
+            <s-link href="/app/rules">Review rules</s-link>
+          </s-paragraph>
         </s-banner>
-      </s-section>
 
-      <s-section>
-        <div className="summary-row summary-row--spread">
-          <SummaryField label="Revenue" value={formatMoney(result.revenueMinor, result.currencyCode)} />
-          <SummaryField
-            label="Total expenses"
-            value={formatMoney(result.totalExpensesMinor, result.currencyCode)}
-          />
-          <SummaryField
-            label="Net"
-            value={formatMoney(result.netAmountMinor, result.currencyCode)}
-            negative={result.netAmountMinor < 0}
-          />
-          <div>
-            <s-button
-              variant="primary"
-              commandFor={SAVE_MODAL_ID}
-              command="--show"
-              loading={isSaving}
-              disabled={isSaving}
-            >
-              Save this calculation
-            </s-button>
-          </div>
-        </div>
-      </s-section>
+        {/* Data-driven banners: shown by what the calculation contains. */}
+        {result.revenueMinor === 0 && (
+          <s-banner tone="info" heading="Revenue is 0">
+            <s-paragraph>
+              Percentage rules give 0 and percentages of revenue can&apos;t be shown. Fixed amounts still count as
+              expenses, and the chart shows each category&apos;s share of total expenses.
+            </s-paragraph>
+          </s-banner>
+        )}
+        {expensesExceedRevenue && (
+          <s-banner tone="warning" heading="Expenses are higher than revenue">
+            <s-paragraph>
+              Net is negative. The chart shows each category&apos;s share of total expenses, because a ring can&apos;t
+              show more than 100% of revenue.
+            </s-paragraph>
+          </s-banner>
+        )}
+        {result.lineItems.length === 0 && (
+          <s-banner tone="warning" heading="No expense rules are switched on">
+            <s-paragraph>
+              There is nothing to break down. <s-link href="/app/rules">Switch rules on</s-link>
+            </s-paragraph>
+          </s-banner>
+        )}
 
-      <s-section heading="Expense breakdown">
-        <ExpenseBreakdown
-          result={result}
-          caption={`Per-category expense breakdown against the revenue figure above. All amounts are in ${result.currencyCode}.`}
-          ruleColumnHeading="Rule applied"
-        />
-      </s-section>
+        <s-section>
+          <MetricTiles result={result} labels={{ revenue: "Revenue", total: "Total expenses", net: "Net" }} />
+        </s-section>
+
+        <s-section heading="Expense breakdown">
+          <ExpenseBreakdown
+            result={result}
+            ruleColumnHeading="Rule applied"
+          />
+        </s-section>
+      </s-stack>
     </s-page>
   );
 }

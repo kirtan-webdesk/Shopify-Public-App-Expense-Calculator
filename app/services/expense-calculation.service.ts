@@ -1,12 +1,17 @@
-// expense-calculation.service — M3 orchestration around the pure engine
-// (app/domain/expense-engine.ts). "Calculate" runs against CURRENT FORM
-// STATE, including unsaved edits (G2 design note: "Calculate runs on
-// unsaved form state, safe per the snapshot data model") — this service
-// therefore takes rule rows exactly as submitted by the calculator form, not
-// rows read back from the database. It does not persist anything (M4 scope,
-// explicitly out for this sprint) and does not import any repository.
+// expense-calculation.service - M3 orchestration around the pure engine
+// (app/domain/expense-engine.ts).
+//
+// G2-revision v2 (J1): "Calculate" runs against the shop's SAVED rules only.
+// The rules editor moved to its own page (/app/rules), so there is no unsaved
+// rule state on the Calculator to run against, and the action never accepts
+// rule values from the client: `calculateFromSavedRules` loads them server-side
+// for the authenticated shop and hands them to the pure `runCalculation`.
+// Nothing is persisted here (saving a calculation is the history service's
+// job, after re-verification).
 
 import { calculateExpenses, type EngineInput, type EngineResult } from "~/domain/expense-engine";
+import type { ShopContext } from "~/db/repositories/shop-context";
+import { getOrSeedExpenseRules, type ExpenseRuleView } from "~/services/expense-rule.service";
 import {
   hasAnyFieldError,
   validateCurrencyCode,
@@ -81,4 +86,59 @@ export function runCalculation(input: RunCalculationInput): RunCalculationResult
 
   const result = calculateExpenses(engineInput);
   return { ok: true, result };
+}
+
+/** What the Calculator form is allowed to send: revenue text and a currency. Nothing else. */
+export interface CalculateFromSavedRulesInput {
+  readonly revenueText: string;
+  readonly currencyCode: string;
+}
+
+export type CalculateFromSavedRulesResult =
+  | { readonly ok: true; readonly result: EngineResult }
+  | {
+      readonly ok: false;
+      readonly revenueError?: string;
+      readonly currencyError?: string;
+      /** True when the merchant's own SAVED rules failed validation (not a form error they can fix here). */
+      readonly savedRulesInvalid: boolean;
+    };
+
+/** A saved rule as the validator/engine input rows. Pure shape translation. */
+export function ruleViewToFormInput(view: ExpenseRuleView): ExpenseRuleFormInput {
+  return {
+    categoryKey: view.categoryKey,
+    enabled: view.enabled,
+    ruleType: view.ruleType,
+    rateBasisPoints: view.rateBasisPoints,
+    fixedAmountMinor: view.fixedAmountMinor,
+    formulaKey: view.formulaKey,
+  };
+}
+
+/**
+ * The Calculate path: validates the merchant's revenue text and currency, loads
+ * THIS shop's saved rules (seeding the placeholder defaults on a first-ever
+ * load, exactly as the rules page does), and runs the engine on them.
+ *
+ * The rule set comes only from `ctx` (the authenticated shop); there is no
+ * parameter through which a caller could substitute rule values.
+ */
+export async function calculateFromSavedRules(
+  ctx: ShopContext,
+  input: CalculateFromSavedRulesInput,
+): Promise<CalculateFromSavedRulesResult> {
+  const saved = await getOrSeedExpenseRules(ctx);
+  const outcome = runCalculation({
+    revenueText: input.revenueText,
+    currencyCode: input.currencyCode,
+    rows: saved.map(ruleViewToFormInput),
+  });
+  if (outcome.ok) return outcome;
+  return {
+    ok: false,
+    revenueError: outcome.revenueError,
+    currencyError: outcome.currencyError,
+    savedRulesInvalid: Object.keys(outcome.fieldErrors).length > 0,
+  };
 }

@@ -34,6 +34,25 @@ declare module "react" {
       "s-number-field": PolarisElementProps;
       "s-select": PolarisElementProps;
       "s-option": PolarisElementProps;
+      // Layout, typography and data components introduced by the G2-revision v2
+      // design (design/v2/DESIGN-NOTES-v2.md section 3). Each was validated
+      // with validate_component_codeblocks at G4-sprint-4.1 (see that
+      // sprint's dev-evidence/ for the per-file results).
+      "s-stack": PolarisElementProps;
+      "s-grid": PolarisElementProps;
+      "s-query-container": PolarisElementProps;
+      "s-box": PolarisElementProps;
+      "s-switch": PolarisElementProps;
+      "s-heading": PolarisElementProps;
+      "s-paragraph": PolarisElementProps;
+      "s-text": PolarisElementProps;
+      "s-divider": PolarisElementProps;
+      "s-table": PolarisElementProps;
+      "s-table-header-row": PolarisElementProps;
+      "s-table-header": PolarisElementProps;
+      "s-table-body": PolarisElementProps;
+      "s-table-row": PolarisElementProps;
+      "s-table-cell": PolarisElementProps;
       // App Bridge web components (NOT Polaris — see app/routes/app.tsx's
       // header comment on why validate_component_codeblocks doesn't cover
       // these two).

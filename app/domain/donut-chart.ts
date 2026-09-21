@@ -126,20 +126,27 @@ function formatPct(value: number): string {
 }
 
 // A small fixed, deterministic colour palette keyed by the 10 fixed
-// categories (design continuity with the G2-approved mockup fixture, which
-// used the same hex values — design/mockup/assets/mockup.js
-// RESULTS_FIXTURES). Not merchant-configurable; colour is never the only
-// carrier of meaning (ADR-0004) — every slice's label/amount/percentage is
-// also in the table.
+// categories. Not merchant-configurable; colour is never the only carrier of
+// meaning (ADR-0004) - every slice's label/amount/percentage is also in the
+// table.
+//
+// G2-revision v2 (J8): the v1 palette had colours below 3:1 against white
+// (QA finding p4; WCAG 1.4.11 non-text contrast). Every colour below is at
+// least 3:1 on #FFFFFF - asserted by tests/domain/chart-palette.test.ts, which
+// computes the WCAG relative-luminance contrast ratio rather than trusting a
+// hand-calculated comment.
 export const CATEGORY_COLORS: Readonly<Record<string, string>> = {
-  cost_of_goods: "#5C6AC4",
-  marketing: "#EEC200",
-  platform_fees: "#9C6ADE",
-  payment_processing: "#50B83C",
-  shipping: "#006FBB",
-  apps_software: "#B98900",
-  payroll: "#47C1BF",
-  overhead: "#8A8A8A",
-  taxes: "#F49342",
-  misc: "#DE3618",
+  cost_of_goods: "#1D4ED8",
+  marketing: "#C2410C",
+  platform_fees: "#7C3AED",
+  payment_processing: "#15803D",
+  shipping: "#0E7490",
+  apps_software: "#A16207",
+  payroll: "#BE185D",
+  overhead: "#475569",
+  taxes: "#B91C1C",
+  misc: "#4D7C0F",
 };
+
+/** Fallback for a category key the palette does not know (>= 3:1 on white). */
+export const FALLBACK_CATEGORY_COLOR = "#616161";

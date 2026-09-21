@@ -31,6 +31,7 @@ describe("shop-context choke point (P1 no-shop-row outage guard)", () => {
         "app.tsx",
         "app._index.tsx",
         "app.calculator.tsx",
+        "app.rules.tsx",
         "app.results.tsx",
         "app.history.tsx",
         "app.history.$id.tsx",
@@ -78,7 +79,7 @@ describe("shop-context choke point (P1 no-shop-row outage guard)", () => {
   );
 
   it("every loader/action in the tenant-data routes that authenticates also binds `session` for the choke point", () => {
-    for (const file of ["app.calculator.tsx", "app.history.tsx", "app.history.$id.tsx", "app.results.tsx"]) {
+    for (const file of ["app.calculator.tsx", "app.rules.tsx", "app.history.tsx", "app.history.$id.tsx", "app.results.tsx"]) {
       const source = read(file);
       const calls = (source.match(/requireShopContext\(\s*session\s*\)/g) ?? []).length;
       const sessionBindings = (source.match(/const\s+\{\s*session\s*\}\s*=\s*await\s+authenticate\.admin\(/g) ?? []).length;

@@ -52,6 +52,7 @@ export default [
   route("app", "routes/app.tsx", [
     index("routes/app._index.tsx"),
     route("calculator", "routes/app.calculator.tsx"),
+    route("rules", "routes/app.rules.tsx"),
     route("results", "routes/app.results.tsx"),
     route("history", "routes/app.history.tsx"),
     route("history/:id", "routes/app.history.$id.tsx"),

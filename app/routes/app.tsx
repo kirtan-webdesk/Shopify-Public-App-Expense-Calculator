@@ -29,12 +29,16 @@ export default function AppLayout() {
           (App Bridge app-nav, verified via Dev MCP search_docs_chunks): a link
           with rel="home" "is hidden from the navigation menu"; the app name in
           the sidebar already links to the app's home route, so it opens
-          /app/calculator, and only History remains as a child entry. Only one
-          link may carry rel="home". */}
+          /app/calculator, and exactly two children remain: "Expense rules"
+          (the rules editor, /app/rules) and "History". Results and the
+          history detail are deliberately NOT nav entries - each has one
+          natural parent and a breadcrumb back to it (design/v2/IA-v2.md).
+          Only one link may carry rel="home". */}
       <s-app-nav>
         <s-link href="/app/calculator" rel="home">
           Calculator
         </s-link>
+        <s-link href="/app/rules">Expense rules</s-link>
         <s-link href="/app/history">History</s-link>
       </s-app-nav>
       <Outlet />
