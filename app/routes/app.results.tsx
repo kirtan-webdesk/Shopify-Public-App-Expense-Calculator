@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Form, redirect, useActionData, useNavigation } from "react-router";
 import type { Route } from "./+types/app.results";
 import { authenticate } from "~/shopify.server";
-import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { requireShopContext } from "~/services/shop-context.service";
 import { saveCalculationFromTransport } from "~/services/calculation-history.service";
 import { decodeCalculationResult } from "~/domain/calculation-transport";
 import { formatMoney } from "~/domain/presentation";
@@ -50,12 +50,7 @@ interface SaveActionError {
 
 export async function action({ request }: Route.ActionArgs) {
   const { session } = await authenticate.admin(request);
-  const ctx = await findShopContextByDomain(session.shop);
-  if (!ctx) {
-    throw new Response("Shop record not found for this session — try reinstalling the app.", {
-      status: 404,
-    });
-  }
+  const ctx = await requireShopContext(session);
 
   const formData = await request.formData();
   const intent = String(formData.get("intent") ?? "");

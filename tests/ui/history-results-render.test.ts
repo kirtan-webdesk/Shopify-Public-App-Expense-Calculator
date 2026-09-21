@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from "vitest";
 // loader data. The repository / shopify.server modules are stubbed BEFORE the
 // route modules are imported so nothing here touches a database.
 vi.mock("~/shopify.server", () => ({ authenticate: { admin: vi.fn() } }));
-vi.mock("~/db/repositories/shop.repository", () => ({ findShopContextByDomain: vi.fn() }));
+vi.mock("~/db/repositories/shop.repository", () => ({ findShopContextByDomain: vi.fn(), ensureShopContext: vi.fn() }));
 vi.mock("~/db/repositories/calculation.repository", () => ({
   countCalculationsForShop: vi.fn(),
   findCalculationWithLineItems: vi.fn(),

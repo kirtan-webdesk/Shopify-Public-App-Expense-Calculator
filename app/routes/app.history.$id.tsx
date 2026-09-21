@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { isRouteErrorResponse } from "react-router";
 import type { Route } from "./+types/app.history.$id";
 import { authenticate } from "~/shopify.server";
-import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { requireShopContext } from "~/services/shop-context.service";
 import { getSavedCalculation } from "~/services/calculation-history.service";
 import { SavedCalculationPage } from "~/components/saved-calculation-page";
 
@@ -25,12 +25,7 @@ import { SavedCalculationPage } from "~/components/saved-calculation-page";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { session } = await authenticate.admin(request);
-  const ctx = await findShopContextByDomain(session.shop);
-  if (!ctx) {
-    throw new Response("Shop record not found for this session — try reinstalling the app.", {
-      status: 404,
-    });
-  }
+  const ctx = await requireShopContext(session);
 
   const saved = await getSavedCalculation(ctx, params.id);
   if (!saved) {

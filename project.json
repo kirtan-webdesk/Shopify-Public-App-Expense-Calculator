@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-18T15:58:26Z",
-    "version": 49,
+    "updated_at": "2026-09-21T06:31:39Z",
+    "version": 51,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -1420,6 +1420,79 @@
       },
       "project_version_before": 48,
       "project_version_after": 49
+    },
+    {
+      "timestamp": "2026-09-21T06:19:45Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "P1_shop_row_never_created_on_embedded_flow",
+      "details": {
+        "symptom": "Live Vercel app: calculator/results/history return 404 'Shop record not found for this session' -> generic ErrorBoundary. Real error obtained from human via Vercel runtime logs.",
+        "root_cause": "upsertInstalledShop() is called ONLY in app/routes/auth.$.tsx (/auth/* route). Managed install + token exchange loads the embedded app at /app/* directly and never visits /auth/*, and shopify.server.ts has no afterAuth hook. So no shop row is ever created for a real install. Latent since G3, invisible during M1 (static shells never read the row), exposed by M2/M4 routes that require a ShopContext (5 call sites throw 404).",
+        "why_missed": "install-fix evidence (g4-sprint-2.2) and M4 evidence called upsertInstalledShop/seeded shop rows directly; no evidence ever drove the real embedded entry path against a shop with NO pre-existing row. Orchestrator also failed to require that test.",
+        "authorization": "human asked 'can you fix this error and why app not working' - treated as fix authorization for this specific bug",
+        "status": "fix routed to shopify-developer, then QA, then push"
+      },
+      "project_version_before": 49,
+      "project_version_after": 50
+    },
+    {
+      "timestamp": "2026-09-21T06:31:39Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "vercel_outage_diagnosis_confirms_root_cause",
+      "details": {
+        "root_cause_confirmed_independently": "missing shop row -> app's own 404 -> root ErrorBoundary; upsertInstalledShop only reachable via /auth/* which managed install + token exchange never visits",
+        "before_probe_neon_state": "shop, expense_rule, calculation, webhook_event, job_heartbeat all empty; shopify_sessions held a fresh offline_wds55 session (expiring token) - so auth + session storage + SSL work on Vercel",
+        "refuted": [
+          "pooled URL/channel_binding/TLS/pool.max:1 (all 22 DB tests pass through pooled host in production mode)",
+          "PgBouncer incompatibility for page paths (FOR UPDATE SKIP LOCKED not exercised - cron/drain path only)",
+          "missing migrations (SequelizeMeta has both; all tables exist)",
+          "vercel.json/build problems"
+        ],
+        "env_vars": {
+          "crash_at_import_if_unset": [
+            "DATABASE_URL",
+            "SHOPIFY_API_KEY",
+            "SHOPIFY_API_SECRET",
+            "SHOPIFY_APP_URL"
+          ],
+          "needed_for_pages": [
+            "PGSSLMODE=no-verify (Production scope)"
+          ],
+          "needed_for_compliance_not_pages": [
+            "CRON_SECRET"
+          ],
+          "not_needed_at_runtime": [
+            "DIRECT_DATABASE_URL (migrations only)",
+            "WEBHOOK_DRAIN_INTERVAL_MS",
+            "SWEEPER_INTERVAL_MS",
+            "PORT"
+          ]
+        },
+        "unreproducible_from_sandbox": [
+          "Vercel serverless runtime (cold start, waitUntil)",
+          "real signed authenticate.admin JWT",
+          "assumption that Vercel uses this same Neon DB (supported by fresh wds55 session, not proven)"
+        ]
+      },
+      "project_version_before": 50,
+      "project_version_after": 50
+    },
+    {
+      "timestamp": "2026-09-21T06:31:39Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "INCIDENT_unintended_live_data_write_by_diagnosis_agent",
+      "details": {
+        "what": "Read-only diagnosis agent ran the loaders from the working tree, which by then contained the fix agent's UNCOMMITTED ensure-shop changes, against live Neon. Result: shop row for wds55.myshopify.com created at ~06:24:04 UTC and 10 default placeholder expense_rule rows seeded for it.",
+        "cause": "Orchestrator error: launched the fix agent and the diagnosis agent concurrently on the same working tree without isolation, so the 'no code changes' diagnosis was not actually running HEAD code.",
+        "impact": "Low. Rows are exactly what the app itself would create for the human's own dev store; no merchant data, no deletion. Side effect: the deployed HEAD will likely load for wds55 now. Any NEW install still hits the 404 until the fix ships.",
+        "disclosure": "agent disclosed immediately and did not clean up (correct, diagnosis-only); offered SQL to revert; orchestrator recommends leaving the rows in place",
+        "prevention": "Do not run agents concurrently on one working tree when one of them touches live data; use worktree isolation or sequence them."
+      },
+      "project_version_before": 51,
+      "project_version_after": 51
     }
   ],
   "lock": {

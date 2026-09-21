@@ -38,21 +38,75 @@ export async function findShopContextByDomain(
 }
 
 /**
- * Called on token-exchange install. Idempotent: a reinstall of a shop that
- * still has a row (uninstalled but not yet redacted) clears uninstalled_at
- * rather than creating a duplicate (ADR-0008 step 2).
+ * Resolve-or-create the tenant root for a shop that has just presented a
+ * VALID authenticated session (G4-sprint-3.2, P1 fix). This is the single
+ * implementation behind both `upsertInstalledShop` (auth/* route) and the
+ * request-path choke point `requireShopContext`
+ * (app/services/shop-context.service.ts).
+ *
+ * Why it exists: under Shopify managed installation + token exchange the
+ * embedded app loads straight at /app/... and /auth/* is never visited, so
+ * nothing else ever creates the shop row — and an EXISTING session (already
+ * in shopify_sessions) never re-runs any install hook. The row has to be
+ * ensured on the request path.
+ *
+ * Semantics:
+ *  - row exists, uninstalled_at NULL  -> one SELECT, no write (hot path).
+ *  - row exists, uninstalled_at set   -> a valid session can only exist after
+ *    a (re)install, so per ADR-0008 step 2 clear uninstalled_at (rules and
+ *    history are retained until redaction; nothing else is touched). The
+ *    UPDATE is conditional (`uninstalled_at IS NOT NULL`) so concurrent
+ *    requests are harmless.
+ *  - no row (first install, or hard-deleted by shop/redact / the sweeper)
+ *    -> INSERT ... ON CONFLICT DO NOTHING, then re-read. A concurrent first
+ *    request that loses the unique(shop_domain) race is a silent no-op, not
+ *    an error; both callers converge on the one row. A post-redact session
+ *    simply gets a fresh, empty row ("start clean", ADR-0008 step 2).
+ *
+ * pool.max:1 (ADR-0010): every statement is a standalone, strictly
+ * sequential autocommit query — no transaction is opened and no second
+ * connection is requested while one is held. It therefore MUST NOT be called
+ * from inside an open transaction (a standalone query there would wait on the
+ * connection the transaction holds); the request path never does.
+ *
+ * `shopDomain` MUST come from the authenticated session, never from request
+ * input (ADR-0003) — see requireShopContext, whose signature enforces that.
+ */
+export async function ensureShopContext(shopDomain: string): Promise<ShopContext> {
+  if (!shopDomain) {
+    throw new Error("ensureShopContext requires a non-empty shop domain from the authenticated session.");
+  }
+
+  // Bounded: a re-read can only miss if a shop/redact hard-delete lands in
+  // the microseconds between our INSERT and re-read; one more pass recreates
+  // the row. Never loops unboundedly.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const existing = await ShopModel.findOne({ where: { shopDomain } });
+    if (existing) {
+      if (existing.uninstalledAt !== null) {
+        await ShopModel.update(
+          { uninstalledAt: null },
+          { where: { id: existing.id, uninstalledAt: { [Op.ne]: null } } },
+        );
+      }
+      return createShopContext(existing.id, existing.shopDomain);
+    }
+    // ignoreDuplicates => ON CONFLICT DO NOTHING (Postgres). bulkCreate is a
+    // single autocommit statement; it applies the model's client-side
+    // defaults (id, installed_at) like create() does.
+    await ShopModel.bulkCreate([{ shopDomain, uninstalledAt: null }], { ignoreDuplicates: true });
+  }
+  throw new Error("ensureShopContext could not resolve a shop row after repeated attempts.");
+}
+
+/**
+ * Called on the auth/* route. Kept for that route; delegates to
+ * ensureShopContext so there is exactly one create/reactivate implementation
+ * (idempotent and race-safe; ADR-0008 step 2 — a reinstall of a shop that
+ * still has a row clears uninstalled_at rather than creating a duplicate).
  */
 export async function upsertInstalledShop(shopDomain: string): Promise<ShopContext> {
-  const existing = await ShopModel.findOne({ where: { shopDomain } });
-  if (existing) {
-    if (existing.uninstalledAt !== null) {
-      existing.uninstalledAt = null;
-      await existing.save();
-    }
-    return createShopContext(existing.id, existing.shopDomain);
-  }
-  const created = await ShopModel.create({ shopDomain });
-  return createShopContext(created.id, created.shopDomain);
+  return ensureShopContext(shopDomain);
 }
 
 /**

@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Form, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import type { Route } from "./+types/app.calculator";
 import { authenticate } from "~/shopify.server";
-import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { requireShopContext } from "~/services/shop-context.service";
 import { getOrSeedExpenseRules, saveExpenseRules, type ExpenseRuleView } from "~/services/expense-rule.service";
 import { runCalculation } from "~/services/expense-calculation.service";
 import { getDuplicatePrefill } from "~/services/calculation-history.service";
@@ -38,12 +38,7 @@ import type { RuleType } from "~/domain/rule-types";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { session } = await authenticate.admin(request);
-  const ctx = await findShopContextByDomain(session.shop);
-  if (!ctx) {
-    throw new Response("Shop record not found for this session — try reinstalling the app.", {
-      status: 404,
-    });
-  }
+  const ctx = await requireShopContext(session);
   const liveRules = await getOrSeedExpenseRules(ctx);
 
   // "Duplicate as new calculation" (G2 default-accepted): /app/calculator?from=<id>
@@ -77,12 +72,7 @@ interface ActionResult {
 
 export async function action({ request }: Route.ActionArgs) {
   const { session } = await authenticate.admin(request);
-  const ctx = await findShopContextByDomain(session.shop);
-  if (!ctx) {
-    throw new Response("Shop record not found for this session — try reinstalling the app.", {
-      status: 404,
-    });
-  }
+  const ctx = await requireShopContext(session);
 
   const formData = await request.formData();
   const intent = String(formData.get("intent") ?? "");

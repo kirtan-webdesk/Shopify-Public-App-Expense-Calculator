@@ -1,6 +1,6 @@
 import type { Route } from "./+types/app.history";
 import { authenticate } from "~/shopify.server";
-import { findShopContextByDomain } from "~/db/repositories/shop.repository";
+import { requireShopContext } from "~/services/shop-context.service";
 import { getHistoryPage, parsePageParam } from "~/services/calculation-history.service";
 import { formatMoney, formatSavedAt } from "~/domain/presentation";
 
@@ -20,12 +20,7 @@ import { formatMoney, formatSavedAt } from "~/domain/presentation";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { session } = await authenticate.admin(request);
-  const ctx = await findShopContextByDomain(session.shop);
-  if (!ctx) {
-    throw new Response("Shop record not found for this session — try reinstalling the app.", {
-      status: 404,
-    });
-  }
+  const ctx = await requireShopContext(session);
   const requestedPage = parsePageParam(new URL(request.url).searchParams.get("page"));
   return { history: await getHistoryPage(ctx, requestedPage) };
 }
