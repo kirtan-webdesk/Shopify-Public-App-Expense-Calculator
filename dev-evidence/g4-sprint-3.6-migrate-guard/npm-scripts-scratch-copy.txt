@@ -1,0 +1,39 @@
+## Scratch copy of HEAD+guard files (repo node_modules is broken, see 00-SUMMARY), fake .invalid URLs, real npm scripts
+
+$ npm run db:migrate
+> db:migrate
+> sequelize-cli db:migrate
+[db-guard] REFUSING TO RUN `db:migrate`: no `--env <name>` on the command line. sequelize-cli would silently default to `development`, whose URL can fall back to DATABASE_URL (the hosted production da
+exit=1
+
+$ npm run db:migrate:undo
+> db:migrate:undo
+> sequelize-cli db:migrate:undo
+[db-guard] REFUSING TO RUN `db:migrate:undo`: no `--env <name>` on the command line. sequelize-cli would silently default to `development`, whose URL can fall back to DATABASE_URL (the hosted producti
+exit=1
+
+$ npm run db:migrate -- --env
+> db:migrate
+> sequelize-cli db:migrate --env
+[db-guard] REFUSING TO RUN `db:migrate`: `--env` was given without a value.
+exit=1
+
+$ npm run db:migrate -- --env development
+> db:migrate
+> sequelize-cli db:migrate --env development
+[db-guard] REFUSING TO RUN `db:migrate`: env=development resolves to a HOSTED database (host ep***.***.neon.invalid, db neondb) — not localhost / 127.0.0.1 / ::1. This is exactly how a bare command 
+exit=1
+
+$ DB_GUARD_CHECK_ONLY=1 npm run db:migrate -- --env test
+Migrating env=test host=localhost db=wsa_probe_test
+[db-guard] DB_GUARD_CHECK_ONLY=1: all checks passed; exiting without connecting.
+exit=0
+
+$ DB_GUARD_CHECK_ONLY=1 npm run db:migrate:undo -- --env test
+Migrating env=test host=localhost db=wsa_probe_test
+[db-guard] DB_GUARD_CHECK_ONLY=1: all checks passed; exiting without connecting.
+exit=0
+
+$ DB_GUARD_CHECK_ONLY=1 ALLOW_HOSTED_DB=1 npm run db:migrate -- --env development
+Migrating env=development host=ep***.***.neon.invalid db=neondb
+[db-guard] DB_GUARD_CHECK_ONLY=1: all checks passed; exiting without connecting.

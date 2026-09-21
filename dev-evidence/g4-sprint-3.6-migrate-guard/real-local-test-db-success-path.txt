@@ -1,0 +1,12 @@
+$ TEST_DATABASE_URL=<local, masked> sequelize-cli db:migrate:status --env test   (real .env loaded, read-only command)
+◇ injected env (13) from .env
+Migrating env=test host=localhost db=expense_calculator_test
+
+[4mSequelize CLI [Node: 22.23.1, CLI: 6.6.5, ORM: 6.37.8][24m
+
+Loaded configuration file "db\config\config.cjs".
+Using environment "test".
+
+[31mERROR:[39m password authentication failed for user "postgres"
+
+exit=1

@@ -1,0 +1,64 @@
+
+> test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Admin/AppData/Local/Temp/claude/D--Projects-Shopify-Public-App---Expense-Calculator/93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f/scratchpad/repo[39m
+
+ [32m✓[39m tests/domain/expense-engine.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 210[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/db/expense-rule-seed-race.db.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/db/shop-ensure.db.test.ts [2m([22m[2m15 tests[22m[2m | [22m[33m15 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/db/calculation-history.db.test.ts [2m([22m[2m22 tests[22m[2m | [22m[33m22 skipped[39m[2m)[22m
+ [32m✓[39m tests/domain/calculation-verification.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m tests/services/calculation-history.service.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m tests/services/expense-rule-seed.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 177[2mms[22m[39m
+ [32m✓[39m tests/architecture/test-db-isolation.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 3180[2mms[22m[39m
+   [33m[2m✓[22m[39m db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy[2m > [22mrequiring the module never throws, whatever is unset (nothing is evaluated eagerly) [33m 424[2mms[22m[39m
+   [33m[2m✓[22m[39m db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy[2m > [22m--env development needs only DATABASE_URL; --env production needs only DIRECT_DATABASE_URL (the known eager-evaluation P3 bug) [33m 1280[2mms[22m[39m
+   [33m[2m✓[22m[39m db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy[2m > [22mTLS for the test env comes from the test URL alone (not an ambient PGSSLMODE) [33m 597[2mms[22m[39m
+ [32m✓[39m tests/ui/history-results-render.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 138[2mms[22m[39m
+ [32m✓[39m tests/architecture/no-in-process-scheduler.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 88[2mms[22m[39m
+ [32m✓[39m tests/architecture/route-auth-matrix.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m tests/architecture/shop-context-choke-point.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m tests/architecture/history-append-only.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m tests/domain/history-presentation.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 310[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-rule-validation.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m tests/domain/donut-chart.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/architecture/test-db-guard.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 169[2mms[22m[39m
+ [32m✓[39m tests/domain/calculation-transport.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m tests/domain/money.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m tests/services/cron-auth.service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32m✓[39m tests/services/expense-rule-seed-repository.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-formulas.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m tests/architecture/no-rest-admin-api.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 70[2mms[22m[39m
+ [32m✓[39m tests/architecture/repository-boundary.test.ts [2m([22m[2m65 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-categories.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/architecture/webhook-route-placement.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/architecture/migrate-guard.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 21181[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:migrate` is refused, with the exact correct usage [33m 669[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:migrate:undo` is refused, with the exact correct usage [33m 444[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:migrate:undo:all` is refused, with the exact correct usage [33m 467[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:migrate:status` is refused, with the exact correct usage [33m 481[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:seed:all` is refused, with the exact correct usage [33m 542[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:seed:undo:all` is refused, with the exact correct usage [33m 433[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:create` is refused, with the exact correct usage [33m 423[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mbare `sequelize-cli db:drop` is refused, with the exact correct usage [33m 471[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22mNODE_ENV / ambient variables are NOT accepted as the environment [33m 1308[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22m`--env` with a missing value is refused (end of line, or followed by another flag) [33m 1716[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22man `--env` that only appears after a bare `--` does not count (sequelize-cli would ignore it and use development) [33m 467[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22munknown, duplicate and negated --env are refused [33m 1467[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22m--url / --config (which would bypass the checks) are refused [33m 699[2mms[22m[39m
+   [33m[2m✓[22m[39m db:* commands refuse without an explicit --env (before any connection)[2m > [22m--options-path replaces .sequelizerc entirely, so it is caught by the guard inside config.cjs (defence in depth) [33m 5489[2mms[22m[39m
+   [33m[2m✓[22m[39m hosted-target safety for --env development / --env test[2m > [22mthe same for db:migrate:undo, and via a DATABASE_URL-only fallback (no DIRECT_DATABASE_URL) [33m 538[2mms[22m[39m
+   [33m[2m✓[22m[39m hosted-target safety for --env development / --env test[2m > [22mthe acknowledgement must come from the shell: ALLOW_HOSTED_DB in a .env file is ignored [33m 604[2mms[22m[39m
+   [33m[2m✓[22m[39m hosted-target safety for --env development / --env test[2m > [22m--env production is the intended hosted target: only the explicit --env is needed (no acknowledgement) [33m 554[2mms[22m[39m
+   [33m[2m✓[22m[39m success-path parsing: the guard passes up to (not including) connecting[2m > [22m--env test with a local test URL prints the confirmation line and stops (check-only) [33m 312[2mms[22m[39m
+   [33m[2m✓[22m[39m success-path parsing: the guard passes up to (not including) connecting[2m > [22maccepts `--env=test`, flag-before-command order, and every db:* command [33m 1053[2mms[22m[39m
+   [33m[2m✓[22m[39m success-path parsing: the guard passes up to (not including) connecting[2m > [22mthe existing --env test isolation guard still runs (unset / equal-to-production URL are refused) [33m 517[2mms[22m[39m
+   [33m[2m✓[22m[39m success-path parsing: the guard passes up to (not including) connecting[2m > [22mnon-DB commands (e.g. migration:generate --help) are not guarded [33m 1385[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m24 passed[39m[22m[2m | [22m[33m3 skipped[39m[90m (27)[39m
+[2m      Tests [22m [1m[32m321 passed[39m[22m[2m | [22m[33m40 skipped[39m[90m (361)[39m
+[2m   Start at [22m 13:07:45
+[2m   Duration [22m 23.62s[2m (transform 3.58s, setup 0ms, collect 17.85s, tests 26.27s, environment 35ms, prepare 18.96s)[22m
+

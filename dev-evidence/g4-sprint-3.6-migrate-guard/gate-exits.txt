@@ -1,0 +1,6 @@
+lint exit=1
+typecheck exit=0
+test exit=0
+build exit=0
+my-files lint exit=0
+lint excl 3.3 tools exit=0
