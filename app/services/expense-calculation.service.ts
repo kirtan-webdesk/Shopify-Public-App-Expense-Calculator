@@ -11,13 +11,19 @@ import {
   hasAnyFieldError,
   validateCurrencyCode,
   validateExpenseRuleRow,
-  validateRevenueMinor,
+  validateRevenueText,
   type ExpenseRuleFieldErrors,
   type ExpenseRuleFormInput,
 } from "~/domain/expense-rule-validation";
 
 export interface RunCalculationInput {
-  readonly revenueMinor: number | null;
+  /**
+   * The revenue field's RAW text, exactly as submitted. Parsing it here (via
+   * validateRevenueText) rather than accepting a pre-parsed number is what lets
+   * a typed "-5" or "1e5" be reported with its real reason instead of collapsing
+   * into a null that can only say "Enter a revenue amount".
+   */
+  readonly revenueText: string;
   readonly currencyCode: string;
   readonly rows: readonly ExpenseRuleFormInput[];
 }
@@ -40,7 +46,7 @@ export type RunCalculationResult =
  * category because of a typo it never told them about.
  */
 export function runCalculation(input: RunCalculationInput): RunCalculationResult {
-  const revenueCheck = validateRevenueMinor(input.revenueMinor);
+  const revenueCheck = validateRevenueText(input.revenueText);
   const currencyCheck = validateCurrencyCode(input.currencyCode);
 
   const fieldErrors: Record<string, ExpenseRuleFieldErrors> = {};
@@ -61,7 +67,7 @@ export function runCalculation(input: RunCalculationInput): RunCalculationResult
   }
 
   const engineInput: EngineInput = {
-    revenueMinor: input.revenueMinor as number,
+    revenueMinor: revenueCheck.revenueMinor,
     currencyCode: input.currencyCode,
     rules: input.rows.map((row) => ({
       categoryKey: row.categoryKey as EngineInput["rules"][number]["categoryKey"],

@@ -118,6 +118,14 @@ export interface SaveExpenseRulesResult {
  * validation already showed (S2.2: "no write path bypasses server
  * validation") — the action calling this must never skip straight to
  * replaceExpenseRulesForShop on the strength of a client-side check alone.
+ *
+ * Every row is validated AS IF ENABLED, including rows the merchant has
+ * switched off. A disabled row is still WRITTEN, and the database requires the
+ * value column for its rule type to be set (chk_expense_rule_value_shape), so
+ * a disabled row that lost its value (cleared field + unticked category) must
+ * be rejected here as a field error — not left to reach the database as a NULL
+ * and surface as an unhandled check_violation. Nothing is written unless every
+ * row is valid.
  */
 export async function saveExpenseRules(
   ctx: ShopContext,
@@ -125,7 +133,7 @@ export async function saveExpenseRules(
 ): Promise<SaveExpenseRulesResult> {
   const fieldErrors: Record<string, ExpenseRuleFieldErrors> = {};
   for (const row of rows) {
-    const errors = validateExpenseRuleRow(row);
+    const errors = validateExpenseRuleRow({ ...row, enabled: true });
     if (hasAnyFieldError(errors)) {
       fieldErrors[row.categoryKey] = errors;
     }

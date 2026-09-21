@@ -53,6 +53,7 @@ export default function HistoryPage({ loaderData }: Route.ComponentProps) {
           </s-banner>
         ) : (
           <div>
+            <div className="table-scroll">
             <table className="data-table">
               <caption className="visually-hidden">Saved calculations, newest first</caption>
               <thead>
@@ -88,6 +89,7 @@ export default function HistoryPage({ loaderData }: Route.ComponentProps) {
                 ))}
               </tbody>
             </table>
+            </div>
 
             <div className="pagination">
               <span className="help-text">

@@ -24,8 +24,17 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function AppLayout() {
   return (
     <>
+      {/* The calculator is the app's landing page, so it is designated the app
+          HOME (rel="home") rather than listed as a child item. Per shopify.dev
+          (App Bridge app-nav, verified via Dev MCP search_docs_chunks): a link
+          with rel="home" "is hidden from the navigation menu"; the app name in
+          the sidebar already links to the app's home route, so it opens
+          /app/calculator, and only History remains as a child entry. Only one
+          link may carry rel="home". */}
       <s-app-nav>
-        <s-link href="/app/calculator">Calculator</s-link>
+        <s-link href="/app/calculator" rel="home">
+          Calculator
+        </s-link>
         <s-link href="/app/history">History</s-link>
       </s-app-nav>
       <Outlet />

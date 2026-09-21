@@ -89,13 +89,21 @@ describe("recomputeAndVerifyClaimedResult", () => {
   });
 
   it("rejects an unsupported currency code as invalid input", () => {
-    const tampered = tamperTransport(encodeDefaultResult(), (p) => {
-      p.c = "XXX";
-    });
-    const verified = recomputeAndVerifyClaimedResult(claimedFrom(tampered));
+    // The transport decoder itself now refuses an unsupported currency (so a crafted
+    // ?d= cannot crash the Results page); the verifier keeps its own guard for any
+    // caller that builds a claim directly, so the claim is constructed here.
+    const claimed = { ...claimedFrom(encodeDefaultResult()), currencyCode: "XXX" };
+    const verified = recomputeAndVerifyClaimedResult(claimed);
     expect(verified.ok).toBe(false);
     if (verified.ok) return;
     expect(verified.reason).toBe("invalid_input");
+  });
+
+  it("a transported payload with an unsupported currency never even decodes", () => {
+    const tampered = tamperTransport(encodeDefaultResult(), (p) => {
+      p.c = "XXX";
+    });
+    expect(decodeCalculationResult(tampered)).toBeNull();
   });
 
   it("rejects revenue above the calculator's sanity ceiling as invalid input", () => {

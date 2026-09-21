@@ -33,7 +33,12 @@ import { roundHalfAwayFromZero, toMinorUnitsFromBigInt, type MinorUnits } from "
 export interface ExpenseFormulaDefinition {
   readonly key: string;
   readonly label: string;
-  /** Shown next to the formula in the UI — makes the placeholder nature of the pattern explicit. */
+  /**
+   * Shown next to the formula in the UI — makes the placeholder nature of the
+   * pattern explicit. Currency-NEUTRAL on purpose (no "$"): the band/fee
+   * figures apply to whichever currency the merchant selected, so a hardcoded
+   * symbol would be wrong for EUR/GBP/CAD.
+   */
   readonly placeholderNote: string;
 }
 
@@ -43,17 +48,17 @@ export const EXPENSE_FORMULAS = [
     label: "Tiered by revenue band",
     placeholderNote:
       "PLACEHOLDER pattern: applies a single rate chosen by which illustrative revenue " +
-      "band the entered revenue falls into (5% up to $10,000; 3.5% up to $50,000; 2% up " +
-      "to $250,000; 1% above that). Bands and rates are illustrative defaults, not real " +
-      "business figures.",
+      "band the entered revenue falls into (5% up to 10,000; 3.5% up to 50,000; 2% up " +
+      "to 250,000; 1% above that, in the currency you selected). Bands and rates are " +
+      "illustrative defaults, not real business figures.",
   },
   {
     key: "base_fee_plus_marginal_percent",
     label: "Base fee + marginal percentage above a threshold",
     placeholderNote:
-      "PLACEHOLDER pattern: a flat base fee ($25.00) plus 1% of revenue above an " +
-      "illustrative $20,000 threshold. Base fee, threshold, and rate are illustrative " +
-      "defaults, not real business figures.",
+      "PLACEHOLDER pattern: a flat base fee (25.00) plus 1% of revenue above an " +
+      "illustrative 20,000 threshold, in the currency you selected. Base fee, " +
+      "threshold, and rate are illustrative defaults, not real business figures.",
   },
 ] as const satisfies readonly ExpenseFormulaDefinition[];
 

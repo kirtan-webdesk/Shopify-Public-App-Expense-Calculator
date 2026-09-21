@@ -112,6 +112,7 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
           variant="primary"
           commandFor={SAVE_MODAL_ID}
           command="--hide"
+          loading={isSaving}
           disabled={isSaving}
           onClick={() => formRef.current?.requestSubmit()}
         >
@@ -163,6 +164,7 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
               variant="primary"
               commandFor={SAVE_MODAL_ID}
               command="--show"
+              loading={isSaving}
               disabled={isSaving}
             >
               Save this calculation
@@ -174,7 +176,7 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
       <s-section heading="Expense breakdown">
         <ExpenseBreakdown
           result={result}
-          caption="Per-category expense breakdown against the revenue figure above."
+          caption={`Per-category expense breakdown against the revenue figure above. All amounts are in ${result.currencyCode}.`}
           ruleColumnHeading="Rule applied"
         />
       </s-section>

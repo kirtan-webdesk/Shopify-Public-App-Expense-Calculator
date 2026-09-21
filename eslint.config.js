@@ -13,6 +13,10 @@ export default tseslint.config(
       "projects/**",
       "design/**",
       ".claude/**",
+      // Delivery evidence (screenshots, MCP records, gate logs) and the scratch
+      // scripts that produced it (dev-evidence/**/tools/*.mjs use Node/browser
+      // globals such as process/console/document) are not app source.
+      "dev-evidence/**",
     ],
   },
   js.configs.recommended,

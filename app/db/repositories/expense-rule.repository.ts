@@ -2,7 +2,6 @@ import type { Transaction } from "sequelize";
 import { ExpenseRuleModel } from "~/db/models/expense-rule.model";
 import type { ShopContext } from "~/db/repositories/shop-context";
 import type { RuleType } from "~/domain/rule-types";
-import { sequelize } from "~/db/sequelize";
 
 // expense-rule.repository — stands up the ADR-0003 pattern for a table that
 // M2 (Configuration milestone) owns the UI/validation for. Every function
@@ -29,51 +28,6 @@ export interface UpsertExpenseRuleInput {
   readonly fixedAmountMinor: number | null;
   readonly formulaKey: string | null;
   readonly enabled: boolean;
-}
-
-/**
- * Creates or updates the ONE rule row for (shop, category) — matches the
- * `uq_expense_rule_shop_category` unique constraint (data-model.md §4.2:
- * "one configured rule per category per shop", not a history of versions).
- * Does not use Sequelize's `upsert()` (which performs an ON CONFLICT on the
- * PRIMARY KEY, not this table's actual uniqueness constraint) — instead an
- * explicit find-then-create-or-update inside the caller's transaction, so
- * concurrent saves for the same shop serialize through the row lock rather
- * than racing on a conflict target that isn't the row's identity column.
- */
-export async function upsertExpenseRule(
-  ctx: ShopContext,
-  input: UpsertExpenseRuleInput,
-  transaction: Transaction,
-): Promise<ExpenseRuleModel> {
-  const existing = await ExpenseRuleModel.findOne({
-    where: { shopId: ctx.shopId, categoryKey: input.categoryKey },
-    transaction,
-    lock: transaction.LOCK.UPDATE,
-  });
-
-  if (existing) {
-    existing.ruleType = input.ruleType;
-    existing.rateBasisPoints = input.rateBasisPoints;
-    existing.fixedAmountMinor = input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor);
-    existing.formulaKey = input.formulaKey;
-    existing.enabled = input.enabled;
-    await existing.save({ transaction });
-    return existing;
-  }
-
-  return ExpenseRuleModel.create(
-    {
-      shopId: ctx.shopId,
-      categoryKey: input.categoryKey,
-      ruleType: input.ruleType,
-      rateBasisPoints: input.rateBasisPoints,
-      fixedAmountMinor: input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor),
-      formulaKey: input.formulaKey,
-      enabled: input.enabled,
-    },
-    { transaction },
-  );
 }
 
 /**
@@ -118,18 +72,52 @@ export async function seedExpenseRulesIfMissing(
 }
 
 /**
- * Replaces every category's rule for this shop in one transaction — the
- * calculator's "Save" action persists all 10 rows together rather than one
- * request per row, so a partial save (e.g. rows 1-6 written, row 7 fails
- * validation) can never leave the shop's configuration half-updated.
+ * Saves every category's rule for this shop as ONE conflict-safe statement —
+ * the calculator's "Save" action persists all rows together, so a partial save
+ * (e.g. rows 1-6 written, row 7 not) can never leave the shop's configuration
+ * half-updated.
+ *
+ * It is a single multi-row `INSERT ... ON CONFLICT (shop_id, category_key) DO
+ * UPDATE` against the real `uq_expense_rule_shop_category` constraint, not a
+ * find-then-create/update loop. Why: the first Save for a shop on TWO
+ * instances/tabs at once (both see "no row yet", both create) hit that unique
+ * constraint in the loser, whose request then failed with an unhandled error.
+ * With ON CONFLICT DO UPDATE the loser simply updates the row the winner just
+ * inserted (last write wins per row, which is the intended "one configured
+ * rule per category" semantics), and no unique violation can escape.
+ *
+ * Connections: one statement is atomic on its own, so no transaction is opened
+ * here — nothing that could take a second connection under `pool.max: 1`
+ * (app/db/sequelize.ts). If a caller ever needs this inside a larger unit of
+ * work it can pass its own `transaction`. Rows are written in a fixed
+ * (category_key) order so two concurrent saves lock rows in the same order
+ * and cannot deadlock each other.
+ *
+ * Every value column is written on every row (the inactive rule types as
+ * NULL), so an existing row that switches rule type still satisfies
+ * `chk_expense_rule_value_shape`. `created_at` is only set on insert.
  */
 export async function replaceExpenseRulesForShop(
   ctx: ShopContext,
   inputs: readonly UpsertExpenseRuleInput[],
+  transaction?: Transaction,
 ): Promise<void> {
-  await sequelize.transaction(async (transaction) => {
-    for (const input of inputs) {
-      await upsertExpenseRule(ctx, input, transaction);
-    }
-  });
+  if (inputs.length === 0) return;
+  const ordered = [...inputs].sort((a, b) => (a.categoryKey < b.categoryKey ? -1 : a.categoryKey > b.categoryKey ? 1 : 0));
+  await ExpenseRuleModel.bulkCreate(
+    ordered.map((input) => ({
+      shopId: ctx.shopId,
+      categoryKey: input.categoryKey,
+      ruleType: input.ruleType,
+      rateBasisPoints: input.rateBasisPoints,
+      fixedAmountMinor: input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor),
+      formulaKey: input.formulaKey,
+      enabled: input.enabled,
+    })),
+    {
+      conflictAttributes: ["shopId", "categoryKey"],
+      updateOnDuplicate: ["ruleType", "rateBasisPoints", "fixedAmountMinor", "formulaKey", "enabled", "updatedAt"],
+      ...(transaction ? { transaction } : {}),
+    },
+  );
 }

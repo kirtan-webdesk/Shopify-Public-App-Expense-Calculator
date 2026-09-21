@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Form, redirect, useActionData, useLoaderData, useNavigation, useSearchParams } from "react-router";
 import type { Route } from "./+types/app.calculator";
 import { authenticate } from "~/shopify.server";
 import { requireShopContext } from "~/services/shop-context.service";
@@ -21,7 +21,9 @@ import {
   hasAnyFieldError,
   isSupportedCurrencyCode,
   parseDecimalString,
+  validateCurrencyCode,
   validateExpenseRuleRow,
+  validateRevenueText,
   type ExpenseRuleFieldErrors,
   type ExpenseRuleFormInput,
 } from "~/domain/expense-rule-validation";
@@ -84,7 +86,6 @@ export async function action({ request }: Route.ActionArgs) {
   const intent = String(formData.get("intent") ?? "");
   const revenueRaw = String(formData.get("revenue") ?? "");
   const currencyCode = String(formData.get("currency") ?? "");
-  const revenueMinor = parseDecimalString(revenueRaw, 2);
   const rows = parseRuleRowsFromFormData(formData);
 
   if (intent === "save") {
@@ -94,7 +95,9 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   if (intent === "calculate") {
-    const calcResult = runCalculation({ revenueMinor, currencyCode, rows });
+    // The RAW revenue text goes in: the validator, not a pre-parse to a number,
+    // decides whether "-5" / "1e5" / "" is reported and with which message.
+    const calcResult = runCalculation({ revenueText: revenueRaw, currencyCode, rows });
     if (!calcResult.ok) {
       const actionResult: ActionResult = {
         intent: "calculate",
@@ -177,32 +180,86 @@ function ruleSummary(row: RuleRowState, currencyCode: string): string {
   return formula ? formula.label : "Formula";
 }
 
+interface ToastHost {
+  readonly shopify?: { readonly toast?: { readonly show: (message: string) => void } };
+}
+
+// Keys for the "which fields has the merchant touched since the last server
+// response" bookkeeping below.
+const REVENUE_KEY = "revenue";
+const CURRENCY_KEY = "currency";
+const rowKey = (categoryKey: string) => `row:${categoryKey}`;
+
+/**
+ * Which fields were edited (or discarded) since the server last responded, so
+ * that a server-side error never outlives the edit that fixes it. It is tied to
+ * the specific action response it applies to (`response`): when a new response
+ * arrives the record no longer matches and everything counts as untouched again
+ * — no effect needed to reset it.
+ */
+interface ServerErrorDismissals {
+  readonly response: unknown;
+  readonly all: boolean;
+  readonly keys: ReadonlySet<string>;
+}
+
+const NO_KEYS: ReadonlySet<string> = new Set();
+
 export default function CalculatorPage() {
+  // `key` re-initialises the form state whenever ?from= changes while this route
+  // stays mounted (Duplicate -> a different Duplicate, or back to the live rules):
+  // the useState initialisers below only run on mount, and would otherwise keep
+  // showing the previous calculation's revenue, currency and rules.
+  const [searchParams] = useSearchParams();
+  return <CalculatorForm key={searchParams.get("from") ?? ""} />;
+}
+
+function CalculatorForm() {
   const { rules, prefill } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as ActionResult | undefined;
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+
+  // The submission in flight (or just completed and redirecting), by intent.
+  const pendingIntent = navigation.state !== "idle" && navigation.formData ? String(navigation.formData.get("intent") ?? "") : null;
+  const isBusy = pendingIntent !== null;
+  const isCalculating = pendingIntent === "calculate";
 
   const initialRevenueText = prefill ? minorUnitsToInputString(prefill.revenueMinor) : "0.00";
+  const initialCurrency: string =
+    prefill && isSupportedCurrencyCode(prefill.currencyCode) ? prefill.currencyCode : SUPPORTED_CURRENCY_CODES[0];
   const [revenueText, setRevenueText] = useState(initialRevenueText);
-  const [currency, setCurrency] = useState<string>(
-    prefill && isSupportedCurrencyCode(prefill.currencyCode)
-      ? prefill.currencyCode
-      : SUPPORTED_CURRENCY_CODES[0],
-  );
+  const [currency, setCurrency] = useState<string>(initialCurrency);
   const [rows, setRows] = useState<Record<string, RuleRowState>>(() => {
     const initial: Record<string, RuleRowState> = {};
     for (const view of rules) initial[view.categoryKey] = toRowState(view);
     return initial;
   });
+  const [dismissals, setDismissals] = useState<ServerErrorDismissals>({ response: actionData, all: false, keys: NO_KEYS });
   const formRef = useRef<HTMLFormElement>(null);
   const intentInputRef = useRef<HTMLInputElement>(null);
+  const toastedFor = useRef<unknown>(null);
+
+  // Dismissals recorded against an older response no longer apply to this one.
+  const activeDismissals = dismissals.response === actionData ? dismissals : { response: actionData, all: false, keys: NO_KEYS };
+  const isDismissed = (key: string) => activeDismissals.all || activeDismissals.keys.has(key);
+
+  function dismissServerError(key: string) {
+    setDismissals((prev) => {
+      const base = prev.response === actionData ? prev : { response: actionData, all: false, keys: NO_KEYS };
+      if (base.all || base.keys.has(key)) return base;
+      return { ...base, keys: new Set(base.keys).add(key) };
+    });
+  }
 
   function resetToLoadedRules() {
     const reset: Record<string, RuleRowState> = {};
     for (const view of rules) reset[view.categoryKey] = toRowState(view);
     setRows(reset);
     setRevenueText(initialRevenueText);
+    setCurrency(initialCurrency);
+    // Discard reverts everything the merchant sees, including any error the
+    // server last reported about the values that were just thrown away.
+    setDismissals({ response: actionData, all: true, keys: NO_KEYS });
   }
 
   function handleCalculateClick() {
@@ -215,29 +272,68 @@ export default function CalculatorPage() {
     if (intentInputRef.current) intentInputRef.current.value = "save";
   }
 
-  // Server-side field errors from the last "save" or "calculate" submission
-  // (S2.2: server re-validates regardless of client state — this is that
-  // server response rendered back into the form, not a client-only check).
-  const serverFieldErrors = actionData && !actionData.ok ? actionData.fieldErrors : {};
-  const serverRevenueError = actionData && !actionData.ok ? actionData.revenueError : undefined;
+  // "Rule changes saved" confirmation: once per successful Save response. The
+  // ref (not just the effect dependency) is what stops a re-run of the effect
+  // for the SAME response — React strict-mode double effects, a re-render that
+  // keeps the response — from showing the toast twice. The response itself is
+  // dropped by React Router on the next navigation, so leaving and coming back
+  // to the calculator does not replay it either.
+  useEffect(() => {
+    if (!actionData || actionData.intent !== "save" || !actionData.ok) return;
+    if (toastedFor.current === actionData) return;
+    toastedFor.current = actionData;
+    (window as unknown as ToastHost).shopify?.toast?.show("Rule changes saved");
+  }, [actionData]);
 
-  // Live client-side validation, recomputed on every render from current
-  // state — the SAME pure validators the server calls (S2.2's "client and
-  // server side" is one implementation exercised twice, not two).
-  const clientFieldErrors = useMemo(() => {
-    const out: Record<string, ExpenseRuleFieldErrors> = {};
+  // Live client-side validation, recomputed from current state — the SAME pure
+  // validators the server calls (S2.2's "client and server side" is one
+  // implementation exercised twice, not two).
+  const revenueCheck = useMemo(() => validateRevenueText(revenueText), [revenueText]);
+  const currencyCheck = validateCurrencyCode(currency);
+
+  // Two views of a row's validity. `saveErrors` treats every row as enabled —
+  // what Save will demand, since a disabled row is still written and must carry
+  // a value. `calculateErrors` is what Calculate demands (a disabled row does
+  // not take part in a calculation, so it need not be valid to calculate).
+  const { saveErrors, calculateErrors } = useMemo(() => {
+    const save: Record<string, ExpenseRuleFieldErrors> = {};
+    const calc: Record<string, ExpenseRuleFieldErrors> = {};
     for (const key of Object.keys(rows)) {
       const row = rows[key];
       if (!row) continue;
-      const errors = validateExpenseRuleRow(toFormInput(row));
-      if (hasAnyFieldError(errors)) out[key] = errors;
+      const input = toFormInput(row);
+      const strict = validateExpenseRuleRow({ ...input, enabled: true });
+      if (hasAnyFieldError(strict)) save[key] = strict;
+      const lenient = validateExpenseRuleRow(input);
+      if (hasAnyFieldError(lenient)) calc[key] = lenient;
     }
-    return out;
+    return { saveErrors: save, calculateErrors: calc };
   }, [rows]);
 
-  const hasClientErrors = Object.keys(clientFieldErrors).length > 0;
+  // Server-reported errors (S2.2: the server re-validates regardless of client
+  // state — this renders that response back into the form), shown only for a
+  // field that has not been edited or discarded since the response arrived.
+  const serverFieldErrors = actionData && !actionData.ok ? actionData.fieldErrors : {};
+  const serverRevenueError =
+    actionData && !actionData.ok && !isDismissed(REVENUE_KEY) ? actionData.revenueError : undefined;
+  const serverCurrencyError =
+    actionData && !actionData.ok && !isDismissed(CURRENCY_KEY) ? actionData.currencyError : undefined;
+
+  const revenueError = revenueCheck.valid ? serverRevenueError : revenueCheck.error;
+  const currencyError = currencyCheck.valid ? serverCurrencyError : currencyCheck.error;
+  const errorsFor = (categoryKey: string): ExpenseRuleFieldErrors => {
+    const client = saveErrors[categoryKey];
+    if (client) return client;
+    return isDismissed(rowKey(categoryKey)) ? {} : (serverFieldErrors[categoryKey] ?? {});
+  };
+
+  const hasBlockingErrors = !revenueCheck.valid || !currencyCheck.valid || Object.keys(calculateErrors).length > 0;
+  const rowsNeedingAttention = EXPENSE_CATEGORIES.filter((c) => hasAnyFieldError(errorsFor(c.key)));
+  const showSaveFailedBanner =
+    actionData?.intent === "save" && !actionData.ok && rowsNeedingAttention.length > 0 && !activeDismissals.all;
 
   function updateRow(categoryKey: string, patch: Partial<RuleRowState>) {
+    dismissServerError(rowKey(categoryKey));
     setRows((prev) => {
       const existing = prev[categoryKey];
       if (!existing) return prev;
@@ -246,6 +342,7 @@ export default function CalculatorPage() {
   }
 
   const sortedCategories = [...EXPENSE_CATEGORIES].sort((a, b) => a.sortOrder - b.sortOrder);
+  const currencyAffix = currencySymbol(currency);
 
   return (
     <s-page heading="Expense Calculator">
@@ -266,12 +363,30 @@ export default function CalculatorPage() {
       */}
       <Form method="post" ref={formRef} data-save-bar="true" onReset={resetToLoadedRules}>
         <input type="hidden" name="intent" defaultValue="save" ref={intentInputRef} />
+        {/* The submitted revenue / currency come from state, not from the
+            s-* fields' own form participation: a Polaris select that ever
+            renders blank would otherwise submit an empty currency, and a
+            number field sanitises non-numeric paste to "" before the server
+            can name the real problem. */}
+        <input type="hidden" name="revenue" value={revenueText} />
+        <input type="hidden" name="currency" value={currency} />
         {prefill && (
           <s-section>
             <s-banner tone="info" heading="New calculation, pre-filled from a saved snapshot">
               <p>
                 These values were loaded from the calculation saved {formatSavedAt(prefill.savedAtIso)}.
                 This is a new, unsaved calculation — changing it will not edit that saved record.
+              </p>
+            </s-banner>
+          </s-section>
+        )}
+
+        {showSaveFailedBanner && (
+          <s-section>
+            <s-banner tone="critical" heading="Rule changes not saved">
+              <p>
+                Nothing was saved. Fix the categories marked &ldquo;Needs attention&rdquo; below
+                (every category needs a valid value, even a disabled one), then save again.
               </p>
             </s-banner>
           </s-section>
@@ -300,22 +415,27 @@ export default function CalculatorPage() {
           <div className="rule-row__field-group">
             <s-number-field
               label="Revenue amount"
-              name="revenue"
               min={0}
               step={0.01}
+              prefix={currencyAffix}
+              suffix={currency}
               value={revenueText}
-              error={serverRevenueError}
+              error={revenueError}
               details="Enter the revenue figure you want to run this estimate against."
               onInput={(e) => {
+                dismissServerError(REVENUE_KEY);
                 setRevenueText((e.currentTarget as unknown as HTMLInputElement).value);
               }}
             ></s-number-field>
+            {/* No `value` prop here on purpose: the matching <s-option> carries
+                `selected` (the G2 pattern). A `value` set on the select before its
+                options exist left it rendering blank on a client-side render. */}
             <s-select
               label="Currency"
-              name="currency"
-              value={currency}
-              details="Set once; used to format every calculation."
+              error={currencyError}
+              details="Used to format this calculation's amounts. It is not saved with your rules."
               onChange={(e) => {
+                dismissServerError(CURRENCY_KEY);
                 setCurrency((e.currentTarget as unknown as HTMLSelectElement).value);
               }}
             >
@@ -339,9 +459,21 @@ export default function CalculatorPage() {
             {sortedCategories.map((category) => {
               const row = rows[category.key];
               if (!row) return null;
-              const errors = serverFieldErrors[category.key] ?? clientFieldErrors[category.key] ?? {};
+              const errors = errorsFor(category.key);
+              const needsAttention = hasAnyFieldError(errors);
               return (
-                <details className="rule-row" key={category.key} open={category.sortOrder === 0}>
+                <details
+                  className="rule-row"
+                  key={category.key}
+                  open={category.sortOrder === 0}
+                  // A row with something to fix is opened so the error is visible.
+                  // Imperative on purpose: tying the `open` PROP to the error would
+                  // close the row again the moment the merchant's edit clears the
+                  // error, i.e. mid-typing.
+                  ref={(el) => {
+                    if (el && needsAttention) el.open = true;
+                  }}
+                >
                   <summary className="rule-row__summary">
                     <svg
                       className="rule-row__chevron"
@@ -353,14 +485,24 @@ export default function CalculatorPage() {
                       <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                     <span className="rule-row__title">{category.label}</span>
-                    <span className="rule-row__at-a-glance">{ruleSummary(row, currency)}</span>
-                    <label className="visually-hidden" htmlFor={`enabled-${category.key}`}>
-                      Enable {category.label} rule
-                    </label>
+                    <span
+                      className={
+                        needsAttention
+                          ? "rule-row__at-a-glance rule-row__at-a-glance--error"
+                          : "rule-row__at-a-glance"
+                      }
+                    >
+                      {needsAttention ? "Needs attention" : ruleSummary(row, currency)}
+                    </span>
+                    {/* The label lives on the control itself (aria-label), not in a
+                        hidden <label> inside <summary> — text inside a summary is
+                        part of the summary's own accessible name. Activating a
+                        control nested in a summary does not toggle the <details>. */}
                     <input
                       type="checkbox"
                       id={`enabled-${category.key}`}
                       name={`enabled-${category.key}`}
+                      aria-label={`Enable ${category.label} rule`}
                       checked={row.enabled}
                       onChange={(e) =>
                         updateRow(category.key, {
@@ -405,7 +547,6 @@ export default function CalculatorPage() {
                             })
                           }
                         ></s-number-field>
-                        <input type="hidden" name={`percent-${category.key}`} value={row.percentText} />
                       </div>
                     )}
                     {row.ruleType === "fixed" && (
@@ -414,7 +555,8 @@ export default function CalculatorPage() {
                           label="Fixed amount"
                           min={0}
                           step={0.01}
-                          prefix={currencySymbol(currency)}
+                          prefix={currencyAffix}
+                          suffix={currency}
                           value={row.fixedText}
                           error={errors.fixedAmountMinor}
                           onInput={(e) =>
@@ -423,15 +565,12 @@ export default function CalculatorPage() {
                             })
                           }
                         ></s-number-field>
-                        <input type="hidden" name={`fixed-${category.key}`} value={row.fixedText} />
                       </div>
                     )}
                     {row.ruleType === "formula" && (
                       <div className="rule-row__field-group">
                         <s-select
                           label="Formula"
-                          name={`formula-${category.key}`}
-                          value={row.formulaKey}
                           error={errors.formulaKey}
                           onChange={(e) =>
                             updateRow(category.key, {
@@ -451,19 +590,14 @@ export default function CalculatorPage() {
                         </p>
                       </div>
                     )}
-                    {/* Hidden inputs so an unselected rule type's value is still
-                        submitted as-is (server ignores fields that don't match
-                        the active rule_type, but keeps state stable across
-                        toggles). */}
-                    {row.ruleType !== "percentage" && (
-                      <input type="hidden" name={`percent-${category.key}`} value={row.percentText} />
-                    )}
-                    {row.ruleType !== "fixed" && (
-                      <input type="hidden" name={`fixed-${category.key}`} value={row.fixedText} />
-                    )}
-                    {row.ruleType !== "formula" && (
-                      <input type="hidden" name={`formula-${category.key}`} value={row.formulaKey} />
-                    )}
+                    {/* Every rule type's value is submitted from state through a
+                        hidden input, whichever type is active: the server ignores
+                        the fields that don't match the active rule_type but the
+                        values stay stable across toggles, and the s-* controls
+                        never have to take part in the form themselves. */}
+                    <input type="hidden" name={`percent-${category.key}`} value={row.percentText} />
+                    <input type="hidden" name={`fixed-${category.key}`} value={row.fixedText} />
+                    <input type="hidden" name={`formula-${category.key}`} value={row.formulaKey} />
                   </div>
                 </details>
               );
@@ -482,7 +616,8 @@ export default function CalculatorPage() {
             <s-button
               type="button"
               variant="primary"
-              disabled={isSubmitting || hasClientErrors}
+              loading={isCalculating}
+              disabled={isBusy || hasBlockingErrors}
               onClick={handleCalculateClick}
             >
               Calculate

@@ -21,6 +21,7 @@
 
 import { EXPENSE_CATEGORIES, isExpenseCategoryKey } from "./expense-categories";
 import type { EngineLineItem, EngineResult } from "./expense-engine";
+import { isSupportedCurrencyCode } from "./expense-rule-validation";
 import { isRuleType } from "./rule-types";
 import { toMinorUnits } from "./money";
 
@@ -88,7 +89,11 @@ export function decodeCalculationResult(encoded: string): EngineResult | null {
 
   if (!payload || payload.v !== 1 || typeof payload.ev !== "string") return null;
   if (!Number.isInteger(payload.r) || payload.r < 0) return null;
-  if (typeof payload.c !== "string") return null;
+  // Only the app's own supported currencies decode. The Results page hands this
+  // code straight to Intl.NumberFormat, which THROWS a RangeError for anything
+  // that is not a well-formed ISO 4217 code — so a crafted or corrupted `?d=`
+  // must degrade to "no calculation yet" here rather than crash the page.
+  if (typeof payload.c !== "string" || !isSupportedCurrencyCode(payload.c)) return null;
   if (!Number.isInteger(payload.t) || payload.t < 0) return null;
   if (!Number.isInteger(payload.n)) return null;
   if (!Array.isArray(payload.li)) return null;

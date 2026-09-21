@@ -57,7 +57,7 @@ export function ExpenseBreakdown({
 
   return (
     <div className="results-grid">
-      <div>
+      <div className="table-scroll">
         <table className="data-table">
           <caption>{caption}</caption>
           <thead>
@@ -110,25 +110,36 @@ export function ExpenseBreakdown({
       <div className="chart-panel">
         <DonutChart data={donut} size={220} stroke={28} />
         {!donut.isEmpty && (
-          <ul className="donut-legend">
-            {lineItems
-              .filter((li) => li.computedAmountMinor > 0)
-              .map((li) => (
-                <li key={li.categoryKey}>
-                  <span
-                    className="donut-legend__swatch"
-                    style={{ background: CATEGORY_COLORS[li.categoryKey] ?? "#8A8A8A" }}
-                    aria-hidden="true"
-                  ></span>
-                  <span className="donut-legend__label">{li.categoryLabel}</span>
-                  <span className="donut-legend__value">
-                    {result.revenueMinor > 0
-                      ? formatPercent(li.percentageOfRevenue)
-                      : formatMoney(li.computedAmountMinor, result.currencyCode)}
-                  </span>
-                </li>
-              ))}
-          </ul>
+          <>
+            <p className="help-text">
+              {donut.basis === "revenue"
+                ? "Each segment is that category's share of revenue."
+                : result.revenueMinor > 0
+                  ? "Expenses are higher than revenue, so each segment is that category's share of total expenses."
+                  : "No revenue was entered, so each segment is that category's share of total expenses."}
+            </p>
+            <ul className="donut-legend">
+              {donut.segments.map((seg) => {
+                const li = lineItems.find((item) => item.categoryKey === seg.categoryKey);
+                if (!li) return null;
+                return (
+                  <li key={seg.categoryKey}>
+                    <span
+                      className="donut-legend__swatch"
+                      style={{ background: seg.color }}
+                      aria-hidden="true"
+                    ></span>
+                    <span className="donut-legend__label">{li.categoryLabel}</span>
+                    <span className="donut-legend__value">
+                      {donut.basis === "revenue"
+                        ? formatPercent(li.percentageOfRevenue)
+                        : `${formatMoney(li.computedAmountMinor, result.currencyCode)} · ${formatPercent(seg.share)}`}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
         )}
       </div>
     </div>

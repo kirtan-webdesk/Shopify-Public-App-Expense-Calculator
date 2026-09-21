@@ -93,6 +93,12 @@ body {
    (ADR-0004 requires this be the always-rendered primary
    representation).
 ------------------------------------------------------------------ */
+/* Wrapper that lets a wide table scroll sideways inside its own box instead of
+   pushing the whole page wider than a narrow Admin iframe. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -181,6 +187,10 @@ body {
 .rule-row__at-a-glance {
   color: var(--p-color-text-secondary, #616161);
   font-size: 0.8125rem;
+}
+.rule-row__at-a-glance--error {
+  color: var(--p-color-text-critical, #b52125);
+  font-weight: 600;
 }
 .rule-row__body {
   padding: 0 var(--p-space-400, 16px) var(--p-space-400, 16px);
