@@ -20,6 +20,11 @@ as skipped) unless `RUN_DB_TESTS=1` and a `DATABASE_URL` are present:
 
     RUN_DB_TESTS=1 npx vitest run tests/db
 
+`tests/db/shop-ensure.db.test.ts` (G4-sprint-3.2) covers the "no `shop` row" gap: every scenario starts from a
+fresh domain with NO shop row (no seeding helper) and drives the real /app loaders/actions through
+`requireShopContext` — first request, concurrent first requests, reinstall, post-redact, repeat requests,
+cross-tenant. Its DB-free companion `tests/architecture/shop-context-choke-point.test.ts` runs in default CI.
+
 They use fresh per-run shop domains and delete every row they create. They
 exercise the real route loaders/actions, service and repository code; only
 `authenticate.admin` is stubbed (a real session-token JWT cannot be fabricated).
