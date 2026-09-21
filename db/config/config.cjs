@@ -9,6 +9,10 @@
 // DIRECT_DATABASE_URL (unpooled, migrations only — this file).
 "use strict";
 
+// MUST stay above dotenv: the guard snapshots ALLOW_HOSTED_DB from the real
+// shell environment at load time, so a value in .env cannot grant it.
+const migrateGuard = require("./migrate-guard.cjs");
+
 require("dotenv/config");
 
 const DEFAULT_DEV_URL =
@@ -33,6 +37,8 @@ function fromEnv(envVar, fallback) {
  * it at all) working without a second env var, while making it impossible to
  * silently run production migrations through the pooler by omission.
  */
+let warnedDirectFallback = false;
+
 function migrationUrl(envName) {
   if (process.env.DIRECT_DATABASE_URL) {
     return process.env.DIRECT_DATABASE_URL;
@@ -44,12 +50,15 @@ function migrationUrl(envName) {
         "DATABASE_URL is not a safe fallback here, unlike in development.",
     );
   }
-  console.warn(
-    `[db/config] DIRECT_DATABASE_URL not set for ${envName} — falling back ` +
-      "to DATABASE_URL for this migration run. Fine for a local dev DB with " +
-      "no pooler in front of it; set DIRECT_DATABASE_URL once one exists " +
-      "(ADR-0010 point 5).",
-  );
+  if (!warnedDirectFallback) {
+    warnedDirectFallback = true; // the guard and sequelize-cli both read this getter
+    console.warn(
+      `[db/config] DIRECT_DATABASE_URL not set for ${envName} — falling back ` +
+        "to DATABASE_URL for this migration run. Fine for a local dev DB with " +
+        "no pooler in front of it; set DIRECT_DATABASE_URL once one exists " +
+        "(ADR-0010 point 5).",
+    );
+  }
   return fromEnv("DATABASE_URL", DEFAULT_DEV_URL);
 }
 
@@ -113,3 +122,9 @@ module.exports = {
     };
   },
 };
+
+// Defence in depth (G4-sprint-3.6): .sequelizerc already runs the explicit-env
+// guard before sequelize-cli parses a command; this covers any path that loads
+// this config without going through .sequelizerc. Memoised and inert unless
+// the process is a `sequelize-cli db:*` command (db/config/migrate-guard.cjs).
+migrateGuard.enforceForCli({ resolveUrl: (envName) => module.exports[envName].url });

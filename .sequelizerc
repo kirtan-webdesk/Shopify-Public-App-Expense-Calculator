@@ -5,6 +5,14 @@
 
 const path = require("path");
 
+// Explicit-env guard (G4-sprint-3.6): every `db:*` command must carry
+// `--env <name>` — refused BEFORE any connection otherwise. Runs here so it
+// also covers `npx sequelize-cli ...` invoked directly. See
+// db/config/migrate-guard.cjs and tests/README.md ("Running migrations").
+require("./db/config/migrate-guard.cjs").enforceForCli({
+  resolveUrl: (envName) => require("./db/config/config.cjs")[envName].url,
+});
+
 module.exports = {
   config: path.resolve("db", "config", "config.cjs"),
   "migrations-path": path.resolve("db", "migrations"),

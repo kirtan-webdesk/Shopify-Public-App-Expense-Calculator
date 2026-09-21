@@ -48,6 +48,70 @@ database that holds the real store), and this is enforced, not just documented:
   `DATABASE_URL` for connecting; `tests/architecture/test-db-guard.test.ts`
   unit-tests the guard.
 
+## Running migrations — the environment must be explicit
+
+A bare `npm run db:migrate` used to default to `development`, whose URL falls
+back to `DATABASE_URL` — which may be the **hosted production** database. So
+every `sequelize-cli db:*` command (`db:migrate`, `db:migrate:undo`,
+`db:migrate:undo:all`, `db:migrate:status`, `db:seed*`, `db:create`, `db:drop`)
+now **refuses to run, before any connection**, unless you pass an **explicit
+`--env <development|test|production>`** on the command line. The guard lives
+in the CLI load path (`.sequelizerc` -> `db/config/migrate-guard.cjs`, and
+again from `db/config/config.cjs`), so `npx sequelize-cli db:migrate ...` is
+covered exactly like the npm scripts. It exits non-zero and prints the correct
+usage. Not accepted as the environment: the sequelize-cli default, `NODE_ENV`,
+any other variable, or an `--env` placed after a bare `--`. `--url`, `--config`
+and `--options-path` are refused for `db:*` commands (they would bypass the
+checks).
+
+Every accepted run first prints one masked line so you can see where it points:
+
+    Migrating env=test host=localhost db=expense_calculator_test
+
+(host partially masked unless it is `localhost` / `127.0.0.1` / `::1`; the
+database name is shown; user, password and the rest of the URL never are).
+
+With npm the flag goes **after `--`**:
+
+| Target | Command (Windows cmd) |
+|---|---|
+| Local development DB | `npm run db:migrate -- --env development` |
+| Test DB (`TEST_DATABASE_URL` only; isolation guard unchanged) | `npm run db:migrate -- --env test` |
+| Hosted production (`DIRECT_DATABASE_URL`, the unpooled endpoint) | `set "DIRECT_DATABASE_URL=postgres://..."&& npm run db:migrate -- --env production` |
+| Undo the last migration | `npm run db:migrate:undo -- --env <name>` |
+| Any other db command | `npx sequelize-cli db:migrate:status --env <name>` |
+
+(PowerShell: `$env:DIRECT_DATABASE_URL="postgres://..."; npm run db:migrate -- --env production`;
+bash: `DIRECT_DATABASE_URL=postgres://... npm run db:migrate -- --env production`.
+In cmd, quote the whole assignment and put `&&` directly after the closing quote;
+a `%` or `&` inside the URL needs escaping. If `DIRECT_DATABASE_URL` is already in your
+`.env`, `--env production` uses it — the `set` above is only needed to override it.)
+
+**Hosted-target safety.** If the URL an environment resolves to is not local
+(`localhost`, `127.0.0.1`, `::1`), then `--env development` and `--env test` are
+**refused** unless you acknowledge it for that one command with
+`ALLOW_HOSTED_DB=1`:
+
+    set "ALLOW_HOSTED_DB=1"&& npm run db:migrate -- --env development
+
+The acknowledgement is read from the real shell environment only — a
+`ALLOW_HOSTED_DB=1` line in `.env` is ignored on purpose (sequelize-cli runs
+yargs in strict mode, so an extra `--allow-hosted` flag is not possible).
+`--env production` is the intended hosted target and needs only the explicit
+`--env production`. There is deliberately no way to migrate hosted data without
+typing the environment.
+
+**Check where a command would point, without connecting:**
+
+    set "DB_GUARD_CHECK_ONLY=1"&& npm run db:migrate -- --env production
+
+runs every check, prints the `Migrating env=...` line, and exits 0 without
+connecting. The default-CI test `tests/architecture/migrate-guard.test.ts`
+drives the real CLI this way (bare command, `--env` without a value, `--env
+development` against a fake hosted host without acknowledgement, and the
+accepted `--env test` local path) and also asserts the `package.json` db
+scripts and these docs still exist.
+
 ### One-time setup
 
 1. Create a separate database (pick one):
@@ -59,9 +123,10 @@ database that holds the real store), and this is enforced, not just documented:
 2. Put its connection string in `.env` (gitignored) as `TEST_DATABASE_URL=...`
    (see `.env.example`) — or export it in the shell for the run. It MUST be a
    different database/branch from every other URL in `.env`.
-3. Migrate it (uses `TEST_DATABASE_URL` only):
+3. Migrate it (uses `TEST_DATABASE_URL` only; `--env test` is mandatory, see
+   "Running migrations" below):
 
-       npx sequelize-cli db:migrate --env test
+       npm run db:migrate -- --env test
 
 4. Run the suites:
 
