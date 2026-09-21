@@ -1,0 +1,67 @@
+
+> build
+> react-router build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 77 modules transformed.
+Generated an empty chunk: "_index".
+Generated an empty chunk: "api.cron.tick".
+Generated an empty chunk: "app._index".
+Generated an empty chunk: "auth._".
+Generated an empty chunk: "healthz".
+Generated an empty chunk: "webhooks.app-uninstalled".
+Generated an empty chunk: "webhooks.customers-data-request".
+Generated an empty chunk: "webhooks.customers-redact".
+Generated an empty chunk: "webhooks.shop-redact".
+rendering chunks...
+computing gzip size...
+build/client/.vite/manifest.json                                   5.26 kB │ gzip:  0.75 kB
+build/client/assets/app-D5OiHKj7.css                               4.55 kB │ gzip:  1.26 kB
+build/client/assets/_index-l0sNRNKZ.js                             0.00 kB │ gzip:  0.02 kB
+build/client/assets/api.cron.tick-l0sNRNKZ.js                      0.00 kB │ gzip:  0.02 kB
+build/client/assets/app._index-l0sNRNKZ.js                         0.00 kB │ gzip:  0.02 kB
+build/client/assets/auth._-l0sNRNKZ.js                             0.00 kB │ gzip:  0.02 kB
+build/client/assets/healthz-l0sNRNKZ.js                            0.00 kB │ gzip:  0.02 kB
+build/client/assets/webhooks.app-uninstalled-l0sNRNKZ.js           0.00 kB │ gzip:  0.02 kB
+build/client/assets/webhooks.customers-data-request-l0sNRNKZ.js    0.00 kB │ gzip:  0.02 kB
+build/client/assets/webhooks.customers-redact-l0sNRNKZ.js          0.00 kB │ gzip:  0.02 kB
+build/client/assets/webhooks.shop-redact-l0sNRNKZ.js               0.00 kB │ gzip:  0.02 kB
+build/client/assets/app-C8Ap-I_I.js                                0.31 kB │ gzip:  0.22 kB
+build/client/assets/root-B9BH0CCs.js                               1.11 kB │ gzip:  0.61 kB
+build/client/assets/presentation-CNnHASHd.js                       2.36 kB │ gzip:  1.18 kB
+build/client/assets/app.history-DWf6Fx56.js                        2.59 kB │ gzip:  1.02 kB
+build/client/assets/app.results-B01PX4YL.js                        2.96 kB │ gzip:  1.21 kB
+build/client/assets/app.history._id-CSXrC0I4.js                    3.74 kB │ gzip:  1.53 kB
+build/client/assets/expense-breakdown-Dsg9XRjR.js                  4.27 kB │ gzip:  1.58 kB
+build/client/assets/app.calculator-l4pdkSin.js                     9.17 kB │ gzip:  3.26 kB
+build/client/assets/chunk-OB3PAWPO-BhRPPHab.js                   129.91 kB │ gzip: 43.77 kB
+build/client/assets/entry.client-Dmi3kA7G.js                     218.98 kB │ gzip: 68.38 kB
+✓ built in 4.93s
+  ⚠️  Future Flag Warning: Route middleware support is changing in React Router v8.
+     You can use the `future.v8_middleware` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_middleware
+  ⚠️  Future Flag Warning: Route module splitting behavior is changing in React Router v8.
+     You can use the `future.v8_splitRouteModules` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_splitroutemodules
+  ⚠️  Future Flag Warning: Vite Environment API usage is changing in React Router v8.
+     You can use the `future.v8_viteEnvironmentApi` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_viteenvironmentapi
+  ⚠️  Future Flag Warning: Request handling behavior is changing in React Router v8.
+     You can use the `future.v8_passThroughRequests` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_passthroughrequests
+  ⚠️  Future Flag Warning: Data request URL formats are changing in React Router v8.
+     You can use the `future.v8_trailingSlashAwareDataRequests` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_trailingslashawaredatarequests
+vite v7.3.6 building ssr environment for production...
+transforming...
+✓ 65 modules transformed.
+rendering chunks...
+build/server/.vite/manifest.json        0.43 kB
+build/server/assets/app-D5OiHKj7.css    4.55 kB
+build/server/index.js                 125.17 kB
+
+✓ 1 asset cleaned from React Router server build.
+build\client\assets\app-D5OiHKj7.css
+
+✓ built in 916ms

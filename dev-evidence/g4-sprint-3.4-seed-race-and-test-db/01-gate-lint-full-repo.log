@@ -1,0 +1,50 @@
+
+> lint
+> eslint . --max-warnings=0
+
+
+D:\Projects\Shopify Public App — Expense Calculator\dev-evidence\g4-sprint-3.3-ui-fixes\tools\interact.mjs
+   3:57   error  'process' is not defined   no-undef
+   6:31   error  'process' is not defined   no-undef
+   8:50   error  'document' is not defined  no-undef
+   8:121  error  'FormData' is not defined  no-undef
+   9:1    error  'console' is not defined   no-undef
+  11:42   error  'document' is not defined  no-undef
+  13:41   error  'document' is not defined  no-undef
+  14:1    error  'console' is not defined   no-undef
+  17:1    error  'console' is not defined   no-undef
+  17:64   error  'document' is not defined  no-undef
+
+D:\Projects\Shopify Public App — Expense Calculator\dev-evidence\g4-sprint-3.3-ui-fixes\tools\mcp.mjs
+   3:26   error  'process' is not defined  no-undef
+   4:13   error  'process' is not defined  no-undef
+  10:223  error  Empty block statement     no-empty
+  18:1    error  'console' is not defined  no-undef
+  19:1    error  'console' is not defined  no-undef
+  21:132  error  'console' is not defined  no-undef
+  22:1    error  'console' is not defined  no-undef
+  32:1    error  'process' is not defined  no-undef
+
+D:\Projects\Shopify Public App — Expense Calculator\dev-evidence\g4-sprint-3.3-ui-fixes\tools\modal.mjs
+   3:57  error  'process' is not defined   no-undef
+   5:31  error  'process' is not defined   no-undef
+   9:31  error  'process' is not defined   no-undef
+  10:1   error  'console' is not defined   no-undef
+  10:51  error  'document' is not defined  no-undef
+
+D:\Projects\Shopify Public App — Expense Calculator\dev-evidence\g4-sprint-3.3-ui-fixes\tools\sel.mjs
+  3:57  error  'process' is not defined   no-undef
+  5:31  error  'process' is not defined   no-undef
+  7:1   error  'console' is not defined   no-undef
+  7:51  error  'document' is not defined  no-undef
+
+D:\Projects\Shopify Public App — Expense Calculator\dev-evidence\g4-sprint-3.3-ui-fixes\tools\shoot.mjs
+   4:38  error  'process' is not defined   no-undef
+   7:57  error  'process' is not defined   no-undef
+  19:33  error  'document' is not defined  no-undef
+  23:55  error  'document' is not defined  no-undef
+  23:97  error  'document' is not defined  no-undef
+  24:5   error  'console' is not defined   no-undef
+
+✖ 33 problems (33 errors, 0 warnings)
+

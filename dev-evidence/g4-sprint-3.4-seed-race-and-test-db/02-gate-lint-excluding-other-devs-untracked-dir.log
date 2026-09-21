@@ -1,0 +1,3 @@
+npx eslint . --max-warnings=0 --ignore-pattern "dev-evidence/g4-sprint-3.3-ui-fixes/**"
+(no output = no findings)
+exit code: 0
