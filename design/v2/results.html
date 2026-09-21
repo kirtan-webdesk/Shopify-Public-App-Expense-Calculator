@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results</title>
+
+  <!-- App Bridge FIRST, in <head> of every page (see calculator.html for the rationale). -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%">
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/v2.css">
+  <script src="./assets/v2.js" defer></script>
+</head>
+<body data-page="results">
+
+  <s-app-nav>
+    <s-link href="./calculator.html" rel="home">Calculator</s-link>
+    <s-link href="./rules.html">Expense rules</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <s-page heading="Results">
+    <!-- Results is a sub-page of the Calculator, so it gets a breadcrumb back, not a nav entry. -->
+    <s-link slot="breadcrumb-actions" href="./calculator.html">Calculator</s-link>
+    <s-button slot="primary-action" variant="primary" commandFor="save-modal" command="--show" data-hide-in="invalid-link no-calculation">Save calculation</s-button>
+    <!-- Fixes "Back loses revenue": the link is rebuilt with revenue + currency so the merchant returns to a filled form. -->
+    <s-button slot="secondary-actions" id="edit-inputs" href="./calculator.html" data-hide-in="invalid-link no-calculation">Change revenue</s-button>
+
+    <!-- ===== Error / empty states of the route itself ===== -->
+    <s-banner tone="critical" heading="This results link isn't valid" data-only="invalid-link" hidden>
+      <s-paragraph>
+        The link is incomplete or was changed, so the calculation can't be shown.
+        <s-link href="./calculator.html">Run a new calculation</s-link>
+      </s-paragraph>
+    </s-banner>
+
+    <s-banner tone="info" heading="No calculation yet" data-only="no-calculation" hidden>
+      <s-paragraph>
+        Run a calculation from the Calculator to see results here. Nothing is saved automatically;
+        this page only shows the calculation you just ran.
+        <s-link href="./calculator.html">Go to Calculator</s-link>
+      </s-paragraph>
+    </s-banner>
+
+    <div data-hide-in="invalid-link no-calculation">
+
+      <s-stack gap="base">
+        <!-- Always present: not saved yet + placeholder-rate labelling (approved product rules). -->
+        <s-banner tone="warning" heading="Estimate only, not saved yet">
+          <s-paragraph>
+            This estimate uses your <strong>saved</strong> rules. Their starting rates are illustrative placeholders
+            until you change them, so treat the figures as a rough estimate. Select <strong>Save calculation</strong>
+            to keep a permanent snapshot in History.
+            <s-link href="./rules.html">Review rules</s-link>
+          </s-paragraph>
+        </s-banner>
+
+        <!-- Data-driven banners (shown by data, not by preview state). -->
+        <s-banner id="b-zero-revenue" tone="info" heading="Revenue is 0" hidden>
+          <s-paragraph>
+            Percentage rules give 0 and percentages of revenue can't be shown. Fixed amounts still count as expenses,
+            and the chart shows each category's share of total expenses.
+          </s-paragraph>
+        </s-banner>
+        <s-banner id="b-exceed" tone="warning" heading="Expenses are higher than revenue" hidden>
+          <s-paragraph>
+            Net is negative. The chart shows each category's share of total expenses, because a ring can't show
+            more than 100% of revenue.
+          </s-paragraph>
+        </s-banner>
+        <s-banner id="b-none-on" tone="warning" heading="No expense rules are switched on" hidden>
+          <s-paragraph>
+            There is nothing to break down.
+            <s-link href="./rules.html">Switch rules on</s-link>
+          </s-paragraph>
+        </s-banner>
+
+        <!-- Summary: three read-only figures. Net negative is signalled by a text badge, not colour alone. -->
+        <s-section>
+          <s-grid gridTemplateColumns="@container (inline-size > 560px) repeat(3, 1fr), 1fr" gap="base">
+            <s-box border="base" borderRadius="base" padding="base" background="subdued">
+              <s-stack gap="small">
+                <s-text color="subdued">Revenue</s-text>
+                <s-heading><span id="m-revenue" class="tabular"></span></s-heading>
+                <s-text color="subdued"><span id="m-revenue-sub"></span></s-text>
+              </s-stack>
+            </s-box>
+            <s-box border="base" borderRadius="base" padding="base" background="subdued">
+              <s-stack gap="small">
+                <s-text color="subdued">Total expenses</s-text>
+                <s-heading><span id="m-total" class="tabular"></span></s-heading>
+                <s-text color="subdued"><span id="m-total-sub"></span></s-text>
+              </s-stack>
+            </s-box>
+            <s-box border="base" borderRadius="base" padding="base" background="subdued">
+              <s-stack gap="small">
+                <s-text color="subdued">Net</s-text>
+                <s-heading><span id="m-net" class="tabular"></span></s-heading>
+                <s-stack direction="inline" gap="small" alignItems="center">
+                  <s-text color="subdued"><span id="m-net-sub"></span></s-text>
+                  <s-badge id="m-net-badge" tone="critical" icon="alert-circle" hidden>Expenses exceed revenue</s-badge>
+                </s-stack>
+              </s-stack>
+            </s-box>
+          </s-grid>
+        </s-section>
+
+        <!-- ADR-0004: table FIRST in DOM/reading order and always rendered; the donut is supplementary. -->
+        <s-section heading="Expense breakdown">
+          <s-grid gridTemplateColumns="@container (inline-size > 720px) 3fr 2fr, 1fr" gap="large" alignItems="start">
+            <s-table aria-label="Expense breakdown by category, largest first">
+              <s-table-header-row>
+                <s-table-header listSlot="primary">Category</s-table-header>
+                <s-table-header listSlot="secondary">Rule applied</s-table-header>
+                <s-table-header format="currency"><span id="col-amount">Amount</span></s-table-header>
+                <s-table-header format="numeric">% of revenue</s-table-header>
+              </s-table-header-row>
+              <s-table-body id="breakdown-body"></s-table-body>
+            </s-table>
+
+            <s-stack gap="base">
+              <s-heading><span id="donut-title">Share of revenue</span></s-heading>
+              <!-- role="img" + one summarising aria-label; everything inside is aria-hidden. The table is the accessible source of truth. -->
+              <div id="donut-mount"></div>
+              <s-text color="subdued"><span id="donut-basis"></span></s-text>
+              <ul id="legend" class="legend"></ul>
+            </s-stack>
+          </s-grid>
+        </s-section>
+      </s-stack>
+    </div>
+
+    <!-- Save confirmation: saving is permanent (freezes a snapshot), so it is confirmed. -->
+    <s-modal id="save-modal" heading="Save this calculation?">
+      <s-paragraph>
+        This creates a permanent record of this revenue figure and the rule values used to calculate it.
+        It will <strong>not</strong> change later if you edit your rules. That is by design, so past calculations stay comparable.
+      </s-paragraph>
+      <s-button slot="primary-action" variant="primary" id="confirm-save">Save calculation</s-button>
+      <s-button slot="secondary-actions" commandFor="save-modal" command="--hide">Cancel</s-button>
+    </s-modal>
+  </s-page>
+
+  <!-- Row templates (shared shape with history-detail.html). -->
+  <template id="breakdown-row-template">
+    <s-table-row>
+      <s-table-cell><span class="swatch" data-bind="swatch" aria-hidden="true"></span><span data-bind="label"></span></s-table-cell>
+      <s-table-cell><span data-bind="rule"></span></s-table-cell>
+      <s-table-cell><span class="tabular" data-bind="amount"></span></s-table-cell>
+      <s-table-cell><span class="tabular" data-bind="pct"></span></s-table-cell>
+    </s-table-row>
+  </template>
+  <template id="breakdown-total-template">
+    <s-table-row>
+      <s-table-cell><strong>Total expenses</strong></s-table-cell>
+      <s-table-cell></s-table-cell>
+      <s-table-cell><strong class="tabular" data-bind="amount"></strong></s-table-cell>
+      <s-table-cell><strong class="tabular" data-bind="pct"></strong></s-table-cell>
+    </s-table-row>
+  </template>
+
+</body>
+</html>

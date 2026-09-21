@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Concept 3: "Coin split" — a solid coin with a 30% slice pulled out.
+     1200x1200, square canvas, NO rounded corners, NO text.
+     Two shapes only, so it is the most legible of the three at 16-32 px. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="Expense Calculator app icon: a coin with a slice pulled out">
+  <title>Expense Calculator — concept 3: coin split</title>
+  <rect width="1200" height="1200" fill="#FFF7E8"/>
+  <!-- the remaining 70% of the coin -->
+  <path d="M560 640 L883.36 745.07 A340 340 0 1 1 560 300 Z" fill="#2F3E9E"/>
+  <!-- the 30% slice, offset 60 units along its bisector -->
+  <path d="M608.54 604.73 L608.54 264.73 A340 340 0 0 1 931.90 709.80 Z" fill="#E4572E"/>
+</svg>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Concept 2: "Category keypad" — a calculator whose keys are the expense categories.
+     1200x1200, square canvas, NO rounded corners on the canvas, NO text.
+     (Rounded corners inside the artwork are fine; only the icon canvas itself must be square.) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="Expense Calculator app icon: a calculator with coloured keys">
+  <title>Expense Calculator — concept 2: category keypad</title>
+  <rect width="1200" height="1200" fill="#EEF0FF"/>
+  <!-- calculator body -->
+  <rect x="250" y="150" width="700" height="900" rx="70" fill="#1B2559"/>
+  <!-- display -->
+  <rect x="310" y="210" width="580" height="220" rx="28" fill="#E7ECFF"/>
+  <rect x="510" y="290" width="340" height="60" rx="30" fill="#1B2559"/>
+  <!-- keys: 3 x 3, four coloured accents + five neutral -->
+  <rect x="310" y="490" width="160" height="130" rx="30" fill="#F1F5F9"/>
+  <rect x="520" y="490" width="160" height="130" rx="30" fill="#F1F5F9"/>
+  <rect x="730" y="490" width="160" height="130" rx="30" fill="#FFB020"/>
+  <rect x="310" y="675" width="160" height="130" rx="30" fill="#2DD4BF"/>
+  <rect x="520" y="675" width="160" height="130" rx="30" fill="#F1F5F9"/>
+  <rect x="730" y="675" width="160" height="130" rx="30" fill="#F1F5F9"/>
+  <rect x="310" y="860" width="160" height="130" rx="30" fill="#F1F5F9"/>
+  <rect x="520" y="860" width="160" height="130" rx="30" fill="#FF7A59"/>
+  <rect x="730" y="860" width="160" height="130" rx="30" fill="#93C5FD"/>
+</svg>

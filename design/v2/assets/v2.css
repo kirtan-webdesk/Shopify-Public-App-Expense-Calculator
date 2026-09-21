@@ -1,0 +1,162 @@
+/*
+  expense-calculator — G2-revision (v2) mockup stylesheet
+  ----------------------------------------------------------------------------
+  Deliberately tiny. Layout, type, colour, spacing, tables, fields, banners,
+  badges, buttons and modals all come from the Polaris web components loaded
+  from the CDN in every page <head>. This file only covers things Polaris has
+  no component for:
+
+    1. [hidden] guard  (custom elements that set `display` in their shadow
+       :host rules would otherwise ignore the hidden attribute in the mockup;
+       in the React app conditional rendering replaces this)
+    2. the chart colour swatch, the donut svg box and its legend list (ADR-0004)
+    3. PREVIEW-ONLY review aids (state switcher bar, save-bar/toast shims).
+       Everything under "PREVIEW ONLY" MUST NOT ship.
+
+  No competing token system: only Polaris-named custom properties with fallbacks.
+  VERIFY AT BUILD: the --p-* token names below against the resolved polaris.js.
+*/
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------------------------------------------------------------- chart -- */
+.swatch {
+  display: inline-block;
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 3px;
+  margin-inline-end: 8px;
+  vertical-align: -1px;
+  flex: none;
+}
+.swatch--track {
+  background: var(--p-color-bg-fill-secondary, #e3e3e3);
+  outline: 1px solid var(--p-color-border, #8a8a8a);
+  outline-offset: -1px;
+}
+
+.donut {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 240px;
+  block-size: auto;
+  margin-inline: auto;
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 0.8125rem;
+}
+.legend li {
+  display: flex;
+  align-items: center;
+}
+.legend__label {
+  flex: 1 1 auto;
+}
+.legend__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--p-color-text-secondary, #616161);
+}
+
+/* Keep amounts aligned in the metric boxes and cells. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible focus for the few custom-styled controls (Polaris handles its own). */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--p-color-border-focus, #005bd3);
+  outline-offset: 2px;
+}
+
+/* ==================================================== PREVIEW ONLY ======== */
+/* Not product UI. Remove at build (index of what to strip is in DESIGN-NOTES-v2.md). */
+
+body {
+  padding-block-end: 72px; /* room for the review bar */
+}
+
+.review-aid {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 2147483000;
+  background: #1a1a1a;
+  color: #f1f1f1;
+  font: 12px/1.4 system-ui, sans-serif;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+  border-block-start: 2px dashed #ffb020;
+}
+.review-aid strong {
+  color: #ffb020;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.review-aid a {
+  color: #9ecbff;
+}
+.review-aid a[aria-current="true"] {
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.review-aid__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+}
+
+/* Stand-in for the App Bridge contextual save bar when the page is opened
+   outside Shopify admin. Inside admin the real App Bridge bar is used
+   (form[data-save-bar]) and this element is never created. */
+.preview-save-bar {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 2147483001;
+  background: #303030;
+  color: #fff;
+  min-block-size: 56px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 14px/1.4 system-ui, sans-serif;
+}
+.preview-save-bar__msg {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+/* Stand-in for shopify.toast.show() outside admin. */
+.preview-toast {
+  position: fixed;
+  inset-block-end: 64px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483002;
+  background: #303030;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font: 14px/1.4 system-ui, sans-serif;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.preview-toast a {
+  color: #9ecbff;
+}

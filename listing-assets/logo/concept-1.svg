@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Concept 1: "Split ring" — a four-segment expense donut on deep navy.
+     1200x1200, square canvas, NO rounded corners, NO text.
+     Segment shares are 45 / 25 / 18 / 12 with a 5-degree gap between segments.
+     Arcs are explicit paths (no stroke-dasharray / pathLength) so the file rasterises
+     identically in any tool (browser, Inkscape, ImageMagick, Figma import). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="Expense Calculator app icon: a four-segment donut chart">
+  <title>Expense Calculator — concept 1: split ring</title>
+  <rect width="1200" height="1200" fill="#14213D"/>
+  <path d="M618.32 180.40 A420 420 0 0 1 747.09 993.40 L670.04 787.33 A200 200 0 0 0 608.72 400.19 Z" fill="#FFB020"/>
+  <path d="M712.24 1004.72 A420 420 0 0 1 206.60 747.09 L412.67 670.04 A200 200 0 0 0 653.45 792.73 Z" fill="#2DD4BF"/>
+  <path d="M195.27 712.24 A420 420 0 0 1 299.41 306.66 L456.86 460.32 A200 200 0 0 0 407.27 653.45 Z" fill="#FF6B57"/>
+  <path d="M326.12 281.58 A420 420 0 0 1 581.68 180.40 L591.28 400.19 A200 200 0 0 0 469.58 448.37 Z" fill="#F8FAFC"/>
+</svg>

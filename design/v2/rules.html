@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense rules</title>
+
+  <!-- App Bridge FIRST, in <head> of every page (see calculator.html for the rationale). -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%">
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/v2.css">
+  <script src="./assets/v2.js" defer></script>
+</head>
+<body data-page="rules">
+
+  <s-app-nav>
+    <s-link href="./calculator.html" rel="home">Calculator</s-link>
+    <s-link href="./rules.html">Expense rules</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <s-page heading="Expense rules">
+    <!-- OPTIONAL feature (judgment call J5): fills the form with the placeholder defaults.
+         Nothing is written until the merchant saves, and Discard undoes it. -->
+    <s-button slot="secondary-actions" commandFor="reset-modal" command="--show">Reset to placeholder defaults</s-button>
+
+    <s-banner tone="warning" heading="Illustrative placeholder defaults">
+      <s-paragraph>
+        The starting percentages and amounts are placeholder examples, not real business figures or advice.
+        They exist so every category has a starting point. Edit any of them to match your business.
+      </s-paragraph>
+    </s-banner>
+
+    <!-- Save failed: shown only after a failed Save. Lists every row with a problem, including OFF rows
+         (every rule needs a valid value even when it is off — NEW_P2). Heading count is set by script. -->
+    <s-banner id="rules-error-banner" tone="critical" heading="Rules need attention" hidden>
+      <s-paragraph>Nothing was saved. Fix these, then save again:</s-paragraph>
+      <ul id="rules-error-list"></ul>
+    </s-banner>
+
+    <!-- App Bridge contextual save bar via form[data-save-bar]: App Bridge detects edits, shows its own
+         Save / Discard bar, Save = native submit, Discard = native reset. Use ONE approach (this one),
+         never also the programmatic shopify.saveBar API. It also raises the "Leave page?" prompt when the
+         merchant navigates away with unsaved edits. -->
+    <form id="rules-form" data-save-bar>
+      <s-section heading="Category rules">
+        <s-stack gap="base">
+          <s-paragraph color="subdued">
+            Ten fixed categories. Each has a rule type (percentage of revenue, a fixed amount, or a preset formula)
+            and can be switched off without losing its values.
+            Fixed amounts are numbers in whichever currency you choose when you calculate.
+          </s-paragraph>
+          <s-divider></s-divider>
+          <s-stack id="rules-list" gap="base"></s-stack>
+        </s-stack>
+      </s-section>
+    </form>
+
+    <s-modal id="reset-modal" heading="Reset to placeholder defaults?">
+      <s-paragraph>
+        This replaces the values on this page with the illustrative placeholder defaults.
+        Nothing is saved until you select <strong>Save</strong>, and <strong>Discard</strong> brings your values back.
+        Saved calculations in History are never affected.
+      </s-paragraph>
+      <s-button slot="primary-action" variant="primary" id="reset-confirm" commandFor="reset-modal" command="--hide">Replace values</s-button>
+      <s-button slot="secondary-actions" commandFor="reset-modal" command="--hide">Cancel</s-button>
+    </s-modal>
+  </s-page>
+
+  <!-- One rule row. Layout: 3 columns from ~640px container width, single column below.
+       Visible labels on every field; the switch label is the category name; each row is a named group. -->
+  <template id="rule-row-template">
+    <s-box role="group" padding="none">
+      <s-stack gap="base">
+        <s-grid gridTemplateColumns="@container (inline-size > 640px) 1fr 1fr 1fr, 1fr" gap="base" alignItems="start">
+          <s-stack gap="small">
+            <s-switch data-f="enabled" label="Category"></s-switch>
+            <s-badge data-f="off" tone="neutral">Off</s-badge>
+          </s-stack>
+
+          <s-select data-f="type" label="Rule type">
+            <s-option value="percentage">Percentage of revenue</s-option>
+            <s-option value="fixed">Fixed amount</s-option>
+            <s-option value="formula">Formula</s-option>
+          </s-select>
+
+          <!-- One value control at a time; the others carry `hidden` (removed from the a11y tree). -->
+          <s-stack>
+            <s-number-field data-f="percent" label="Percentage" suffix="%" min="0" step="0.01" inputMode="decimal"></s-number-field>
+            <s-number-field data-f="fixed" label="Fixed amount" min="0" step="0.01" inputMode="decimal"></s-number-field>
+            <s-select data-f="formula" label="Formula">
+              <s-option value="tiered_by_revenue_band">Tiered by revenue band</s-option>
+              <s-option value="base_fee_plus_marginal_percent">Base fee + marginal percentage above a threshold</s-option>
+            </s-select>
+          </s-stack>
+        </s-grid>
+
+        <s-paragraph data-f="note" color="subdued" hidden></s-paragraph>
+        <s-divider data-f="divider"></s-divider>
+      </s-stack>
+    </s-box>
+  </template>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>History</title>
+
+  <!-- App Bridge FIRST, in <head> of every page (see calculator.html for the rationale). -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%">
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/v2.css">
+  <script src="./assets/v2.js" defer></script>
+</head>
+<body data-page="history">
+
+  <s-app-nav>
+    <s-link href="./calculator.html" rel="home">Calculator</s-link>
+    <s-link href="./rules.html">Expense rules</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <s-page heading="History">
+    <s-button slot="primary-action" variant="primary" href="./calculator.html" data-hide-in="empty">New calculation</s-button>
+
+    <!-- Populated. s-table renders as a table on wide iframes and a list on narrow ones, so no horizontal
+         scroll wrapper is needed (QA p3 "tables lack overflow-x"). The date is the row link, so every link
+         has a unique name (a column of identical "View" links is ambiguous for screen readers). -->
+    <s-section padding="none" data-hide-in="empty">
+      <s-table id="history-table" paginate>
+        <s-table-header-row>
+          <s-table-header listSlot="primary">Saved</s-table-header>
+          <s-table-header format="currency">Revenue</s-table-header>
+          <s-table-header format="currency">Total expenses</s-table-header>
+          <s-table-header format="currency">Net</s-table-header>
+          <s-table-header listSlot="secondary">Currency</s-table-header>
+        </s-table-header-row>
+        <s-table-body id="history-body"></s-table-body>
+      </s-table>
+    </s-section>
+
+    <s-text color="subdued" data-hide-in="empty">
+      Every saved calculation is a snapshot: it keeps the revenue and rule values from the moment it was saved,
+      even if you change your rules later.
+    </s-text>
+
+    <!-- Empty state. Composed from stack/heading/paragraph/button (the safest cross-version composition).
+         VERIFY AT BUILD: if <s-empty-state> exists in the resolved polaris.js, swap it in. -->
+    <s-section data-only="empty" hidden>
+      <s-stack gap="base" alignItems="center">
+        <s-heading>No saved calculations yet</s-heading>
+        <s-paragraph color="subdued">
+          Run a calculation and select <strong>Save calculation</strong> on the results page.
+          Saved calculations appear here, newest first.
+        </s-paragraph>
+        <s-button variant="primary" href="./calculator.html">Go to Calculator</s-button>
+      </s-stack>
+    </s-section>
+  </s-page>
+
+  <template id="history-row-template">
+    <s-table-row>
+      <s-table-cell><s-link data-bind="link"></s-link></s-table-cell>
+      <s-table-cell data-bind="revenue"></s-table-cell>
+      <s-table-cell data-bind="total"></s-table-cell>
+      <s-table-cell data-bind="net"></s-table-cell>
+      <s-table-cell data-bind="currency"></s-table-cell>
+    </s-table-row>
+  </template>
+
+</body>
+</html>

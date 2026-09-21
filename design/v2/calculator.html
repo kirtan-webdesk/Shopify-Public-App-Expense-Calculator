@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Calculator</title>
+
+  <!-- App Bridge FIRST, in <head> of every page. Unpinned CDN URL so the app always runs the
+       latest App Bridge (App Store req 2.2.3) and Shopify collects Web Vitals (Built for Shopify,
+       post-launch). The api-key meta must precede the script. VERIFY AT BUILD: current CDN URLs. -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%">
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <!-- Polaris web components (CDN). Never Polaris React (archived). -->
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/v2.css">
+  <script src="./assets/v2.js" defer></script>
+</head>
+<body data-page="calculator">
+
+  <!-- App Bridge navigation. The Calculator is the app HOME (rel="home"): App Bridge hides a
+       rel="home" link from the child list, so opening the app lands here and the sidebar shows
+       only "Expense rules" and "History". Only one link may carry rel="home". -->
+  <s-app-nav>
+    <s-link href="./calculator.html" rel="home">Calculator</s-link>
+    <s-link href="./rules.html">Expense rules</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <s-page heading="Expense Calculator">
+    <!-- One primary action, in the page header (always visible, also at 600px). -->
+    <s-button slot="primary-action" variant="primary" id="calculate-btn">Calculate</s-button>
+    <s-button slot="secondary-actions" href="./rules.html">Edit rules</s-button>
+
+    <!-- Shown only when arriving from History detail "Duplicate as new calculation" (?from=id).
+         After the split, only revenue + currency are copied; rules are always the SAVED rules. -->
+    <s-banner id="prefill-banner" tone="info" heading="New calculation, pre-filled from a saved snapshot" hidden>
+      <s-paragraph>
+        Revenue and currency were copied from the calculation saved Sep 21, 2026, 6:55 AM UTC.
+        The rules are your current saved rules, not the ones in that snapshot
+        (<s-link href="./history-detail.html">see the snapshot's rules</s-link>).
+        Changing anything here will not edit that saved record.
+      </s-paragraph>
+    </s-banner>
+
+    <s-section heading="Revenue">
+      <s-stack gap="base">
+        <s-paragraph color="subdued">
+          Enter the revenue you want to estimate expenses against. You type this in yourself;
+          the app never reads your store's sales.
+        </s-paragraph>
+
+        <s-grid gridTemplateColumns="@container (inline-size > 560px) 2fr 1fr, 1fr" gap="base">
+          <!-- s-text-field (not s-number-field) on purpose: the validator needs the RAW text so it can
+               say exactly what is wrong ("-5", "1,5", "10.555"). The prefix shows the chosen currency code. -->
+          <s-text-field
+            id="revenue"
+            label="Revenue"
+            name="revenue"
+            inputMode="decimal"
+            autocomplete="off"
+            placeholder="0.00"
+            prefix="USD"
+            required
+            details="For example 12500.50. Commas are fine as thousands separators."
+          ></s-text-field>
+
+          <!-- B1 fix: mark the chosen <s-option selected>; do NOT also set value on <s-select>. -->
+          <s-select id="currency" label="Currency" name="currency" details="Used for this calculation.">
+            <s-option value="USD" selected>USD — US Dollar</s-option>
+            <s-option value="CAD">CAD — Canadian Dollar</s-option>
+            <s-option value="EUR">EUR — Euro</s-option>
+            <s-option value="GBP">GBP — British Pound</s-option>
+          </s-select>
+        </s-grid>
+      </s-stack>
+    </s-section>
+
+    <s-section heading="Rules used for this estimate">
+      <s-stack gap="base">
+        <s-stack direction="inline" gap="small" alignItems="center" justifyContent="space-between">
+          <s-stack direction="inline" gap="small" alignItems="center">
+            <s-badge tone="warning">Placeholder rates</s-badge>
+            <s-text color="subdued"><span id="rules-count">10 of 10 categories on</span></s-text>
+          </s-stack>
+          <s-link href="./rules.html">Edit rules</s-link>
+        </s-stack>
+
+        <s-banner id="none-on" tone="warning" heading="No expense rules are switched on" hidden>
+          <s-paragraph>
+            With every category off, the estimate will show no expenses.
+            <s-link href="./rules.html">Switch rules on</s-link>
+          </s-paragraph>
+        </s-banner>
+
+        <!-- Read-only summary. Rules are edited on the Rules page, never here. -->
+        <s-table>
+          <s-table-header-row>
+            <s-table-header listSlot="primary">Category</s-table-header>
+            <s-table-header listSlot="secondary">Rule</s-table-header>
+          </s-table-header-row>
+          <s-table-body id="summary-body"></s-table-body>
+        </s-table>
+
+        <s-text color="subdued">
+          Starting rates are illustrative placeholders, not real business figures or advice, until you change them.
+          Calculate always uses your <strong>saved</strong> rules.
+        </s-text>
+      </s-stack>
+    </s-section>
+  </s-page>
+
+  <!-- Row template: this markup is what the React route maps over EXPENSE_CATEGORIES. -->
+  <template id="summary-row-template">
+    <s-table-row>
+      <s-table-cell><span data-bind="label"></span></s-table-cell>
+      <s-table-cell>
+        <span data-bind="rule"></span>
+        <s-badge data-bind="off">Off</s-badge>
+      </s-table-cell>
+    </s-table-row>
+  </template>
+
+</body>
+</html>

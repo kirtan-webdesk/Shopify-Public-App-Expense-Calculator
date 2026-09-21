@@ -6,7 +6,7 @@
     "project_type": "app-build",
     "build_context": "shopify-app",
     "stage": "development",
-    "current_gate": "G4-sprint-3.1",
+    "current_gate": "G4-sprint-4.1",
     "schema_version": "1.0.0",
     "shopify": {
       "distribution": "public",
@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-21T07:18:30Z",
-    "version": 59,
+    "updated_at": "2026-09-21T08:28:47Z",
+    "version": 66,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -200,6 +200,31 @@
       "approver": "QA lead (role - stakeholder in the interim)",
       "notes": "Upcoming: M4 Save + History (calculation snapshot persistence, history list/detail, engine_version on saved rows, append-only). NOT started - pending human go-ahead. Carry-forward before G5: axe-core a11y run (FT-19a), config.cjs lazy-eval fix decision, RV-2/RV-7/RV-8 live Vercel verification, real OQ-4 rates. | OPENED 2026-09-18T15:13:37Z on human instruction 'start M4'. Note: human has not yet confirmed M2/M3 works on the live Vercel deploy nor that the job_heartbeat migration was run on Neon - not a blocker for building, but live verification still owed. | QA VERDICT: PASS WITH FLAGS, 0 open P1/P2, 5 P3 + 6 P4. Verified by reading tree at HEAD ac0b2d3: snapshot immutability (detail path never calls engine, never reads expense_rule, no FK, by-value typed columns), tenant isolation (ShopContext first arg everywhere, identical 404 for cross-tenant/nonexistent/malformed), save integrity (server recomputes + rejects tampered amounts, only 2 DB calls inside the transaction both pass {transaction}), append-only (no update/delete export, no mutating action on history routes, BEFORE UPDATE triggers). Live evidence cross-checked: 41 PASS, sha256 equal before/after with the live-rule hash provably changed, 20+5 pagination contiguous. FLAGS: F1 P3 double-submit no server idempotency (duplicate rows only via Back/two tabs, permanent since append-only; fix = nullable save_token + partial unique index, needs G-Schema-owner sign-off); F2 P3 22 DB tests opt-in and skipped in CI so tenant-predicate and {transaction}-threading regressions would pass CI green (mitigate with static guard test or Postgres service container); F3 P3 live logs carry no embedded SHA/env header, bound to ffd3bf7 only via bundle+timing; F4 P3 provenance: M4 source on origin/main under RFC-002 commit 105b1c6 before QA; F5 P3 calculator hardcodes $ for all currencies (wrong for CAD/EUR/GBP, pre-existing); F6 P3 axe-core FT-19a still not run (must close before G5). P4s: transitive engine import in detail bundle, trigger blind spot for zero-line-item calculation, no per-shop save cap, formatRuleApplied lacks currency symbol, UTC label pending OQ-6, cosmetic G2 deviations/toast replay.",
       "opened_at": "2026-09-18T15:13:37Z"
+    },
+    {
+      "id": "G2-revision",
+      "type": "design-approval",
+      "scope": "IA-restructure+UI-redesign+app-logo",
+      "status": "passed",
+      "opened_at": "2026-09-21T07:39:41Z",
+      "sla_hours": 48,
+      "expires_at": "2026-09-23T07:39:41Z",
+      "approver": "Design lead (role - stakeholder in the interim)",
+      "notes": "Human request (with 2 live screenshots): (1) remove the redundant 'Calculator' nav child (opening the app already lands on it); (2) replace it with a NEW SEPARATE module/page 'Expense category rules' so rule setup is split out of the single calculator page; (3) current UI 'is not proper' on every page - produce a proper Polaris-idiomatic UI; (4) generate an app logo/icon (none exists). Proposed IA: app home (rel=home) = Calculator (revenue + currency + read-only rules summary + Calculate); nav children = 'Expense rules' (/app/rules) and 'History' (/app/history); Results and History detail remain sub-pages. NOTE this changes the G2-approved behaviour that Calculate runs on UNSAVED form state (judgment call #2 at G2): after the split Calculate uses the SAVED rules. Designer produces v2 mockups + logo concepts; human decides; only then implementation (pass 3). UI pass 2 (bug fixes B1-B3 etc.) continues in parallel and its logic fixes remain valid. | DESIGNER PROPOSAL delivered (PROPOSED, not approved): design/v2/{index,calculator,rules,results,history,history-detail}.html + assets + IA-v2.md + DESIGN-NOTES-v2.md; logo concepts in listing-assets/logo. IA: Calculator = app home (rel=home), children 'Expense rules' (/app/rules) + 'History'; Results/History-detail sub-pages. 12 judgment calls J1-J12 with defaults (J1 Calculate uses SAVED rules only - reverses G2 v1 unsaved-preview behaviour; J10 sidebar label 'Expense rules' vs human's 'Expense category rules'). Designer could not render or tool-validate anything. ORCHESTRATOR RENDERED the mockups with headless Chrome (design/v2/screenshots/*.png at 1000px) and found: (a) Results metric cards (Revenue/Total expenses/Net) stack full-width instead of sitting side by side - s-grid columns not applying (designer flagged the container-query syntax as unverified); (b) Rules page is ~2000px+ tall: each of 10 categories stacks switch + rule type + value full-width, not the 'compact rows' claimed (J4); (c) Currency select renders BLANK in the calculator mockup (same s-select value/selected pattern issue as live bug B1 - developer must use the pass-1 fixed pattern); (d) heavy amber banners; otherwise cards/tables/badges/actions/donut palette look like a proper Polaris app. Recommended decision: CONFIRM with 3 targeted refinements folded into the build (metrics in a 3-col grid, rules as a grid row layout at >=~800px, currency select fix). | DECISION: CONFIRM by sales@webdesksolution.ca on 2026-09-21T08:28:47Z, taken as accepting the orchestrator's recommendation: v2 IA + designer defaults J1-J12, plus 3 refinements (Results metrics in a 3-column grid; Rules rows as a grid row at wide widths; currency select uses the pass-1 fixed pattern). Label call (human did not choose): nav item 'Expense rules', page heading 'Expense category rules' (covers both wordings; one-line change if the human prefers the long label in the nav). Logo: concept 1 split ring exported as listing-assets/logo/app-icon-1200.png (upload is a human step).",
+      "decided_by": "sales@webdesksolution.ca",
+      "decided_at": "2026-09-21T08:28:47Z",
+      "decision": "CONFIRM"
+    },
+    {
+      "id": "G4-sprint-4.1",
+      "type": "sprint-qa",
+      "scope": "UI-v2-build (Expense rules page, slimmed Calculator, redesigned pages)",
+      "status": "open",
+      "opened_at": "2026-09-21T08:28:47Z",
+      "sla_hours": 24,
+      "expires_at": "2026-09-22T08:28:47Z",
+      "approver": "QA lead (role - stakeholder in the interim)",
+      "notes": "Implements the G2-revision design. Calculate now uses SAVED rules only. QA debt carried in: independent QA of pass 1 (ee967b2), seed-race + test-DB isolation (dd4c266), migrate guard (3f7135f), pass 2 (9d6407f); DB save-race test never executed; live-Admin checks owed by human (sidebar, currency select, save bar, toast, chart at revenue 0)."
     }
   ],
   "budget": {
@@ -1826,6 +1851,211 @@
       },
       "project_version_before": 58,
       "project_version_after": 58
+    },
+    {
+      "timestamp": "2026-09-21T07:39:41Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "ia_restructure_ui_redesign_logo_request",
+      "details": {
+        "live_screenshots_observed": "Calculator page live: currency now shows 'USD - US Dollar', symbols and percent text correct (pass 1 fixes are live); nav still lists Calculator + History; History page works with 2 saved rows and looks acceptable.",
+        "screenshot_artifacts": "The Calculator screenshot shows a duplicated 'Payroll' row and a clipped radio row. Both sit exactly at horizontal boundaries (y~600 and y~960) where the image has black notches on the right edge: it is a scroll-stitched capture, so these are almost certainly capture artifacts, NOT app bugs (the app renders exactly 10 categories from a constant). To be confirmed with a normal screenshot / DOM row-count test.",
+        "requests": [
+          "remove 'Calculator' from nav list",
+          "new separate 'Expense category rules' module/page",
+          "make proper UI on every page",
+          "generate app logo"
+        ],
+        "process": "IA change + UI redesign = G2 revision (opened as gate G2-revision); logo is a listing asset (Shopify app icon 1200x1200 PNG/JPEG, no rounded corners) uploaded by the human in Partner Dashboard - cannot be uploaded by agents"
+      },
+      "project_version_before": 59,
+      "project_version_after": 60
+    },
+    {
+      "timestamp": "2026-09-21T07:43:01Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "migrate_guard_delivered",
+      "details": {
+        "commits": {
+          "3f7135f": "code",
+          "4745ac2": "evidence"
+        },
+        "pushed": false,
+        "design": "db/config/migrate-guard.cjs invoked from .sequelizerc (covers direct npx sequelize-cli) and again at the bottom of config.cjs (covers --options-path). Every db:* command must have an explicit --env in {development,test,production}; nothing implicit counts (not the CLI default, not NODE_ENV, not --env after a bare --); missing/duplicate/--no-env/unknown refused; --url/--config/--options-path refused. --env development|test against a non-local host refused unless shell sets ALLOW_HOSTED_DB=1 (read before dotenv so .env cannot grant it); --env production needs only the explicit flag. Masked confirmation line 'Migrating env=.. host=.. db=..' before every accepted run. DB_GUARD_CHECK_ONLY=1 runs checks and exits 0 without connecting. test-db-guard.cjs untouched.",
+        "demonstrated": "with the real .env and DB_GUARD_CHECK_ONLY=1 as safety net: bare db:migrate refused; --env with no value refused; `db:migrate --env development` REFUSED as HOSTED (ep***.***.neon.tech) - the exact careless-command scenario; --env test / production refused (TEST_DATABASE_URL / DIRECT_DATABASE_URL unset). Through real npm scripts in a scratch copy: refusals + local --env test accepted.",
+        "tests": "tests/architecture/migrate-guard.test.ts, 28 child-process default-CI cases (no DB)",
+        "gates": "run in a SCRATCH COPY (git archive HEAD + fresh npm ci) because repo node_modules is broken: typecheck 0, test 321 passed/40 skipped, build 0, lint exit 1 only from dev-evidence/g4-sprint-3.3-ui-fixes/tools/*.mjs (fixed in pass 2)",
+        "not_run": [
+          "local test-DB migrate success path (documented default creds rejected, not guessed further)",
+          "hosted/production DB never contacted",
+          "gates on the real working tree"
+        ],
+        "disclosed": [
+          "hand-made --options-path file not using this repo's config.cjs can still bypass (accident protection, not deliberate-bypass protection)",
+          "older 'DIRECT_DATABASE_URL not set, falling back' warning still prints with --env development but the run is now refused anyway"
+        ]
+      },
+      "project_version_before": 60,
+      "project_version_after": 60
+    },
+    {
+      "timestamp": "2026-09-21T07:43:01Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "INCIDENT_repo_node_modules_broken",
+      "details": {
+        "observed": "repo node_modules has been missing .bin/, @rollup, @esbuild, @eslint, @react-router, @jridgewell since ~12:44 (first noticed by orchestrator when npm scripts failed with 'not recognized'); still broken after migrate-guard agent finished; git worktree list shows a single worktree",
+        "cause": "unknown; likely an agent-side cleanup or interrupted concurrent install (pass 1 used a 'clean worktree' for gates; a junction/symlinked node_modules followed by a delete is a known Windows failure mode) - NOT proven",
+        "impact": "npm run lint/typecheck/test/build and the local dev server cannot run in the real tree; agents have been running gates in scratch copies; UI pass 2 was running in the tree at the time",
+        "planned_fix": "after UI pass 2 finishes: `npm ci` in the real tree (pinned by package-lock, no source change), then re-run all four gates in the real tree; do not run npm ci while an agent is mid-run"
+      },
+      "project_version_before": 60,
+      "project_version_after": 60
+    },
+    {
+      "timestamp": "2026-09-21T07:46:06Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "node_modules_repaired",
+      "details": {
+        "command": "npm ci in repo root (human-authorized: 'fix node_modules now'); pinned by package-lock, no source/lock change",
+        "result": "exit 0, 460 packages installed in ~1m; .bin restored; eslint 9.39.5, vitest 3.2.7, react-router 7.18.4, tsc 6.0.3 all run; npm ls --depth=0 reports 0 missing/invalid/extraneous",
+        "caveat": "UI pass 2 was still active in the working tree (its files staged) when this ran; node_modules was already unusable so no working run of its own could have been broken, but it should re-run its gates in the real tree.",
+        "new_low_priority_item": "npm reports 4 moderate audit vulnerabilities and deprecated packages (eslint 9.39.5, glob 10.5.0, uuid 8.3.2) - triage before G5/G-Review; do NOT run npm audit fix --force"
+      },
+      "project_version_before": 61,
+      "project_version_after": 61
+    },
+    {
+      "timestamp": "2026-09-21T07:52:38Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "app_icon_png_exported",
+      "details": {
+        "request": "human asked for the logo as PNG/JPG 1200x1200 <=1MB (Partner Dashboard 'App icon' field)",
+        "method": "designer's SVG concepts (listing-assets/logo/concept-{1,2,3}.svg) rendered with the machine's installed headless Chrome at 1200x1200, device scale 1, no scrollbars; dimensions verified from the PNG header; each image visually inspected",
+        "outputs": {
+          "recommended": "listing-assets/logo/app-icon-1200.png (= concept 1 split-ring donut, 1200x1200, ~42 KB, opaque RGB, square corners, no text)",
+          "alternatives": "listing-assets/logo/png/app-icon-concept-{1,2,3}-1200.png (~43 KB / 22 KB / 25 KB)"
+        },
+        "note": "design gate G2-revision (designer's full v2 mockups + logo choice) is still open; the export is offered early because the human asked for it. Upload to Partner Dashboard is a human task."
+      },
+      "project_version_before": 62,
+      "project_version_after": 62
+    },
+    {
+      "timestamp": "2026-09-21T08:01:35Z",
+      "actor": "designer",
+      "actor_type": "agent",
+      "action": "g2_revision_v2_design_delivered",
+      "details": {
+        "files": "design/v2/*, listing-assets/logo/*",
+        "not_verified_by_designer": "no render, no axe, no Dev MCP validate; new Polaris tags (s-stack/s-grid/s-box/s-table*/s-switch/s-heading/s-paragraph/s-text/s-divider) and attributes unconfirmed - developer must validate every file with validate_component_codeblocks",
+        "judgment_calls": "J1-J12 (see DESIGN-NOTES-v2.md)",
+        "orchestrator_render_findings": [
+          "Results metric cards stack instead of 3 columns",
+          "Rules page very long (not compact)",
+          "currency select blank in mockup",
+          "heavy amber banners"
+        ],
+        "status": "PROPOSED - awaiting Design lead decision, not self-approved"
+      },
+      "project_version_before": 63,
+      "project_version_after": 64
+    },
+    {
+      "timestamp": "2026-09-21T08:16:11Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g4-sprint-3.5-ui-pass2/DEVELOPER-HANDOFF.md",
+        "commit": "9d6407f",
+        "result": "EXIT 0 HANDOFF OK, 4 validations, independently re-run",
+        "provenance_caveat": "MCP validation driven via @shopify/dev-mcp@1.14.5 over stdio (harness tools unavailable to the developer), descriptive tool-call ids; app.tsx (s-app-nav rel=home) is not Polaris-validatable - rel=home behaviour confirmed from docs (records/docs-app-nav-rel-home.txt) instead"
+      },
+      "project_version_before": 64,
+      "project_version_after": 64
+    },
+    {
+      "timestamp": "2026-09-21T08:16:11Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "ui_pass2_delivered",
+      "details": {
+        "commits": {
+          "9d6407f": "code, 25 files",
+          "91d74ed": "evidence (no 00-SUMMARY.md: sandbox refused; SHA256SUMS.txt carries SHA + hashes)"
+        },
+        "fixed": [
+          "A nav: calculator link rel=home (docs: home link hidden from menu, app name is home route), History only child; /app forwards query string",
+          "B2 donut empty-state keyed on amountMinor>0",
+          "B2b ring = share of revenue only when revenue>0 and total<=100%, else share of total expenses; dash clamped 0-100, no negative gap; aria-label 'of total expenses'/'of revenue' and 'table above'",
+          "B3 validateRevenueText (action + live inline + min=0 + disables Calculate), commas only as proper thousands separators ('1,5' rejected)",
+          "C saveExpenseRules validates every row as enabled (disabled blank row -> fieldErrors, nothing written); replaceExpenseRulesForShop = single INSERT..ON CONFLICT (shop_id,category_key) DO UPDATE, no transaction; dead upsertExpenseRule removed",
+          "D Discard resets currency+rules+revenue and clears server errors; server errors clear on edit; once-only 'Rule changes saved' toast; loading on Calculate and Results Save buttons; .table-scroll wrappers; currency caption + symbol/code on fields; currency-neutral formula notes; ?from= re-initialises; crafted ?d= with unsupported currency -> 'no calculation'; enable checkbox aria-label and click/Space no longer toggle the row (NOT moved out of <summary>: partial); 'Rule changes not saved' banner; error rows auto-open",
+          "E eslint ignores dev-evidence/** (was 33 errors)",
+          "B1 dropped value= (selected on s-option), currency/revenue/formula submitted from state via hidden inputs, currencyError rendered + disables Calculate, 'Set once' copy replaced - blank mechanism NOT reproduced in 9 hydrated runs, needs live check"
+        ],
+        "judgement_calls": [
+          "orchestrator's donut example (revenue 100000 cogs 5000 + shipping 45000 -> 10/90) actually gives 5/45 under the stated ring rule; tests pin both 10000c->10/90 and 100000c->5/45",
+          "disabled blank row shows inline error because Save requires it; Calculate still allowed since a disabled row takes no part"
+        ],
+        "not_fixed_product_decisions": [
+          "tiered formula cliff",
+          "no cap at 100%",
+          "Back navigation loses unsaved inputs"
+        ],
+        "not_run": [
+          "DB tests (local test-DB password lives only in .env, developer told not to read it): expense-rule-save-race.db.test.ts written + guard-wired but never executed; DB-free stand-ins run",
+          "App Bridge nav/save bar/toast not seen (needs live Admin iframe)"
+        ],
+        "note": "developer reported shared-tree node_modules damaged - repaired by orchestrator npm ci (v62) before this gate run"
+      },
+      "project_version_before": 64,
+      "project_version_after": 64
+    },
+    {
+      "timestamp": "2026-09-21T08:16:11Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gates_run_real_tree_and_pushed",
+      "details": {
+        "lint": 0,
+        "typecheck": 0,
+        "test": "exit 0: 390 passed, 43 skipped (4 opt-in DB files)",
+        "build": 0,
+        "pushed": "origin/main up to 91d74ed (UI pass 2 + migrate guard + evidence); secret scan clean",
+        "qa_owed": "independent QA of pass 1 + seed-race + migrate guard + pass 2 as pushed; DB save-race test never executed; live Admin checks by human"
+      },
+      "project_version_before": 64,
+      "project_version_after": 64
+    },
+    {
+      "timestamp": "2026-09-21T08:28:47Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "gate_decision",
+      "details": {
+        "gate": "G2-revision",
+        "decision": "CONFIRM"
+      },
+      "project_version_before": 65,
+      "project_version_after": 66
+    },
+    {
+      "timestamp": "2026-09-21T08:28:47Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "sprint_opened",
+      "details": {
+        "gate": "G4-sprint-4.1",
+        "scope": "UI v2 build"
+      },
+      "project_version_before": 65,
+      "project_version_after": 66
     }
   ],
   "lock": {

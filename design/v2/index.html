@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Calculator — v2 mockup index (review only)</title>
+
+  <!-- App Bridge FIRST, in <head> of every page. This index is a review aid and does NOT ship. -->
+  <meta name="shopify-api-key" content="%SHOPIFY_API_KEY%">
+  <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+  <script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+
+  <link rel="stylesheet" href="./assets/v2.css">
+  <script src="./assets/v2.js" defer></script>
+</head>
+<body data-page="index">
+
+  <s-app-nav>
+    <s-link href="./calculator.html" rel="home">Calculator</s-link>
+    <s-link href="./rules.html">Expense rules</s-link>
+    <s-link href="./history.html">History</s-link>
+  </s-app-nav>
+
+  <s-page heading="G2-revision v2 mockup: review index">
+    <s-banner tone="info" heading="Review aid, not product UI">
+      <s-paragraph>
+        Outside Shopify admin the App Bridge sidebar does not render, so use the links below (and the bar at the bottom of
+        every page) to move between screens and states. Not self-approved: this is a Human design gate.
+      </s-paragraph>
+    </s-banner>
+
+    <s-section heading="Screens and states">
+      <s-table>
+        <s-table-header-row>
+          <s-table-header listSlot="primary">Screen</s-table-header>
+          <s-table-header listSlot="secondary">Route in the app</s-table-header>
+          <s-table-header>States to review</s-table-header>
+        </s-table-header-row>
+        <s-table-body>
+          <s-table-row>
+            <s-table-cell><s-link href="./calculator.html">Calculator</s-link> (app home)</s-table-cell>
+            <s-table-cell>/app/calculator (rel="home")</s-table-cell>
+            <s-table-cell>
+              <s-link href="./calculator.html?from=5">prefilled from snapshot</s-link>,
+              <s-link href="./calculator.html?state=variants">rules variants</s-link>,
+              <s-link href="./calculator.html?state=error-empty">empty revenue</s-link>,
+              <s-link href="./calculator.html?state=error-negative">negative</s-link>,
+              <s-link href="./calculator.html?state=error-decimals">3 decimals</s-link>,
+              <s-link href="./calculator.html?state=error-comma">"1,5"</s-link>
+            </s-table-cell>
+          </s-table-row>
+          <s-table-row>
+            <s-table-cell><s-link href="./rules.html">Expense rules</s-link></s-table-cell>
+            <s-table-cell>/app/rules (new)</s-table-cell>
+            <s-table-cell>
+              <s-link href="./rules.html?state=variants">variants</s-link>,
+              <s-link href="./rules.html?state=dirty">unsaved edit (save bar)</s-link>,
+              <s-link href="./rules.html?state=errors">validation errors</s-link>,
+              <s-link href="./rules.html?state=saved">saved toast</s-link>
+            </s-table-cell>
+          </s-table-row>
+          <s-table-row>
+            <s-table-cell><s-link href="./results.html">Results</s-link></s-table-cell>
+            <s-table-cell>/app/results?d=… (sub-page of Calculator)</s-table-cell>
+            <s-table-cell>
+              <s-link href="./results.html?state=zero-revenue">zero revenue</s-link>,
+              <s-link href="./results.html?state=expenses-exceed">expenses exceed revenue</s-link>,
+              <s-link href="./results.html?state=single-category">single category</s-link>,
+              <s-link href="./results.html?state=small-slices">small slices</s-link>,
+              <s-link href="./results.html?state=all-off">all rules off</s-link>,
+              <s-link href="./results.html?state=invalid-link">invalid link</s-link>,
+              <s-link href="./results.html?state=no-calculation">no calculation</s-link>
+            </s-table-cell>
+          </s-table-row>
+          <s-table-row>
+            <s-table-cell><s-link href="./history.html">History</s-link></s-table-cell>
+            <s-table-cell>/app/history</s-table-cell>
+            <s-table-cell>
+              <s-link href="./history.html?state=empty">empty</s-link>,
+              <s-link href="./history.html?state=loading">loading</s-link>,
+              <s-link href="./history.html?state=paged">paginated</s-link>
+            </s-table-cell>
+          </s-table-row>
+          <s-table-row>
+            <s-table-cell><s-link href="./history-detail.html">History detail</s-link></s-table-cell>
+            <s-table-cell>/app/history/:id (sub-page of History)</s-table-cell>
+            <s-table-cell>
+              <s-link href="./history-detail.html?saved=1">just saved</s-link>,
+              <s-link href="./history-detail.html?state=not-found">not found</s-link>
+            </s-table-cell>
+          </s-table-row>
+        </s-table-body>
+      </s-table>
+    </s-section>
+  </s-page>
+
+</body>
+</html>
