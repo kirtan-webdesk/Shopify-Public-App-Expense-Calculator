@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+import { pathToFileURL } from "node:url";
+const browser = await chromium.launch({ executablePath: process.env.HOME + "/AppData/Local/ms-playwright/chromium-1234/chrome-win64/chrome.exe" });
+const page = await (await browser.newContext({ viewport: { width: 1000, height: 800 } })).newPage();
+await page.goto(pathToFileURL(process.argv[2] + "/results.html").href, { waitUntil: "networkidle" });
+await page.waitForTimeout(1500);
+await page.locator('s-button[command="--show"]').click();
+await page.waitForTimeout(800);
+await page.screenshot({ path: process.argv[3] });
+console.log(await page.evaluate(() => { const m = document.querySelector("s-modal"); return JSON.stringify({ open: m?.matches(":popover-open") ?? null, tag: m?.tagName }); }));
+await browser.close();

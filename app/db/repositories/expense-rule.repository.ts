@@ -77,6 +77,47 @@ export async function upsertExpenseRule(
 }
 
 /**
+ * Seeds the given rules for this shop WITHOUT ever overwriting or failing on
+ * a row that already exists: one multi-row `INSERT ... ON CONFLICT DO NOTHING`
+ * (Sequelize `bulkCreate({ ignoreDuplicates: true })`) against the real
+ * `uq_expense_rule_shop_category` unique constraint.
+ *
+ * Why this and not `replaceExpenseRulesForShop` for first-load seeding: two
+ * first-ever requests for a fresh shop on DIFFERENT serverless instances can
+ * both read "no rules yet" and then both insert the same
+ * (shop_id, category_key) rows. With a plain INSERT the loser hit the unique
+ * constraint, its transaction threw, and the merchant saw an error on first
+ * load; with find-then-update it would have overwritten anything the winner
+ * (or the merchant) had already customised. INSERT-IGNORE keeps whichever
+ * rows got there first, untouched, and no unique violation can escape.
+ * The caller re-reads afterwards to get the rows that actually exist.
+ *
+ * Transactions: a single INSERT statement is atomic on its own, so no
+ * transaction is opened here (nothing to thread, and nothing that could
+ * acquire a second connection under pool.max:1). If a caller ever needs this
+ * inside a larger unit of work, pass its `transaction` and this uses it.
+ */
+export async function seedExpenseRulesIfMissing(
+  ctx: ShopContext,
+  inputs: readonly UpsertExpenseRuleInput[],
+  transaction?: Transaction,
+): Promise<void> {
+  if (inputs.length === 0) return;
+  await ExpenseRuleModel.bulkCreate(
+    inputs.map((input) => ({
+      shopId: ctx.shopId,
+      categoryKey: input.categoryKey,
+      ruleType: input.ruleType,
+      rateBasisPoints: input.rateBasisPoints,
+      fixedAmountMinor: input.fixedAmountMinor === null ? null : String(input.fixedAmountMinor),
+      formulaKey: input.formulaKey,
+      enabled: input.enabled,
+    })),
+    { ignoreDuplicates: true, ...(transaction ? { transaction } : {}) },
+  );
+}
+
+/**
  * Replaces every category's rule for this shop in one transaction — the
  * calculator's "Save" action persists all 10 rows together rather than one
  * request per row, so a partial save (e.g. rows 1-6 written, row 7 fails

@@ -3,6 +3,7 @@ import { QueryTypes } from "sequelize";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { EXPENSE_CATEGORIES } from "~/domain/expense-categories";
 import { encodeDefaultResult } from "../helpers/calc-fixtures";
+import { assertConnectedToTestDatabase, setupTestDatabase } from "../helpers/test-database";
 
 // --------------------------------------------------------------------------
 // G4-sprint-3.2 (P1 fix) — "no shop row" gap, real Postgres, OPT-IN.
@@ -17,9 +18,12 @@ import { encodeDefaultResult } from "../helpers/calc-fixtures";
 // existence only as a side effect of the real route loaders/actions.
 //
 // Runs only with RUN_DB_TESTS=1 (skipped and reported as skipped otherwise;
-// the default `npm test` stays DB-free — see tests/README.md):
+// the default `npm test` stays DB-free — see tests/README.md) AND a
+// TEST_DATABASE_URL pointing at a SEPARATE database (never production —
+// tests/helpers/test-database.ts fails loudly if it is unset or matches any
+// non-test URL):
 //
-//   RUN_DB_TESTS=1 npx vitest run tests/db/shop-ensure.db.test.ts
+//   RUN_DB_TESTS=1 TEST_DATABASE_URL=... npx vitest run tests/db/shop-ensure.db.test.ts
 //
 // Real route loaders/actions -> requireShopContext -> service -> repository ->
 // Postgres, under the production pool.max:1. Only `authenticate.admin` is
@@ -30,7 +34,8 @@ import { encodeDefaultResult } from "../helpers/calc-fixtures";
 // webhook handlers' repository calls (the real production functions).
 // --------------------------------------------------------------------------
 
-const RUN_DB = process.env.RUN_DB_TESTS === "1";
+// Throws loudly (RUN_DB_TESTS=1 with no/unsafe TEST_DATABASE_URL); redirects the app at the TEST DB.
+const RUN_DB = setupTestDatabase();
 
 vi.setConfig({ testTimeout: 60_000, hookTimeout: 60_000 });
 
@@ -160,6 +165,7 @@ describe.skipIf(!RUN_DB)("ensure-shop on the request path (real Postgres, NO pre
       import("~/routes/app"),
       import("~/routes/auth.$"),
     ]);
+    await assertConnectedToTestDatabase(seq.sequelize);
     m = {
       sequelize: seq.sequelize,
       markShopUninstalled: shopRepo.markShopUninstalled,

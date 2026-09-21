@@ -1,0 +1,82 @@
+import { createElement, type ComponentType } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { describe, it, vi } from "vitest";
+
+vi.mock("~/shopify.server", () => ({ authenticate: { admin: vi.fn() } }));
+vi.mock("~/db/repositories/shop.repository", () => ({ findShopContextByDomain: vi.fn(), ensureShopContext: vi.fn() }));
+vi.mock("~/db/repositories/calculation.repository", () => ({
+  countCalculationsForShop: vi.fn(),
+  findCalculationWithLineItems: vi.fn(),
+  insertCalculationSnapshot: vi.fn(),
+  listCalculationsForShop: vi.fn(),
+}));
+
+import HistoryPage from "~/routes/app.history";
+import ResultsPage from "~/routes/app.results";
+import CalculatorPage from "~/routes/app.calculator";
+import { ErrorBoundary as DetailErrorBoundary } from "~/routes/app.history.$id";
+import { SavedCalculationPage } from "~/components/saved-calculation-page";
+import { ENGINE_VERSION } from "~/domain/expense-engine";
+import { DEFAULT_EXPENSE_RULES } from "~/domain/expense-rule-defaults";
+import { EXPENSE_CATEGORIES } from "~/domain/expense-categories";
+import { buildDefaultResult, encodeDefaultResult } from "../helpers/calc-fixtures";
+import { decodeCalculationResult } from "~/domain/calculation-transport";
+
+const OUT = process.env.RENDER_OUT!;
+const asComponent = (c: unknown) => c as ComponentType<Record<string, unknown>>;
+const css = readFileSync("app/styles/app.css", "utf8");
+
+function shell(body: string, title: string): string {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>${title}</title>
+<meta name="shopify-api-key" content="stub"/>
+<script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+<script src="https://cdn.shopify.com/shopifycloud/polaris.js"></script>
+<style>${css}</style></head><body>${body}</body></html>`;
+}
+
+async function renderRoute(Component: unknown, loaderData: unknown, viaLoader: boolean): Promise<string> {
+  const routes = viaLoader
+    ? [{ path: "/", loader: () => loaderData, Component: asComponent(Component) }]
+    : [{ path: "/", Component: () => createElement(asComponent(Component), { loaderData }) }];
+  const handler = createStaticHandler(routes);
+  const context = await handler.query(new Request("http://localhost/"));
+  if (context instanceof Response) throw new Error("redirect");
+  const router = createStaticRouter(handler.dataRoutes, context);
+  return renderToStaticMarkup(createElement(StaticRouterProvider, { router, context, hydrate: false }));
+}
+
+const rules = DEFAULT_EXPENSE_RULES.map((d) => {
+  const c = EXPENSE_CATEGORIES.find((x) => x.key === d.categoryKey)!;
+  return { categoryKey: d.categoryKey, categoryLabel: c.label, sortOrder: c.sortOrder, enabled: true, ruleType: d.ruleType,
+    rateBasisPoints: d.rateBasisPoints, fixedAmountMinor: d.fixedAmountMinor, formulaKey: d.formulaKey };
+});
+rules[3] = { ...rules[3]!, ruleType: "formula", rateBasisPoints: null, formulaKey: "tiered_by_revenue_band" } as never;
+rules[9] = { ...rules[9]!, enabled: false } as never;
+
+const hItems = [
+  { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 5_000_000, totalExpensesMinor: 3_662_000, netAmountMinor: 1_338_000, currencyCode: "USD" },
+  { id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", savedAtIso: "2026-09-03T16:02:00.000Z", revenueMinor: 4_200_000, totalExpensesMinor: 4_314_000, netAmountMinor: -114_000, currencyCode: "CAD" },
+];
+
+describe("render", () => {
+  it("writes pages", async () => {
+    mkdirSync(OUT, { recursive: true });
+    const w = (n: string, html: string) => writeFileSync(`${OUT}/${n}.html`, shell(html, n));
+    w("calculator", await renderRoute(CalculatorPage, { rules, prefill: null }, true));
+    w("calculator-cad", await renderRoute(CalculatorPage, { rules, prefill: { savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 5_000_000, currencyCode: "CAD" } }, true));
+    w("calculator-eur", await renderRoute(CalculatorPage, { rules, prefill: { savedAtIso: "2026-09-17T09:14:00.000Z", revenueMinor: 5_000_000, currencyCode: "EUR" } }, true));
+    for (const [n, cur, rev] of [["results", "USD", 5_000_000], ["results-cad", "CAD", 5_000_000], ["results-zero", "USD", 0], ["results-tiny", "EUR", 100_000]] as const) {
+      const encoded = encodeDefaultResult(rev, cur);
+      w(n, await renderRoute(ResultsPage, { result: decodeCalculationResult(encoded), encoded }, false));
+    }
+    w("results-empty", await renderRoute(ResultsPage, { result: null, encoded: null }, false));
+    w("history", await renderRoute(HistoryPage, { history: { items: hItems, page: 1, totalPages: 3, totalCount: 42, pageSize: 20 } }, false));
+    w("history-empty", await renderRoute(HistoryPage, { history: { items: [], page: 1, totalPages: 1, totalCount: 0, pageSize: 20 } }, false));
+    const saved = { id: "3f2b8c1e-9a4d-4e0b-8f6a-1c2d3e4f5a6b", savedAtIso: "2026-09-17T09:14:00.000Z", engineVersion: ENGINE_VERSION, result: buildDefaultResult(5_000_000, "CAD") };
+    w("history-detail", renderToStaticMarkup(createElement(SavedCalculationPage, { saved })));
+    w("history-notfound", renderToStaticMarkup(createElement(DetailErrorBoundary as never, { error: { status: 404, statusText: "", data: "", internal: false } } as never)));
+  });
+});

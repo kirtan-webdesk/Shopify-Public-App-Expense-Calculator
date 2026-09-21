@@ -58,27 +58,58 @@ const common = {
   logging: false,
 };
 
+// Per-environment values are LAZY (getters): sequelize-cli reads only
+// `config[<--env>]`, so `--env test` needs only TEST_DATABASE_URL,
+// `--env development` only DATABASE_URL/DIRECT_DATABASE_URL, and
+// `--env production` only DIRECT_DATABASE_URL. (Previously all three blocks
+// were evaluated eagerly at require time, so a missing var for ONE env threw
+// even when migrating another.)
+//
+// The `test` env reads TEST_DATABASE_URL ONLY — it never falls back to
+// DIRECT_DATABASE_URL / DATABASE_URL (which may be production) — and refuses
+// a URL whose host + database match any non-test URL (db/config/
+// test-db-guard.cjs, G4-sprint-3.4).
+const { resolveTestDatabaseUrl } = require("./test-db-guard.cjs");
+const path = require("path");
+
 module.exports = {
-  development: {
-    ...common,
-    url: migrationUrl("development"),
+  get development() {
+    return {
+      ...common,
+      url: migrationUrl("development"),
+    };
   },
-  test: {
-    ...common,
-    url: process.env.DIRECT_DATABASE_URL || process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+  get test() {
+    const url = resolveTestDatabaseUrl(process.env, path.resolve(__dirname, "..", ".."));
+    return {
+      ...common,
+      url,
+      // TLS is decided by the TEST url alone, never by an ambient PGSSLMODE
+      // (dotenv loads .env's PGSSLMODE, which is meant for the hosted DB and
+      // would make a local test Postgres refuse the connection). A managed
+      // test branch (e.g. Neon) carries ?sslmode=require and needs TLS;
+      // sequelize-cli does not derive it from ?sslmode= itself.
+      dialectOptions: {
+        ssl: /[?&]sslmode=(require|verify-ca|verify-full)\b/i.test(url)
+          ? { require: true, rejectUnauthorized: false }
+          : false,
+      },
+    };
   },
-  production: {
-    ...common,
-    url: migrationUrl("production"),
-    dialectOptions: {
-      // VERIFY AT BUILD: the hosting provider's managed Postgres SSL
-      // requirements (ADR-0010's companion note to ADR-0001's original one).
-      // Most managed providers require SSL with a non-self-signed-friendly
-      // CA chain; rejectUnauthorized:false is a common but
-      // security-relaxing default — confirm the provider's documented
-      // setting before shipping to production rather than carrying this
-      // placeholder.
-      ssl: { require: true, rejectUnauthorized: false },
-    },
+  get production() {
+    return {
+      ...common,
+      url: migrationUrl("production"),
+      dialectOptions: {
+        // VERIFY AT BUILD: the hosting provider's managed Postgres SSL
+        // requirements (ADR-0010's companion note to ADR-0001's original one).
+        // Most managed providers require SSL with a non-self-signed-friendly
+        // CA chain; rejectUnauthorized:false is a common but
+        // security-relaxing default — confirm the provider's documented
+        // setting before shipping to production rather than carrying this
+        // placeholder.
+        ssl: { require: true, rejectUnauthorized: false },
+      },
+    };
   },
 };

@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-21T06:31:39Z",
-    "version": 51,
+    "updated_at": "2026-09-21T07:07:20Z",
+    "version": 57,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -1493,6 +1493,234 @@
       },
       "project_version_before": 51,
       "project_version_after": 51
+    },
+    {
+      "timestamp": "2026-09-21T06:39:00Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "p1_shop_row_fix_delivered",
+      "details": {
+        "commits": {
+          "144b3ee": "NOT the developer's - kirtan-webdesk blanket commit already on origin/main; contains the fix's app code + tests + project.json (2nd provenance incident, same pattern as 105b1c6)",
+          "7765afe": "tests/README note",
+          "c3eba1a": "evidence (unpushed at time of report)"
+        },
+        "design": "ensureShopContext(shopDomain) in shop.repository.ts: SELECT first, INSERT ON CONFLICT DO NOTHING (ignoreDuplicates) + re-read (max 3), conditional UPDATE clearing uninstalled_at on reinstall; no transaction (pool.max:1 safe). requireShopContext(session) in app/services/shop-context.service.ts is the single choke point taking the authenticated session (domain cannot come from request input). All 5 404 sites replaced; upsertInstalledShop delegates to it; auth.$.tsx still works. Per-route not layout loader (layout loader does not run for child actions, adds a SELECT per navigation). No afterAuth hook (request path covers existing sessions).",
+        "semantics": "reinstall: same row, uninstalled_at cleared, id/installed_at/rules/history kept (ADR-0008 step 2). Session after shop/redact hard-delete: fresh empty row, new id, no old data.",
+        "gates": "lint/typecheck/build exit 0; tests 244 passed 37 skipped; DB suites 37/37 (22 M4 + 15 new); run-gates.py still fails on Windows (F4), manual equivalent",
+        "live_evidence": "dev-evidence/g4-sprint-3.2-shop-ensure-fix/: outage state reproduced (real session, no shop row, old lookup returns null); requireShopContext created row for existing session without new token exchange; fresh-domain scenarios a-f all pass incl. 2 and 5 concurrent first requests -> exactly one row with ON CONFLICT path actually hit, repeat requests 3 SELECTs 0 writes, cross-tenant identical 404, shop/shopId in URL/form never selects a tenant; zero residue",
+        "ci_guard": "tests/architecture/shop-context-choke-point.test.ts runs in default CI (no DB): fails if any app/routes/app*.tsx uses findShopContextByDomain, throws old 404, hand-builds ShopContext, reads shop from request input",
+        "mcp": "N/A backend only, no artifact claimed",
+        "disclosed_not_fixed": [
+          "wds55 shop row pre-existed the fix (created 06:24:04Z) - orchestrator note: that is the diagnosis agent's accidental write (see INCIDENT entry), not a manual hotfix",
+          "late shop/redact after reinstall would delete the reinstalled shop's data + sessions; redact handler has no reinstall guard (P3 compliance-semantics, needs decision; ensure step recreates a fresh row)",
+          "cross-instance race in getOrSeedExpenseRules: loser can hit uq_expense_rule_shop_category unique violation (P3)",
+          "DB suites write to the same Neon DB as the real store under ensure-*/m4-* domains and clean up"
+        ]
+      },
+      "project_version_before": 51,
+      "project_version_after": 52
+    },
+    {
+      "timestamp": "2026-09-21T06:42:34Z",
+      "actor": "designer",
+      "actor_type": "agent",
+      "action": "ui_review_read_only_delivered",
+      "details": {
+        "method": "code-only review vs G2 mockups; live page not viewable (Shopify login)",
+        "shell_ok": "app.css wired correctly via ?url + <Links/>, built asset exists, all used classes exist; App Bridge+Polaris scripts in <head> with api-key meta first; nav matches mockup",
+        "p1": "none confirmed",
+        "confirmed_p2": [
+          "P2-1 rule rows lost expand chevron (svg + 8 CSS lines not ported)",
+          "P2-2 hardcoded $ in calculator (app.calculator.tsx:169,397)",
+          "P2-3 formatRuleApplied: fixed amount has no currency symbol, formula shown as raw key (presentation.ts:72-76; test history-presentation.test.ts asserts old strings)",
+          "P2-4 hidden intent input stuck on 'calculate' after a validation error, so Save bar posts wrong intent",
+          "P2-5 no 'Rule changes saved' toast on calculator",
+          "P2-6 Calculate disabled with errors hidden inside collapsed rows",
+          "P2-12 results copy says 'above' while banner is above figures / implies partial placeholders"
+        ],
+        "suspected_p2": [
+          "P2-7 s-sections wrapped in <form> lose Polaris card spacing",
+          "P2-8 native HTML in light DOM renders in default serif/16px",
+          "P2-9 slot='action' on s-banner probably should be primary-action (designer's own mockup error) - buttons may not render",
+          "P2-10 percent/fixed inputs lack name so App Bridge save bar dirty-detection may not fire",
+          "P2-11 results-grid breakpoint by viewport not container, no overflow-x wrappers, cramped 800-1000px"
+        ],
+        "p3": [
+          "two stacked banners on calculator",
+          "hardcoded body colours (dark mode) and #D82C0D",
+          "radios crammed",
+          "unlabeled checkbox",
+          "percent formatting 32.50% vs 32.5%",
+          "currency select codes only",
+          "row order vs mockup",
+          "USD/CAD both '$' with no code on results",
+          "stale server errors",
+          "a11y: repeated 'View' links, td vs th scope=row, donut max-width",
+          "inline svg in s-badge, div in s-banner",
+          "s-page directly under s-banner in error boundaries",
+          "toast replay on reload",
+          "no ErrorBoundary boundary pattern in app.tsx"
+        ],
+        "human_should_check_live": [
+          "Network: /assets/app-*.css 200 text/css",
+          "computed font-family of <p> in s-section",
+          "calculator full-page: separate cards? rows expandable?",
+          "save bar appears on percent change? toast after save?",
+          "invalid value in collapsed row -> dead Calculate?",
+          "results at 800-1000px width, CAD/EUR result",
+          "empty history: button inside banner?",
+          "sidebar nav highlight incl. /app/history/:id"
+        ]
+      },
+      "project_version_before": 52,
+      "project_version_after": 53
+    },
+    {
+      "timestamp": "2026-09-21T06:43:44Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_sprint_3_2_shop_ensure_qa_verdict",
+      "details": {
+        "reviewed_commit": "c3eba1a",
+        "code_commit": "144b3ee",
+        "verdict": "PASS_WITH_FLAGS",
+        "open_p1": 0,
+        "open_p2": 0,
+        "verified_by_reading_tree": [
+          "ensureShopContext: SELECT-first, INSERT ON CONFLICT DO NOTHING, capped retries, conditional UPDATE, no transaction (pool.max:1 safe), uq_shop_domain real",
+          "requireShopContext takes the authenticated session only; all 5 former 404 sites use it; no shop domain read from request/params/form/search; auth.$ still works",
+          "cross-tenant identical 404 intact (M4 not regressed)",
+          "only authenticate.admin sessions create tenant rows; webhooks lookup-only; no row-flood",
+          "no-pre-existing-row scenario genuine (raw SELECT assertNoRow before first request); 2-way conflict path asserted from SQL log; repeat requests 0 writes; zero residue",
+          "choke-point test runs in default npm test/CI, auto-covers new app*.tsx routes"
+        ],
+        "flags": [
+          "P3 evidence provenance: dev-authored, ran on uncommitted tree before 144b3ee, no embedded SHA/executor, stubs authenticate.admin so no real Shopify token ever flowed through fixed path",
+          "P3 late shop/redact after reinstall deletes the reinstalled shop's data + sessions (ADR-0008 silent; GDPR-conservative but silent data loss for an active merchant; cron-driven drain makes it likelier) - needs a DECISION",
+          "P3 cross-instance getOrSeedExpenseRules unique-violation race -> possible 500/ErrorBoundary on a merchant's first load (fix: bulkCreate ignoreDuplicates or catch UniqueConstraintError + re-read + test)",
+          "P3 DB suites share the production Neon DB (no guard against RUN_DB_TESTS pointing at prod; recommend separate branch + TEST_DATABASE_URL)",
+          "P4 SUMMARY overstates 5-way SQL-log assertion (only 2-way asserts it)",
+          "P4 choke-point test scans app/routes only",
+          "P4 late app/uninstalled after reinstall (self-heals; idle shop could be swept after 45d)",
+          "P4 pg sslmode deprecation warning: set verify-full explicitly"
+        ],
+        "conditions_before_G4_signoff": [
+          "independent executor re-run of DB suites + live script at pushed HEAD with SHA/env header",
+          "one real embedded load on a disposable second dev store with no prior shop row (wds55 row is the diagnosis agent's accidental write, explained, do not delete)",
+          "decisions on redact-after-reinstall, seed race fix, test-DB isolation",
+          "push c3eba1a and get green CI"
+        ]
+      },
+      "project_version_before": 53,
+      "project_version_after": 54
+    },
+    {
+      "timestamp": "2026-09-21T06:58:59Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "ui_bug_report_and_full_qa_request",
+      "details": {
+        "source": "human manual testing of the live embedded app (wds55), submitted as a written fix+QA prompt",
+        "confirmed_bugs": [
+          "B1 Calculator: Currency select renders blank on every fresh load/navigation though the stored value is real (dropdown shows it highlighted) - controlled-value/label desync; must show persisted currency immediately, no blank flash",
+          "B2 Results: donut shows 'No data' when Revenue=0 even though total expenses non-zero (e.g. Shipping $450 fixed) - empty-state condition likely keyed on revenue instead of expense amounts; plot by per-category expense, 'No data' only when total expenses = 0",
+          "B3 Calculator: Revenue accepts negatives with no inline warning; on Calculate the block is correct but message says 'Enter a revenue amount' (reads as empty) - add real-time validation (min=0 + inline feedback) and accurate copy e.g. 'Revenue amount must be zero or greater.'"
+        ],
+        "qa_matrix": [
+          "numeric inputs: empty/zero/negative/decimal/huge/non-numeric paste/leading zeros, percent >100%",
+          "disabled category excluded from table+chart+counts",
+          "switching rule type must not retain/resubmit stale values",
+          "Tiered-by-revenue-band formula correctness vs documented placeholder bands",
+          "Save bar Discard reverts all field changes; unsaved-changes navigation behaviour",
+          "chart colours match legend swatches (zero and non-zero revenue)",
+          "% of revenue shows dash not NaN/Infinity/blank at revenue 0",
+          "Save-this-calculation modal Cancel = no partial save; snapshots current rules",
+          "double-submit on Calculate and Save",
+          "History empty state; pagination boundaries; snapshot immutability end-to-end",
+          "narrow viewport, loading/pending states, non-USD currency formatting (CAD/EUR/GBP), a11y basics, zero console errors/failed requests"
+        ],
+        "constraints": "do not change placeholder defaults, category names or business copy except where tied to a bug fix; fix root causes in state/logic not CSS-only",
+        "note": "human's prompt says Remix; actual stack is React Router 7 - map to real repo"
+      },
+      "project_version_before": 54,
+      "project_version_after": 55
+    },
+    {
+      "timestamp": "2026-09-21T07:04:56Z",
+      "actor": "sales@webdesksolution.ca",
+      "actor_type": "human",
+      "action": "ui_requirement_nav_and_push",
+      "details": {
+        "requirement_N1": "Shopify Admin sidebar currently shows Apps > Expense Calculator with children 'Calculator' and 'History'. Remove the redundant 'Calculator' child: the calculator is the default landing page so it needs no nav entry of its own. Keep 'History'.",
+        "implementation_hint": "app/routes/app.tsx s-app-nav: make the calculator link the app home (rel=\"home\") so App Bridge treats it as the app root and does not list it as a child item; verify against current shopify.dev docs via Dev MCP before relying on it and confirm History still appears and the app-name entry opens /app/calculator.",
+        "requirement_N2": "fix all UI errors and push (repeated authorization; push after orchestrator verifies MCP evidence)",
+        "sequencing": "UI agent 1 (own screenshot review) still running -> second developer pass = nav change + designer P2/P3 list + human bugs B1-B3 + QA trace defects -> orchestrator runs check-dev-handoff.py -> push -> QA"
+      },
+      "project_version_before": 55,
+      "project_version_after": 56
+    },
+    {
+      "timestamp": "2026-09-21T07:07:20Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "static_trace_ui_defects_delivered",
+      "details": {
+        "kind": "read-only static trace, no gate action; working tree was mid-edit (HEAD advanced to ee967b2 during the read) so line numbers must be re-anchored",
+        "B1_currency_blank": "SUSPECTED P2: <s-select value={currency}> AND <s-option selected> both set; polaris.js (blocking in <head>) upgrades s-select before s-option children exist, so value is applied to an empty native select (selectedIndex -1 = blank); G2 mockup used only <s-option selected>. Fix: drop value=, keep selected on options; if insufficient, ref + customElements.whenDefined('s-select') imperative sync. Also CONFIRMED: currencyError returned by the action is never rendered (blank select submits currency='' and Calculate silently does nothing); copy 'Set once' is false (currency is not persisted).",
+        "B2_donut_no_data_at_zero_revenue": "CONFIRMED P2: percentageOfRevenue() returns 0 when revenue<=0 (presentation.ts:16-19) -> donut-chart.ts:51 filters on percentage>0 -> every slice dropped -> isEmpty; legend hidden. Fix: key empty state on amountMinor>0; ring basis = share of revenue when revenue>0 and sum<=100 else share of total expenses (aria-label says 'of total expenses'). Test: revenue 0 + shipping 45000 -> isEmpty false, one segment dash 100.",
+        "B2b_donut_wrong_when_expenses_exceed_revenue": "CONFIRMED P2: cursor accumulates past 100 -> dash>100/negative gap -> invalid stroke-dasharray, overlapping arcs. Realistic with seeded defaults (71.5% + $870 fixed at $1,000 revenue = 158.5%). Same normalisation fixes it. Test: revenue 100000c, cogs 5000 + shipping 45000 -> dashes 10 and 90.",
+        "B3_negative_revenue": "CONFIRMED P2: parseDecimalString('-5') returns null (regex rejects sign) so action calls validateRevenueMinor(null) -> 'Enter a revenue amount.'; the negative branch (line 73) is unreachable. No client-side revenue validation at all. Fix: text-level validator ('' -> 'Enter a revenue amount.', leading '-' -> 'Revenue must be zero or a positive amount.', bad decimals -> decimals message) used by action AND client useMemo, wired to field error + Calculate disabled; runCalculation takes raw revenue text.",
+        "NEW_P2_save_rules_500": "CONFIRMED P2: validateExpenseRuleRow skips disabled rows with null value, saveExpenseRules writes that null for the active rule type, DB chk_expense_rule_value_shape requires NOT NULL -> unhandled check_violation -> root ErrorBoundary and lost form. Repro: clear a percent field, untick the category, Save. Fix: validate each row as {...row, enabled:true} in saveExpenseRules. Test: shipping {enabled:false, fixed, null} -> ok:false + fieldErrors, nothing written.",
+        "p3": [
+          "stale server errors persist after user fixes field (server error preferred over client; also serverRevenueError)",
+          "Discard resets rows+revenue but NOT currency, and does not clear server errors",
+          "no success toast after Save",
+          "USD and CAD both render '$' (narrowSymbol) and no code shown on Results/calculator",
+          "formula help text hardcodes '$'",
+          "generic messages for 3 decimals/.5/1e5/huge; 'strip commas anywhere' turns '1,5' into 15.00 (EUR hazard)",
+          "useState initialisers do not re-run when ?from= changes on same mounted route (SUSPECTED)",
+          "Back navigation loses revenue/unsaved rule edits",
+          "no loading indicator on Calculate/Save (only disabled)",
+          "tables lack overflow-x wrapper (SUSPECTED)",
+          "enable checkbox nested inside <summary> hurts a11y (SUSPECTED)",
+          "tiered formula cliff ($500 -> $350 at +1c) matches documented single-rate-per-band text but is a product decision"
+        ],
+        "p4": [
+          "crafted ?d= with non-ISO currency crashes Results via Intl.NumberFormat (self-inflicted)",
+          "some chart colours <3:1 contrast on white (swatches aria-hidden, table carries data)"
+        ],
+        "verified_ok": [
+          "formulas arithmetic correct at band edges (worked examples match code+tests)",
+          "disabled category excluded from table/chart/legend",
+          "% of revenue shows dash at revenue 0",
+          "chart colours consistent with legend swatches",
+          "modal Cancel cannot submit; Save recomputes server-side",
+          "history empty state, page clamping, immutability intact",
+          "no cap at 100% for percent (cap 1000%), no warning when percentages sum >100 (deliberate: negative net allowed)"
+        ],
+        "human_only": [
+          "B1 mechanism + whether blank select submits currency=''",
+          "save bar Discard + leave-page prompt behaviour (App Bridge)",
+          "whether s-number-field error= renders inline",
+          "narrow-width overflow, banner contrast, keyboard/screen-reader of summary+checkbox"
+        ]
+      },
+      "project_version_before": 56,
+      "project_version_after": 57
+    },
+    {
+      "timestamp": "2026-09-21T07:07:20Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "ui_pass1_commit_observed",
+      "details": {
+        "commit": "ee967b2",
+        "message": "fix(ui): G4-sprint-3.3 UI review fixes (currency, chevrons, select prefill, copy, toast replay)",
+        "status": "UI agent 1 has committed code; final report/MCP-Evidence not yet received; seed-race/test-DB agent still active in the same tree (touches expense-rule.service/repository which pass 2 also needs) so pass 2 is sequenced after both report"
+      },
+      "project_version_before": 57,
+      "project_version_after": 57
     }
   ],
   "lock": {

@@ -6,17 +6,19 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { DEFAULT_EXPENSE_RULES } from "~/domain/expense-rule-defaults";
 import { ENGINE_VERSION, type EngineResult } from "~/domain/expense-engine";
 import { buildDefaultResult, encodeDefaultResult, tamperTransport } from "../helpers/calc-fixtures";
+import { assertConnectedToTestDatabase, setupTestDatabase } from "../helpers/test-database";
 
 // --------------------------------------------------------------------------
 // M4 DB-backed tests (real Postgres) — OPT-IN.
 //
 // vitest.config.ts deliberately keeps the default `npm test` DB-free (no
-// DATABASE_URL secret in CI — see tests/README.md). This file therefore runs
+// database secret in CI — see tests/README.md). This file therefore runs
 // only when RUN_DB_TESTS=1 is set; otherwise every test in it is SKIPPED (and
-// reported as skipped — never silently green). Run it against a real database
-// with:
+// reported as skipped — never silently green). Run it against a SEPARATE test
+// database (TEST_DATABASE_URL — never production; tests/helpers/test-database.ts
+// fails loudly if it is unset or matches any non-test URL) with:
 //
-//   RUN_DB_TESTS=1 npx vitest run tests/db
+//   RUN_DB_TESTS=1 TEST_DATABASE_URL=... npx vitest run tests/db
 //
 // It uses genuinely fresh shop domains per run (randomUUID) and deletes every
 // row it creates. It exercises the REAL route loaders/actions, service and
@@ -32,7 +34,8 @@ import { buildDefaultResult, encodeDefaultResult, tamperTransport } from "../hel
 // pool.max:1 transaction-threading guarantee (every test runs under it).
 // --------------------------------------------------------------------------
 
-const RUN_DB = process.env.RUN_DB_TESTS === "1";
+// Throws loudly (RUN_DB_TESTS=1 with no/unsafe TEST_DATABASE_URL); redirects the app at the TEST DB.
+const RUN_DB = setupTestDatabase();
 
 // Real network round trips to a serverless Postgres: the 5s default is too
 // tight for multi-statement transactions on a cold connection.
@@ -46,7 +49,7 @@ vi.mock("~/shopify.server", () => ({
 type Ctx = { shopId: string; shopDomain: string };
 
 // Resolved in beforeAll (dynamic imports keep the Sequelize connection from
-// loading when the suite is skipped and DATABASE_URL is unset).
+// loading when the suite is skipped and no test database is configured).
 let m: {
   sequelize: typeof import("~/db/sequelize").sequelize;
   upsertInstalledShop: typeof import("~/db/repositories/shop.repository").upsertInstalledShop;
@@ -136,6 +139,7 @@ describe.skipIf(!RUN_DB)("M4 save + history (real Postgres)", () => {
         import("~/routes/app.history.$id"),
         import("~/routes/app.calculator"),
       ]);
+    await assertConnectedToTestDatabase(seq.sequelize);
     m = {
       sequelize: seq.sequelize,
       upsertInstalledShop: shopRepo.upsertInstalledShop,

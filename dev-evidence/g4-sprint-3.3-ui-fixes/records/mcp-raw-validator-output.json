@@ -1,0 +1,39 @@
+{
+  "server": {
+    "name": "shopify-dev-mcp",
+    "version": "1.14.5"
+  },
+  "conversationId": "1190970c-1fed-462a-9b7c-82ee772ae24b",
+  "results": [
+    {
+      "file": "app/routes/app.calculator.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.calculator.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-section, s-banner, s-number-field, s-select, s-option, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - Form\n  - input\n  - p\n  - p\n  - p\n  - div\n  - p\n  - div\n  - details\n  - summary\n  - svg\n  - path\n  - span\n  - span\n  - label\n  - input\n  - div\n  - fieldset\n  - legend\n  - label\n  - input\n  - div\n  - input\n  - div\n  - input\n  - div\n  - p\n  - input\n  - input\n  - input\n  - div\n  - p\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.results.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.results.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-link, s-section, s-banner, s-modal, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - p\n  - p\n  - strong\n  - Form\n  - input\n  - input\n  - p\n  - p\n  - strong\n  - div\n  - SummaryField\n  - SummaryField\n  - SummaryField\n  - div\n  - ExpenseBreakdown\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.history.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.history.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-section, s-banner, s-button, s-link.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - p\n  - svg\n  - rect\n  - path\n  - p\n  - strong\n  - div\n  - table\n  - caption\n  - thead\n  - tr\n  - th\n  - th\n  - th\n  - th\n  - th\n  - th\n  - span\n  - tbody\n  - tr\n  - td\n  - td\n  - td\n  - td\n  - td\n  - td\n  - div\n  - span\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.history.$id.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.history.$id.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-link, s-section, s-banner, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - SavedCalculationPage\n  - p\n  - p\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/components/saved-calculation-page.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/components/saved-calculation-page.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-link, s-section, s-banner, s-badge, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - svg\n  - rect\n  - path\n  - p\n  - span\n  - LockIcon\n  - strong\n  - strong\n  - div\n  - LockIcon\n  - span\n  - div\n  - SummaryField\n  - SummaryField\n  - SummaryField\n  - SummaryField\n  - ExpenseBreakdown\n  - div\n  - p\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/components/expense-breakdown.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/components/expense-breakdown.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** No components found to validate by TypeScript.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - div\n  - span\n  - span\n  - div\n  - div\n  - table\n  - caption\n  - thead\n  - tr\n  - th\n  - th\n  - th\n  - th\n  - tbody\n  - tr\n  - td\n  - tr\n  - th\n  - span\n  - td\n  - td\n  - td\n  - tfoot\n  - tr\n  - th\n  - td\n  - td\n  - td\n  - div\n  - DonutChart\n  - ul\n  - li\n  - span\n  - span\n  - span\n  - svg\n  - circle\n  - text\n  - svg\n  - g\n  - circle\n\n",
+      "isError": false
+    }
+  ]
+}

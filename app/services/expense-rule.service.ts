@@ -21,6 +21,7 @@ import type { ExpenseRuleModel } from "~/db/models/expense-rule.model";
 import {
   listExpenseRulesForShop,
   replaceExpenseRulesForShop,
+  seedExpenseRulesIfMissing,
   type UpsertExpenseRuleInput,
 } from "~/db/repositories/expense-rule.repository";
 import type { ShopContext } from "~/db/repositories/shop-context";
@@ -74,6 +75,7 @@ function defaultsAsView(): readonly ExpenseRuleView[] {
  * install" behaviour from S2.1, implemented lazily on first calculator load
  * rather than hooked into the install webhook path (a deliberate scope
  * decision for this sprint — see the developer handoff for the reasoning).
+ * Safe under concurrent first loads on different instances (insert-ignore).
  */
 export async function getOrSeedExpenseRules(ctx: ShopContext): Promise<readonly ExpenseRuleView[]> {
   const existing = await listExpenseRulesForShop(ctx);
@@ -94,7 +96,13 @@ export async function getOrSeedExpenseRules(ctx: ShopContext): Promise<readonly 
     formulaKey: d.formulaKey,
     enabled: true,
   }));
-  await replaceExpenseRulesForShop(ctx, seedInputs);
+  // Insert-ignore-duplicates, then re-read (first-load seed race, G4-sprint-
+  // 3.4): a concurrent first request on another serverless instance may have
+  // seeded — or the merchant may already have customised — some/all of these
+  // rows between our read above and this insert. Those rows are kept as-is
+  // (never overwritten, no unique violation), and the re-read below returns
+  // whatever really exists.
+  await seedExpenseRulesIfMissing(ctx, seedInputs);
   const seeded = await listExpenseRulesForShop(ctx);
   return seeded.map(toView).sort((a, b) => a.sortOrder - b.sortOrder);
 }
