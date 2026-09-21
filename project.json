@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-21T08:28:47Z",
-    "version": 66,
+    "updated_at": "2026-09-21T10:51:29Z",
+    "version": 69,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -224,7 +224,7 @@
       "sla_hours": 24,
       "expires_at": "2026-09-22T08:28:47Z",
       "approver": "QA lead (role - stakeholder in the interim)",
-      "notes": "Implements the G2-revision design. Calculate now uses SAVED rules only. QA debt carried in: independent QA of pass 1 (ee967b2), seed-race + test-DB isolation (dd4c266), migrate guard (3f7135f), pass 2 (9d6407f); DB save-race test never executed; live-Admin checks owed by human (sidebar, currency select, save bar, toast, chart at revenue 0)."
+      "notes": "Implements the G2-revision design. Calculate now uses SAVED rules only. QA debt carried in: independent QA of pass 1 (ee967b2), seed-race + test-DB isolation (dd4c266), migrate guard (3f7135f), pass 2 (9d6407f); DB save-race test never executed; live-Admin checks owed by human (sidebar, currency select, save bar, toast, chart at revenue 0). | CONSOLIDATED QA (HEAD 17d0772, read-only): 3.3 PWF (P4), 3.4 PWF (P3x3,P4x2), 3.5 PWF (P3x2), 3.6 PWF (P3x2,P4x3), 4.1 BLOCKED = single P2 evidence gap, NO confirmed P1 code defect. Blocker: every primary action is an s-page slot button (Calculate, Save calculation -> modal via commandFor/--show, Edit rules, Reset, Change revenue, New calculation, Duplicate) and the Rules page has no in-body Save; whether Admin chrome forwards clicks/invoker commands into the iframe, and whether the App Bridge save bar detects changes on dotted-name shadow-DOM controls, is unverified. If Save calculation fails merchants cannot save (P1). v1 used an in-body button that the human saw working. Recommended fix: keep header buttons, ADD in-body fallbacks (Results: non-primary Save calculation with same command/commandFor; Calculator: in-body Calculate type=button; Rules: in-body type=submit Save). Verified clean: J1 (Calculate uses saved rules only, forged fields ignored, Save re-verifies), /app/rules auth+choke point, no cross-tenant/crash via ?from/?revenue/?currency/?d, pass-2 logic + pinned tests, seed-race SQL, test-DB guard, lazy config.cjs, migrate guard (no cheap accidental bypass). P4: forged ?d= rates can be saved (self-only; suggest HMAC). P3: PowerShell ack example persists $env:ALLOW_HOSTED_DB for the session; production db:drop/undo:all add no friction; a11y s-table critical aria-required-children judged plausible false positive but NVDA/VoiceOver check mandatory before G5; 43 DB tests skipped in CI (no Postgres service) and expense-rule-save-race never executed; npm audit 4 moderate + deprecations; rotate SHOPIFY_API_SECRET; MCP evidence for 3.3/3.5 stale vs rewritten files."
     }
   ],
   "budget": {
@@ -2056,6 +2056,168 @@
       },
       "project_version_before": 65,
       "project_version_after": 66
+    },
+    {
+      "timestamp": "2026-09-21T10:10:11Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g4-sprint-4.1-ui-v2/DEVELOPER-HANDOFF.md",
+        "commit": "6a8657f",
+        "result": "EXIT 0 HANDOFF OK, 7 validations, independently re-run",
+        "provenance_caveat": "MCP driven over stdio (@shopify/dev-mcp@1.14.5), descriptive call ids; app.tsx (s-app-nav) not Polaris-validatable"
+      },
+      "project_version_before": 66,
+      "project_version_after": 66
+    },
+    {
+      "timestamp": "2026-09-21T10:10:11Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "ui_v2_built",
+      "details": {
+        "commits": {
+          "6a8657f": "code (parent 82577eb, a blanket 'design-v2' commit by someone else)",
+          "1c524ae+17d0772": "evidence (sandbox refused SUMMARY files; SHA256SUMS.txt carries hashes)"
+        },
+        "built": [
+          "nav: Calculator rel=home, Expense rules -> /app/rules, History",
+          "app.rules.tsx: compact rows (~1226px vs ~2000px), data-save-bar, saveExpenseRules (disabled row must still be valid), Discard resets all, once-only toast with Calculate action, 'not saved' banner lists bad rows + focus first bad field, Reset-to-defaults fills form only",
+          "calculator slim: revenue+currency+read-only saved-rules table + Placeholder badge; J1 Calculate = calculateFromSavedRules(ctx,{revenueText,currencyCode}) loads saved rules server-side; test forges rule fields/dotted names/intent/rules blob -> identical result; J6 ?from= copies revenue+currency only, ?revenue=&currency= revalidated",
+          "results: breadcrumb, 3 metric tiles, table primary, donut w/ pass-2 basis logic, palette >=3:1 (computed contrast test), all degenerate states",
+          "history: date is link, New calculation, empty, pagination (own Prev/Next, not s-table paginate); detail: frozen-snapshot signals, Duplicate, identical 404",
+          "app.css 308 -> ~65 lines; JSX decls for 15 tags"
+        ],
+        "browser_found_bugs": [
+          "s-grid @container needs s-query-container; comma inside repeat(3, 1fr) mis-parsed -> 1 column (guard test)",
+          "s-switch React onChange never fired -> onInput (test pinned) - toggling off would have been ignored on Save",
+          "s-text-field has no inputMode/onKeyDown",
+          "s-table host aria-label not exposed + axe flag; root.tsx had no <title> (added)",
+          "s-page header moves to Admin chrome when window.shopify exists (harness stub caused missing headers)"
+        ],
+        "validators": "VALID: calculator, rules, results, history, history detail, saved-calculation-page, expense-breakdown; app.tsx INVALID-by-namespace (App Bridge); s-query-container/s-grid/s-box/s-stack/s-switch/s-heading/s-paragraph/s-text/s-divider/s-table confirmed VALID",
+        "tests": "537 passed / 43 DB skipped (was 390)",
+        "cannot_verify_without_live_admin": [
+          "EVERY header action button (Calculate, Save calculation, Edit rules, Reset, Change revenue, New calculation, Duplicate) is an s-page slot: whether click/commandFor reaches the modal in the iframe is unverified - Save calculation flow depends on it",
+          "real save bar dirty detection (best effort: dotted names, hidden inputs, dispatched input+change after Reset)",
+          "sidebar nav, real toast, screen reader, s-table <560px"
+        ],
+        "a11y_judgement": "axe reports 1 critical aria-required-children on every s-table page; developer judged false positive because Chromium's real AX tree shows grid/rows/columnheaders/cells; native-table fallback NOT used; no screen reader tried; table has no accessible name (only section heading)",
+        "other": [
+          "tsconfig.json now excludes dev-evidence; dev-evidence/g4-sprint-3.1-m4/live-evidence.ts uses a removed getDuplicatePrefill signature and would no longer type-check/run as written",
+          "tables keep category order not largest-first",
+          "amber banners left as designed"
+        ]
+      },
+      "project_version_before": 66,
+      "project_version_after": 66
+    },
+    {
+      "timestamp": "2026-09-21T10:10:11Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "gates_run_real_tree_and_pushed",
+      "details": {
+        "lint": 0,
+        "typecheck": 0,
+        "test": "exit 0: 537 passed, 43 skipped (4 opt-in DB files)",
+        "build": 0,
+        "pushed": "origin/main through 17d0772 (UI v2), secret scan clean",
+        "qa_owed": "single QA covering sprints 3.3 (pass 1), 3.4 (seed-race + test-DB isolation), 3.5 (pass 2), 3.6 (migrate guard), 4.1 (UI v2)"
+      },
+      "project_version_before": 66,
+      "project_version_after": 66
+    },
+    {
+      "timestamp": "2026-09-21T10:21:04Z",
+      "actor": "qa-agent",
+      "actor_type": "agent",
+      "action": "g4_consolidated_qa_verdict",
+      "details": {
+        "head": "17d0772",
+        "scope": [
+          "3.3",
+          "3.4",
+          "3.5",
+          "3.6",
+          "4.1"
+        ],
+        "verdicts": {
+          "3.3": "PASS_WITH_FLAGS",
+          "3.4": "PASS_WITH_FLAGS",
+          "3.5": "PASS_WITH_FLAGS",
+          "3.6": "PASS_WITH_FLAGS",
+          "4.1": "BLOCKED"
+        },
+        "blocked_reason_4.1": "P2 evidence gap: header-slot actions and Rules save bar unverified in live Admin; no confirmed P1 code defect",
+        "open_p1": 0,
+        "open_p2": 1,
+        "fix_order_before_G5": [
+          "1 in-body fallbacks (Save calculation on Results, Calculate on Calculator, Save on Rules) + update tests/ui",
+          "2 human live verification of header actions + rules save bar",
+          "3 run 43 DB tests once on local test DB, add Postgres service to app-ci.yml",
+          "4 NVDA/VoiceOver check of s-table results table (else native table)",
+          "5 rotate SHOPIFY_API_SECRET, triage npm audit (no --force)",
+          "6 re-run MCP validation in a harness session on final HEAD; address rejectUnauthorized:false on prod DB pool",
+          "7 guard hardening (PowerShell one-shot example, prod db:drop/undo:all friction, optional HMAC-signed ?d=)",
+          "8 archive/update dev-evidence g4-sprint-3.1-m4 live-evidence.ts, remove dead code"
+        ]
+      },
+      "project_version_before": 67,
+      "project_version_after": 68
+    },
+    {
+      "timestamp": "2026-09-21T10:51:29Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "g4_sprint_4_2_fallbacks_delivered",
+      "details": {
+        "commits": {
+          "5ca3acd": "code (13 files)",
+          "586d5cc": "evidence"
+        },
+        "part_a": [
+          "Results: in-body 'Save calculation' in the 'Estimate only, not saved yet' banner, same command=--show/commandFor as header button",
+          "Calculator: in-body Calculate below sections, same handleCalculate/loading (like header, not disabled on invalid: click shows error + focuses field)",
+          "Rules: in-body Save (type=submit, primary) + Discard (form.reset -> existing onReset) at end of Category rules, inside the data-save-bar form; disabled while saving; retry after failed save works with no save bar"
+        ],
+        "harness_proof": "Chromium harness (real polaris.js + routes + services, stubbed auth/in-memory repos): empty revenue error stays; 50000 -> Results; Discard restores 32.50; failed save banner zero writes, Save stays enabled, retry = 1 write + toast; real Playwright mouse click on Save = exactly 1 write; Results fallback opens same modal and modal Save completes",
+        "validators": "3 files VALID (stdio-driven dev-mcp 1.14.5, harness MCP tools unavailable)",
+        "part_b": [
+          "migrate-guard hint now one-shot (PowerShell try/finally Remove-Item; cmd set ... && ... & set ALLOW_HOSTED_DB=), tests/README + tests updated, no new friction rules (product decision)",
+          "app-ci.yml: postgres:18 service (health-checked), migrate --env test, RUN_DB_TESTS=1 vitest tests/db; TEST_DATABASE_URL 127.0.0.1 on those two steps only; permissions contents:read, 20-min timeout, **/*.cjs path filter; tests/architecture/ci-workflow.test.ts pins shape",
+          "live-evidence.ts (3.1-m4) marked ARCHIVED with README, not deleted"
+        ],
+        "caveats": [
+          "two .click() in the same JS task produced 2 writes (React not yet re-rendered disabled); no ref-latch added (a stuck latch would block saving) - hard guarantee is a human/product decision; server-side idempotency key still absent (M4 P3)",
+          "CI workflow unproven until first Actions run (service start, migrate on PG18, DB suites on Linux)",
+          "Postgres 18 tag: production version not recorded in repo - human to run SHOW server_version on hosted DB",
+          "DB suites not run (local creds refused; .env not read)",
+          "harness cannot show App Bridge save bar or Admin header chrome",
+          "design question: two Calculate / two Save calculation buttons per page"
+        ]
+      },
+      "project_version_before": 68,
+      "project_version_after": 68
+    },
+    {
+      "timestamp": "2026-09-21T10:51:29Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "checked_gated_and_pushed",
+      "details": {
+        "handoff_checker": "EXIT 0, 3 validations, independently re-run at 5ca3acd",
+        "lint": 0,
+        "typecheck": 0,
+        "test": "exit 0: 555 passed, 43 skipped",
+        "build": 0,
+        "pushed": "origin/main through 586d5cc, secret scan clean",
+        "next": "first CI run on GitHub (postgres service) + human live checks; QA re-review of 4.2 fallbacks then close G4-sprint-4.1"
+      },
+      "project_version_before": 68,
+      "project_version_after": 68
     }
   ],
   "lock": {
