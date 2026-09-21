@@ -43,30 +43,28 @@ export function SavedCalculationPage({ saved }: { readonly saved: SavedCalculati
 
       <s-section>
         <s-banner tone="info" heading="This is a saved snapshot">
-          <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-            <LockIcon size={18} />
-            <p>
-              Saved <strong>{savedAt}</strong> using the revenue and rule values active at that
-              moment. If you&apos;ve changed your category rules since then, those changes are{" "}
-              <strong>not</strong> reflected below — this record won&apos;t change.{" "}
-              <s-link href="/app/calculator">View my current rules</s-link>
-            </p>
-          </div>
+          <p>
+            <span className="lock-icon">
+              <LockIcon size={16} />
+            </span>
+            Saved <strong>{savedAt}</strong> using the revenue and rule values active at that
+            moment. If you&apos;ve changed your category rules since then, those changes are{" "}
+            <strong>not</strong> reflected below — this record won&apos;t change.{" "}
+            <s-link href="/app/calculator">View my current rules</s-link>
+          </p>
         </s-banner>
       </s-section>
 
       <s-section>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBlockEnd: "12px" }}>
+        <div className="snapshot-meta">
           <s-badge tone="info">
             <LockIcon size={12} />
             Snapshot
           </s-badge>
-          <span style={{ color: "var(--p-color-text-secondary, #616161)", fontSize: "0.8125rem" }}>
-            Engine version {saved.engineVersion}
-          </span>
+          <span className="help-text">Engine version {saved.engineVersion}</span>
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+        <div className="summary-row">
           <SummaryField label="Revenue (as saved)" value={formatMoney(result.revenueMinor, result.currencyCode)} />
           <SummaryField
             label="Total expenses (as saved)"
@@ -90,19 +88,13 @@ export function SavedCalculationPage({ saved }: { readonly saved: SavedCalculati
       </s-section>
 
       <s-section>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+        <div className="action-row">
           <s-button href="/app/history">Back to history</s-button>
           <s-button variant="primary" href={`/app/calculator?from=${saved.id}`}>
             Duplicate as new calculation
           </s-button>
         </div>
-        <p
-          style={{
-            color: "var(--p-color-text-secondary, #616161)",
-            fontSize: "0.8125rem",
-            textAlign: "right",
-          }}
-        >
+        <p className="help-text help-text--end">
           Starts a fresh calculation pre-filled with these values — it won&apos;t edit this saved
           record.
         </p>

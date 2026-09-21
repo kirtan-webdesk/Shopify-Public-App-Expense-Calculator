@@ -32,20 +32,8 @@ export default function HistoryPage({ loaderData }: Route.ComponentProps) {
   return (
     <s-page heading="History">
       <s-section heading="Saved calculations">
-        <p
-          style={{
-            color: "var(--p-color-text-secondary, #616161)",
-            fontSize: "0.8125rem",
-            marginBlockEnd: "12px",
-          }}
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 16 16"
-            aria-hidden="true"
-            style={{ verticalAlign: "-2px", marginInlineEnd: "4px" }}
-          >
+        <p className="help-text help-text--spaced">
+          <svg className="lock-icon" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
             <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
             <path d="M5 7V5a3 3 0 016 0v2" fill="none" stroke="currentColor" strokeWidth="1.3" />
           </svg>
@@ -101,16 +89,8 @@ export default function HistoryPage({ loaderData }: Route.ComponentProps) {
               </tbody>
             </table>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                gap: "8px",
-                marginBlockStart: "16px",
-              }}
-            >
-              <span style={{ color: "var(--p-color-text-secondary, #616161)", fontSize: "0.8125rem" }}>
+            <div className="pagination">
+              <span className="help-text">
                 Page {page} of {totalPages}
               </span>
               <s-button disabled={page <= 1} href={page > 1 ? `/app/history?page=${page - 1}` : undefined}>

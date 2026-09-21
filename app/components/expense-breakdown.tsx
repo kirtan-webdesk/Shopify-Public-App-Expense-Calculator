@@ -24,11 +24,11 @@ export function SummaryField({
   readonly negative?: boolean;
 }) {
   return (
-    <div>
-      <div style={{ fontSize: "0.8125rem", color: "var(--p-color-text-secondary, #616161)" }}>{label}</div>
-      <div style={{ fontSize: "1.25rem", fontWeight: 600, color: negative ? "#D82C0D" : undefined }}>
+    <div className="summary-field">
+      <span className="summary-field__label">{label}</span>
+      <span className={negative ? "summary-field__value summary-field__value--negative" : "summary-field__value"}>
         {value}
-      </div>
+      </span>
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function ExpenseBreakdown({
                   ></span>
                   {li.categoryLabel}
                 </th>
-                <td>{formatRuleApplied(li)}</td>
+                <td>{formatRuleApplied(li, result.currencyCode)}</td>
                 <td className="numeric">{formatMoney(li.computedAmountMinor, result.currencyCode)}</td>
                 <td className="numeric">
                   {result.revenueMinor > 0 ? formatPercent(li.percentageOfRevenue) : "—"}

@@ -48,8 +48,15 @@ export default function HistoryDetailPage({ loaderData }: Route.ComponentProps) 
   // is provided by the App Bridge script in <head>; absent outside the admin
   // iframe, in which case the snapshot banner below is the confirmation.
   useEffect(() => {
-    if (justSaved) {
-      (window as unknown as ToastHost).shopify?.toast?.show("Calculation saved");
+    if (!justSaved) return;
+    (window as unknown as ToastHost).shopify?.toast?.show("Calculation saved");
+    // The toast is a one-time confirmation of the redirect that just happened.
+    // Drop the `saved` flag from the address bar (no navigation, no loader
+    // re-run) so reloading or re-opening this URL does not replay it.
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("saved")) {
+      url.searchParams.delete("saved");
+      window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
     }
   }, [justSaved]);
 

@@ -140,22 +140,14 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
           <p>
             This is a live preview using the rule values from the Calculator page, including any
             unsaved edits. Select <strong>Save this calculation</strong> to keep a permanent
-            snapshot of it in your history. Percentages and formula amounts above used placeholder
-            illustrative defaults where you have not entered your own figures.
+            snapshot of it in your history. Any rule you have not edited still uses its
+            illustrative placeholder default, so treat the figures below as an estimate.
           </p>
         </s-banner>
       </s-section>
 
       <s-section>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "20px",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
+        <div className="summary-row summary-row--spread">
           <SummaryField label="Revenue" value={formatMoney(result.revenueMinor, result.currencyCode)} />
           <SummaryField
             label="Total expenses"

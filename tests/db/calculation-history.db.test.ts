@@ -299,7 +299,7 @@ describe.skipIf(!RUN_DB)("M4 save + history (real Postgres)", () => {
       const after = await renderDetail();
       expect(after.json).toBe(before.json);
       expect(after.html).toBe(before.html);
-      expect(before.html).toContain("32.50% of revenue"); // the rule as saved, not the mutated live rule
+      expect(before.html).toContain("32.5% of revenue"); // the rule as saved, not the mutated live rule
       expect(before.html).not.toContain("777777");
     });
 

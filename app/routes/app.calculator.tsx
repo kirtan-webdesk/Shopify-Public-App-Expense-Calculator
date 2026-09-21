@@ -9,7 +9,13 @@ import { getDuplicatePrefill } from "~/services/calculation-history.service";
 import { encodeCalculationResult } from "~/domain/calculation-transport";
 import { EXPENSE_CATEGORIES, type ExpenseCategoryKey } from "~/domain/expense-categories";
 import { EXPENSE_FORMULAS } from "~/domain/expense-formulas";
-import { formatSavedAt, minorUnitsToInputString } from "~/domain/presentation";
+import {
+  currencyOptionLabel,
+  currencySymbol,
+  formatSavedAt,
+  minorUnitsToInputString,
+  trimDecimalZeros,
+} from "~/domain/presentation";
 import {
   SUPPORTED_CURRENCY_CODES,
   hasAnyFieldError,
@@ -163,10 +169,10 @@ function toFormInput(row: RuleRowState): ExpenseRuleFormInput {
   };
 }
 
-function ruleSummary(row: RuleRowState): string {
+function ruleSummary(row: RuleRowState, currencyCode: string): string {
   if (!row.enabled) return "Disabled";
-  if (row.ruleType === "percentage") return `${row.percentText || "0"}% of revenue`;
-  if (row.ruleType === "fixed") return `$${row.fixedText || "0.00"} fixed`;
+  if (row.ruleType === "percentage") return `${trimDecimalZeros(row.percentText) || "0"}% of revenue`;
+  if (row.ruleType === "fixed") return `${currencySymbol(currencyCode)}${row.fixedText || "0.00"} fixed`;
   const formula = EXPENSE_FORMULAS.find((f) => f.key === row.formulaKey);
   return formula ? formula.label : "Formula";
 }
@@ -202,6 +208,11 @@ export default function CalculatorPage() {
   function handleCalculateClick() {
     if (intentInputRef.current) intentInputRef.current.value = "calculate";
     formRef.current?.requestSubmit();
+    // The submission has already captured the form data synchronously; put the
+    // shared intent back to "save" so the contextual save bar's own Save (which
+    // carries no intent of its own) can never replay "calculate" after a
+    // validation error kept the merchant on this page.
+    if (intentInputRef.current) intentInputRef.current.value = "save";
   }
 
   // Server-side field errors from the last "save" or "calculate" submission
@@ -309,8 +320,8 @@ export default function CalculatorPage() {
               }}
             >
               {SUPPORTED_CURRENCY_CODES.map((code) => (
-                <s-option key={code} value={code}>
-                  {code}
+                <s-option key={code} value={code} selected={code === currency}>
+                  {currencyOptionLabel(code)}
                 </s-option>
               ))}
             </s-select>
@@ -332,8 +343,17 @@ export default function CalculatorPage() {
               return (
                 <details className="rule-row" key={category.key} open={category.sortOrder === 0}>
                   <summary className="rule-row__summary">
+                    <svg
+                      className="rule-row__chevron"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                    >
+                      <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
                     <span className="rule-row__title">{category.label}</span>
-                    <span className="rule-row__at-a-glance">{ruleSummary(row)}</span>
+                    <span className="rule-row__at-a-glance">{ruleSummary(row, currency)}</span>
                     <label className="visually-hidden" htmlFor={`enabled-${category.key}`}>
                       Enable {category.label} rule
                     </label>
@@ -350,7 +370,7 @@ export default function CalculatorPage() {
                     />
                   </summary>
                   <div className="rule-row__body">
-                    <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+                    <fieldset className="rule-row__types">
                       <legend className="visually-hidden">Rule type for {category.label}</legend>
                       {(["percentage", "fixed", "formula"] as const).map((type) => (
                         <label key={type}>
@@ -394,7 +414,7 @@ export default function CalculatorPage() {
                           label="Fixed amount"
                           min={0}
                           step={0.01}
-                          prefix="$"
+                          prefix={currencySymbol(currency)}
                           value={row.fixedText}
                           error={errors.fixedAmountMinor}
                           onInput={(e) =>
@@ -420,12 +440,12 @@ export default function CalculatorPage() {
                           }
                         >
                           {EXPENSE_FORMULAS.map((f) => (
-                            <s-option key={f.key} value={f.key}>
+                            <s-option key={f.key} value={f.key} selected={f.key === row.formulaKey}>
                               {f.label}
                             </s-option>
                           ))}
                         </s-select>
-                        <p style={{ color: "var(--p-color-text-secondary, #616161)", fontSize: "0.8125rem" }}>
+                        <p className="help-text">
                           {EXPENSE_FORMULAS.find((f) => f.key === row.formulaKey)?.placeholderNote ??
                             "PLACEHOLDER formula pattern — illustrative only, pending OQ-4 sign-off."}
                         </p>
@@ -452,7 +472,7 @@ export default function CalculatorPage() {
         </s-section>
 
         <s-section>
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+          <div className="action-row">
             {/* type="button" (not "submit"): s-button has no name/value pair
                 to carry the "calculate" intent (verified via Dev MCP
                 validate_component_codeblocks — s-button does not support a
@@ -468,7 +488,7 @@ export default function CalculatorPage() {
               Calculate
             </s-button>
           </div>
-          <p style={{ color: "var(--p-color-text-secondary, #616161)", fontSize: "0.8125rem", textAlign: "right" }}>
+          <p className="help-text help-text--end">
             Uses the rule values shown above, including any unsaved edits — save your rules
             first if you want to reuse these values next time.
           </p>

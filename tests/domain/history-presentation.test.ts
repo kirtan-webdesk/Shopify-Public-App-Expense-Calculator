@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { formatRuleApplied, formatSavedAt } from "~/domain/presentation";
+import {
+  currencyOptionLabel,
+  currencySymbol,
+  formatMoney,
+  formatRuleApplied,
+  formatSavedAt,
+  trimDecimalZeros,
+} from "~/domain/presentation";
 import { isUuid } from "~/domain/ids";
 
 describe("formatSavedAt", () => {
@@ -24,21 +31,57 @@ describe("formatSavedAt", () => {
 });
 
 describe("formatRuleApplied", () => {
-  it("describes each rule type from the rule's own values", () => {
-    expect(
-      formatRuleApplied({ ruleType: "percentage", rateBasisPoints: 3250, fixedAmountMinor: null, formulaKey: null }),
-    ).toBe("32.50% of revenue");
-    expect(
-      formatRuleApplied({ ruleType: "fixed", rateBasisPoints: null, fixedAmountMinor: 45_000, formulaKey: null }),
-    ).toBe("450.00 fixed");
-    expect(
-      formatRuleApplied({
-        ruleType: "formula",
-        rateBasisPoints: null,
-        fixedAmountMinor: null,
-        formulaKey: "tiered_by_revenue_band",
-      }),
-    ).toBe("Formula: tiered_by_revenue_band");
+  const pct = (bp: number) =>
+    formatRuleApplied({ ruleType: "percentage", rateBasisPoints: bp, fixedAmountMinor: null, formulaKey: null });
+  const fixed = (minor: number, currency?: string) =>
+    formatRuleApplied({ ruleType: "fixed", rateBasisPoints: null, fixedAmountMinor: minor, formulaKey: null }, currency);
+
+  it("describes a percentage rule without insignificant trailing zeros (matches the G2 mockup)", () => {
+    expect(pct(3250)).toBe("32.5% of revenue");
+    expect(pct(800)).toBe("8% of revenue");
+    expect(pct(290)).toBe("2.9% of revenue");
+    expect(pct(1234)).toBe("12.34% of revenue");
+    expect(pct(0)).toBe("0% of revenue");
+  });
+
+  it("gives a fixed amount its currency symbol when the calculation currency is known", () => {
+    expect(fixed(45_000, "USD")).toBe("$450.00 fixed");
+    expect(fixed(45_000, "CAD")).toBe("$450.00 fixed");
+    expect(fixed(45_000, "EUR")).toBe("€450.00 fixed");
+    expect(fixed(45_000, "GBP")).toBe("£450.00 fixed");
+    expect(fixed(45_000)).toBe("450.00 fixed"); // legacy call without a currency: bare number
+  });
+
+  it("shows a formula's merchant-facing label, falling back to the stored key for an unknown one", () => {
+    const formula = (formulaKey: string) =>
+      formatRuleApplied({ ruleType: "formula", rateBasisPoints: null, fixedAmountMinor: null, formulaKey });
+    expect(formula("tiered_by_revenue_band")).toBe("Formula: Tiered by revenue band");
+    expect(formula("retired_formula_key")).toBe("Formula: retired_formula_key");
+  });
+});
+
+describe("currencySymbol / currencyOptionLabel / trimDecimalZeros", () => {
+  it("follows the selected currency instead of a hardcoded dollar sign", () => {
+    expect(currencySymbol("USD")).toBe("$");
+    expect(currencySymbol("EUR")).toBe("€");
+    expect(currencySymbol("GBP")).toBe("£");
+    expect(currencySymbol("NOPE")).toBe("NOPE"); // never throws on an unknown code
+    expect(formatMoney(45_000, "EUR").startsWith(currencySymbol("EUR"))).toBe(true);
+  });
+
+  it("labels the currency picker options like the mockup", () => {
+    expect(currencyOptionLabel("USD")).toBe("USD — US Dollar");
+    expect(currencyOptionLabel("GBP")).toBe("GBP — British Pound");
+    expect(currencyOptionLabel("XYZ")).toBe("XYZ");
+  });
+
+  it("trims trailing zeros only from well-formed 2-decimal numbers", () => {
+    expect(trimDecimalZeros("32.50")).toBe("32.5");
+    expect(trimDecimalZeros("8.00")).toBe("8");
+    expect(trimDecimalZeros("2.9")).toBe("2.9");
+    expect(trimDecimalZeros("")).toBe("");
+    expect(trimDecimalZeros("abc")).toBe("abc");
+    expect(trimDecimalZeros("1.234")).toBe("1.234");
   });
 });
 

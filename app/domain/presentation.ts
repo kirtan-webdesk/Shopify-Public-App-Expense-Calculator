@@ -6,6 +6,7 @@
 // value, so ordinary floating-point math is fine here (and only here).
 
 import type { EngineLineItem, EngineResult } from "./expense-engine";
+import { EXPENSE_FORMULAS } from "./expense-formulas";
 
 /**
  * Percentage of revenue a line item's amount represents, 0-100 (or 0 if
@@ -53,27 +54,87 @@ export function formatMoney(amountMinor: number, currencyCode: string): string {
   }).format(major);
 }
 
+// Static (not Intl.DisplayNames) so server and browser always render the same
+// text — no hydration mismatch if the two ICU builds ever disagree on a name.
+const CURRENCY_NAMES: Record<string, string> = {
+  USD: "US Dollar",
+  CAD: "Canadian Dollar",
+  EUR: "Euro",
+  GBP: "British Pound",
+};
+
+/** Currency picker option text, e.g. "USD — US Dollar" (matches the G2 mockup). */
+export function currencyOptionLabel(currencyCode: string): string {
+  const name = CURRENCY_NAMES[currencyCode];
+  return name ? `${currencyCode} — ${name}` : currencyCode;
+}
+
+/**
+ * The currency symbol the shared formatter would put in front of an amount
+ * (e.g. "USD" -> "$", "EUR" -> "€", "GBP" -> "£"). Used for input prefixes and
+ * the calculator's per-category summary so they follow the selected currency
+ * instead of a hardcoded "$". Falls back to the code itself for an unknown one.
+ */
+export function currencySymbol(currencyCode: string): string {
+  try {
+    const parts = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currencyCode,
+      currencyDisplay: "narrowSymbol",
+    }).formatToParts(0);
+    return parts.find((p) => p.type === "currency")?.value ?? currencyCode;
+  } catch {
+    return currencyCode;
+  }
+}
+
+/**
+ * Drops insignificant trailing zeros from a decimal string of at most 2
+ * decimals ("32.50" -> "32.5", "8.00" -> "8", "2.9" -> "2.9"). Anything else
+ * (blank, non-numeric, more than 2 decimals) is returned untouched so a
+ * half-typed or invalid value is never silently rewritten in the UI.
+ */
+export function trimDecimalZeros(text: string): string {
+  const trimmed = text.trim();
+  if (!/^\d+(\.\d{1,2})?$/.test(trimmed)) return text;
+  return String(Number(trimmed));
+}
+
 /**
  * One-line description of the rule applied to a category, rendered from the
  * rule's own values (never from the current live rule). Shared by the
  * Results page and the saved-calculation detail page so both describe a rule
  * identically — on the detail page the inputs are the stored `*_at_save`
  * columns, so a later edit to the live rule cannot change this text.
+ *
+ * `currencyCode` (the calculation's own currency) gives a fixed amount its
+ * symbol, e.g. "$450.00 fixed" / "€450.00 fixed"; without it only the bare
+ * number is shown.
  */
-export function formatRuleApplied(li: {
-  readonly ruleType: string;
-  readonly rateBasisPoints: number | null;
-  readonly fixedAmountMinor: number | null;
-  readonly formulaKey: string | null;
-}): string {
+export function formatRuleApplied(
+  li: {
+    readonly ruleType: string;
+    readonly rateBasisPoints: number | null;
+    readonly fixedAmountMinor: number | null;
+    readonly formulaKey: string | null;
+  },
+  currencyCode?: string,
+): string {
   if (li.ruleType === "percentage" && li.rateBasisPoints !== null) {
-    return `${(li.rateBasisPoints / 100).toFixed(2)}% of revenue`;
+    return `${trimDecimalZeros((li.rateBasisPoints / 100).toFixed(2))}% of revenue`;
   }
   if (li.ruleType === "fixed" && li.fixedAmountMinor !== null) {
-    return `${(li.fixedAmountMinor / 100).toFixed(2)} fixed`;
+    const amount = currencyCode
+      ? formatMoney(li.fixedAmountMinor, currencyCode)
+      : (li.fixedAmountMinor / 100).toFixed(2);
+    return `${amount} fixed`;
   }
   if (li.ruleType === "formula" && li.formulaKey) {
-    return `Formula: ${li.formulaKey}`;
+    // Merchant-facing label, not the internal snake_case key. An unknown key
+    // (e.g. a formula retired after a snapshot was saved) falls back to the
+    // stored key so the snapshot still says something true.
+    const label = EXPENSE_FORMULAS.find((f) => f.key === li.formulaKey)?.label;
+    return `Formula: ${label ?? li.formulaKey}`;
   }
   return "—";
 }

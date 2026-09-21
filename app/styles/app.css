@@ -166,6 +166,14 @@ body {
   outline: 2px solid var(--p-color-border-focus, #005bd3);
   outline-offset: -2px;
 }
+.rule-row__chevron {
+  flex: 0 0 auto;
+  transition: transform 0.15s ease;
+  color: var(--p-color-icon, #8a8a8a);
+}
+.rule-row[open] > .rule-row__summary .rule-row__chevron {
+  transform: rotate(90deg);
+}
 .rule-row__title {
   flex: 1 1 auto;
   font-weight: 600;
@@ -181,12 +189,93 @@ body {
   flex-direction: column;
   gap: var(--p-space-300, 12px);
 }
+.rule-row__types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-space-200, 8px) var(--p-space-400, 16px);
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.rule-row__types label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--p-space-100, 4px);
+}
 .rule-row__field-group {
   display: flex;
   flex-wrap: wrap;
   gap: var(--p-space-300, 12px);
   align-items: flex-end;
 }
+/* Muted helper text under a control / block (replaces per-element inline styles). */
+.help-text {
+  color: var(--p-color-text-secondary, #616161);
+  font-size: 0.8125rem;
+  margin: 0;
+}
+.help-text--end {
+  text-align: end;
+  margin-block-start: var(--p-space-200, 8px);
+}
+.help-text--spaced {
+  margin-block-end: var(--p-space-300, 12px);
+}
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--p-space-200, 8px);
+  margin-block-start: var(--p-space-400, 16px);
+}
+.snapshot-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--p-space-200, 8px);
+  margin-block-end: var(--p-space-300, 12px);
+}
+
+/* Read-only label/value pair used for the Revenue / Total / Net summary rows
+   (ported from the mockup's .snapshot-readonly-field). */
+.summary-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.summary-field__label {
+  font-size: 0.75rem;
+  color: var(--p-color-text-secondary, #616161);
+}
+.summary-field__value {
+  font-size: 1rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.summary-field__value--negative {
+  color: var(--p-color-text-critical, #d82c0d);
+}
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--p-space-500, 20px);
+  align-items: flex-start;
+}
+.summary-row--spread {
+  justify-content: space-between;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--p-space-300, 12px);
+}
+.lock-icon {
+  display: inline-flex;
+  vertical-align: -3px;
+  margin-inline-end: 4px;
+}
+
 .field-error {
   color: var(--p-color-text-critical, #b52125);
   font-size: 0.8125rem;
