@@ -136,6 +136,23 @@ describe("hosted-target safety for --env development / --env test", () => {
     expect(r.out).toMatch(/host ep\*\*\*\.\*\*\*\.neon\.invalid, db neondb/); // masked host, db name only
   });
 
+  it("the refusal suggests ONE-SHOT acknowledgements only (nothing that leaves ALLOW_HOSTED_DB set for the session)", () => {
+    const r = cli(["db:migrate", "--env", "development"], BASE);
+    expectRefused(r, /HOSTED database/);
+    // cmd: cleared again after the command, whether or not it succeeded (`&`, not `&&`, before the clear).
+    expect(r.out).toContain('set "ALLOW_HOSTED_DB=1"&& npm run db:migrate -- --env development & set "ALLOW_HOSTED_DB="');
+    // PowerShell: try/finally removes the variable even if the command fails.
+    expect(r.out).toContain(
+      "$env:ALLOW_HOSTED_DB=1; try { npm run db:migrate -- --env development } finally { Remove-Item Env:ALLOW_HOSTED_DB }",
+    );
+    // bash: a command-scoped prefix assignment.
+    expect(r.out).toMatch(/^\s+bash\s+: ALLOW_HOSTED_DB=1 npm run db:migrate -- --env development$/m);
+    // The old session-persisting PowerShell suggestion must be gone.
+    expect(r.out).not.toContain("$env:ALLOW_HOSTED_DB=1; npm run");
+    // ... and the reason is stated.
+    expect(r.out).toMatch(/whole terminal session/);
+  });
+
   it("the same for db:migrate:undo, and via a DATABASE_URL-only fallback (no DIRECT_DATABASE_URL)", () => {
     expectRefused(cli(["db:migrate:undo", "--env", "development"], BASE), /HOSTED database/);
     expectRefused(cli(["db:migrate", "--env", "development"], { DATABASE_URL: HOSTED }), /HOSTED database/);
@@ -233,6 +250,10 @@ describe("wiring + docs (static)", () => {
       expect(readme, `tests/README.md should mention ${needle}`).toContain(needle);
     }
     expect(readme).toMatch(/explicit\s+`--env/i);
+    // The acknowledgement is documented as one-shot (cleared after the command), never a session-persisting variable.
+    expect(readme).toContain('set "ALLOW_HOSTED_DB=1"&& npm run db:migrate -- --env development & set "ALLOW_HOSTED_DB="');
+    expect(readme).toContain("finally { Remove-Item Env:ALLOW_HOSTED_DB }");
+    expect(readme).not.toContain("$env:ALLOW_HOSTED_DB=1; npm run");
     const envExample = read(".env.example");
     expect(envExample).toMatch(/--env <name>/);
     expect(envExample).toMatch(/ALLOW_HOSTED_DB/);

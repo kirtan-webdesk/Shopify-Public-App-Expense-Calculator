@@ -383,3 +383,50 @@ describe("/app/history/:id - loader shape and the identical 404", () => {
     expect(html).not.toMatch(/other shop|another shop|forbidden|permission|malformed|invalid id/i);
   });
 });
+
+// G4-sprint-4.2: the header "Save calculation" button is an s-page slot button (Admin chrome; forwarding into the iframe is
+// unverified), so an in-body fallback opens the very same modal.
+describe("/app/results in-body Save calculation fallback (G4-sprint-4.2)", () => {
+  const encoded = encodeDefaultResult();
+  const okData = { result: decodeCalculationResult(encoded), encoded, linkState: "ok" };
+  const render = () => renderRoute(ResultsPage, okData, "http://localhost/app/results", { passLoaderData: true });
+  const openers = (html: string) => html.match(/<s-button\b[^>]*command="--show"[^>]*>[^<]*<\/s-button>/g) ?? [];
+
+  it("keeps the header primary button AND adds a non-primary in-body one that opens the SAME modal with the SAME command", async () => {
+    const html = await render();
+    const buttons = openers(html);
+    expect(buttons).toHaveLength(2);
+    const header = buttons.find((b) => b.includes('slot="primary-action"'))!;
+    const body = buttons.find((b) => !b.includes('slot="primary-action"'))!;
+    expect(header).toContain('variant="primary"');
+    expect(body).not.toContain('variant="primary"');
+    expect(body).toContain(">Save calculation<");
+    for (const b of buttons) {
+      expect(b).toContain('commandFor="save-calculation-modal"');
+      expect(b).toContain('command="--show"');
+    }
+    expect(countTags(html, "s-modal")).toBe(1); // one modal, both buttons target it
+    expect(html).toContain('<s-modal id="save-calculation-modal"');
+  });
+
+  it("the fallback lives in the 'Estimate only, not saved yet' banner, i.e. in the page body", async () => {
+    const html = await render();
+    const banner = html.match(/<s-banner\b[^>]*heading="Estimate only, not saved yet"[^>]*>[\s\S]*?<\/s-banner>/)![0];
+    expect(banner).toContain('command="--show"');
+    expect(banner).toContain('commandFor="save-calculation-modal"');
+  });
+
+  it("the modal, the hidden save form and the transported payload are unchanged (server recompute path)", async () => {
+    const html = await render();
+    expect(html).toContain('name="intent" value="save"');
+    expect(html).toContain(`name="d" value="${encoded}"`);
+    expect((html.match(/<form\b/g) ?? []).length).toBe(1);
+    expect(html).toContain('command="--hide"');
+  });
+
+  it("no Save fallback on the empty state (nothing to save there)", async () => {
+    const html = await renderRoute(ResultsPage, { result: null, encoded: null, linkState: "none" }, "http://localhost/app/results", { passLoaderData: true });
+    expect(html).not.toContain("save-calculation-modal");
+    expect(html).not.toContain(">Save calculation<");
+  });
+});

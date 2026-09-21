@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // DB-free tests of the Expense rules route (G4-sprint-4.1, G2-revision v2): the
@@ -284,5 +286,60 @@ describe("/app/rules action (Save)", () => {
     expect(res.ok).toBe(true);
     const inputs = ruleRepo.replaceExpenseRulesForShop.mock.calls[0]![1] as Array<Record<string, unknown>>;
     expect(inputs.find((i) => i.categoryKey === "cost_of_goods")).toMatchObject({ rateBasisPoints: 3250, enabled: true });
+  });
+});
+
+// G4-sprint-4.2: the App Bridge contextual save bar only appears when its change detection sees an edit (dotted-name shadow-DOM
+// controls, programmatic hidden inputs and a remount on the saved values can all defeat it) and stays hidden after a failed
+// Save. In-body Save / Discard buttons work regardless.
+describe("/app/rules in-body Save / Discard fallback (G4-sprint-4.2)", () => {
+  const source = readFileSync(resolve(process.cwd(), "app/routes/app.rules.tsx"), "utf8");
+  const formOf = (html: string) => html.match(/<form\b[^>]*data-save-bar="true"[^>]*>[\s\S]*<\/form>/)![0];
+  const button = (html: string, text: string) => (html.match(new RegExp(`<s-button\\b[^>]*>${text}</s-button>`)) ?? [""])[0];
+
+  it("a type=submit Save and a Discard button sit INSIDE the same data-save-bar form, after the ten rules", async () => {
+    const html = await render(viewOf());
+    const form = formOf(html);
+    const save = button(form, "Save");
+    const discard = button(form, "Discard");
+    expect(save).toContain('type="submit"');
+    expect(save).toContain('variant="primary"');
+    expect(discard).toContain('type="button"');
+    expect(discard).not.toContain('type="submit"');
+    expect(form.indexOf(save)).toBeGreaterThan(form.lastIndexOf('label="Misc"'));
+    // one form only: the fallback posts the very same form/action as the save bar
+    expect((html.match(/<form\b/g) ?? []).length).toBe(1);
+    expect(html).not.toContain("ui-save-bar"); // still no programmatic save-bar API next to data-save-bar
+  });
+
+  it("Save is enabled and not loading at rest; the fallback needs no edit first (so a failed Save can be retried)", async () => {
+    const html = await render(viewOf());
+    for (const text of ["Save", "Discard"]) expect(button(html, text)).not.toMatch(/disabled|loading/);
+  });
+
+  it("after a FAILED save the error banner shows and the in-body Save is still there and enabled for a retry", async () => {
+    const html = await render(viewOf(), {
+      ok: false,
+      fieldErrors: { cost_of_goods: { rateBasisPoints: "Enter a percentage." } },
+    });
+    expect(html).toContain("Rule changes not saved");
+    const save = button(formOf(html), "Save");
+    expect(save).toContain('type="submit"');
+    expect(save).not.toMatch(/disabled|loading/);
+  });
+
+  it("the fallback adds no form field and does not change what is submitted", async () => {
+    const inputs = (await render(viewOf())).match(/<input\b[^>]*>/g) ?? [];
+    expect(inputs.every((i) => /type="hidden"/.test(i))).toBe(true);
+    for (const i of inputs) expect(i).not.toMatch(/name="(save|discard|intent)/);
+  });
+
+  it("Discard resets THIS form (form.reset() fires onReset={discard}, as the bar's Discard does); Save is the native submit with an in-flight guard (source-level)", () => {
+    expect(source).toMatch(/<Form method="post" ref=\{formRef\} data-save-bar="true" onReset=\{discard\}>/);
+    expect(source).toMatch(/<s-button type="button" onClick=\{\(\) => formRef\.current\?\.reset\(\)\} disabled=\{isSaving\}>\s*Discard/);
+    expect(source).toMatch(/<s-button type="submit" variant="primary" loading=\{isSaving\} disabled=\{isSaving\}>\s*Save/);
+    // no second submit path (no requestSubmit / programmatic save bar API) that could double-fire with the bar's Save
+    expect(source).not.toContain("requestSubmit");
+    expect(source).not.toMatch(/\.saveBar\.(show|hide|toggle|leaveConfirmation)\(/);
   });
 });

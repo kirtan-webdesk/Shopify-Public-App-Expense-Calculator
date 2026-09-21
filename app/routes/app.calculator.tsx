@@ -342,6 +342,17 @@ function CalculatorForm() {
             </s-text>
           </s-stack>
         </s-section>
+
+        {/* In-body FALLBACK for the header Calculate button (G4-sprint-4.2): Admin hoists the s-page
+            header actions into its own chrome and it is unverified that clicks reach this iframe. Same
+            handler, same pending/loading state; the page keeps its one primary action in the header, so
+            this one is the default (non-primary) variant. It carries no rule value: Calculate reads only
+            the two hidden inputs above, and the server uses the SAVED rules. */}
+        <s-stack direction="inline" gap="small" justifyContent="end">
+          <s-button type="button" loading={isCalculating} disabled={isCalculating} onClick={handleCalculate}>
+            Calculate
+          </s-button>
+        </s-stack>
       </s-stack>
     </s-page>
   );

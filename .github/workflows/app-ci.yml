@@ -4,14 +4,44 @@ name: App CI
 # scripts (package.json), so CI fails loudly if any of them regress or go
 # missing. These are the exact 4 gate commands tools/scripts/run-gates.py
 # uses, so a green run here matches the canonical local gate evidence.
+#
+# G4-sprint-4.2: the job also runs the opt-in real-Postgres suites
+# (tests/db/*.db.test.ts, RUN_DB_TESTS=1) against a throw-away Postgres SERVICE
+# CONTAINER, after applying the migrations with `--env test`. That database
+# exists only for the life of the job: it is the ONLY database this workflow can
+# reach (no DATABASE_URL / DIRECT_DATABASE_URL / production secret is defined or
+# passed anywhere in this file), and TEST_DATABASE_URL is set on the two steps
+# that need it, not job-wide, so the default `npm test` and the guard tests see
+# exactly the environment they did before.
 on:
   push:
-    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
+    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.cjs", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
   pull_request:
-    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
+    paths: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.cjs", "**/*.graphql", "**/*.css", "**/*.json", "**/*.toml", ".github/workflows/**"]
+permissions:
+  contents: read
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        # The version the DB suites and migrations were last verified against (local Postgres 18.1 in the
+        # G4 evidence). The production database's server version is NOT recorded in this repo: confirm it
+        # (`SHOW server_version;` on the hosted DB, by a human) and change this tag if it differs.
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: expense_calculator_test
+        ports:
+          - 5432:5432
+        # The job's steps do not start until this reports healthy.
+        options: >-
+          --health-cmd "pg_isready -U postgres -d expense_calculator_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,3 +55,16 @@ jobs:
         run: npm test
       - name: Build (mandatory)
         run: npm run build
+      # 127.0.0.1 (not "localhost"): the service container's published port is reached over IPv4, and
+      # 127.0.0.1 counts as local for db/config/migrate-guard.cjs, so no ALLOW_HOSTED_DB acknowledgement
+      # is needed. No ?sslmode= on purpose: the container has no TLS and db/config/config.cjs decides TLS
+      # from this URL alone. The credentials are the throw-away container's own, not a secret.
+      - name: Migrate the CI test database (--env test)
+        run: npx sequelize-cli db:migrate --env test
+        env:
+          TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/expense_calculator_test
+      - name: DB suites (RUN_DB_TESTS=1, tests/db)
+        run: npx vitest run tests/db
+        env:
+          RUN_DB_TESTS: "1"
+          TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/expense_calculator_test

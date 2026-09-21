@@ -92,7 +92,15 @@ a `%` or `&` inside the URL needs escaping. If `DIRECT_DATABASE_URL` is already 
 **refused** unless you acknowledge it for that one command with
 `ALLOW_HOSTED_DB=1`:
 
-    set "ALLOW_HOSTED_DB=1"&& npm run db:migrate -- --env development
+    set "ALLOW_HOSTED_DB=1"&& npm run db:migrate -- --env development & set "ALLOW_HOSTED_DB="
+
+(PowerShell: `$env:ALLOW_HOSTED_DB=1; try { npm run db:migrate -- --env development } finally { Remove-Item Env:ALLOW_HOSTED_DB }`;
+bash: `ALLOW_HOSTED_DB=1 npm run db:migrate -- --env development`.) Use these
+one-shot forms: a bare `set` or `$env:` assignment lasts for the whole terminal
+session, so every later `--env development` / `--env test` command would pass the
+guard silently against the hosted database. The trailing `set "ALLOW_HOSTED_DB="`
+and the PowerShell `finally` clear it even when the command fails; the bash form
+only applies to that single command.
 
 The acknowledgement is read from the real shell environment only — a
 `ALLOW_HOSTED_DB=1` line in `.env` is ignored on purpose (sequelize-cli runs
@@ -137,6 +145,13 @@ scripts and these docs still exist.
 Note for a local, non-TLS Postgres: TLS is decided from the test URL alone
 (`?sslmode=require` -> TLS, otherwise plain) — an ambient `PGSSLMODE` from
 `.env` is overridden for the test process and for `--env test`.
+
+**In CI (G4-sprint-4.2).** `.github/workflows/app-ci.yml` starts a throw-away `postgres` service container,
+runs `npx sequelize-cli db:migrate --env test`, then `RUN_DB_TESTS=1 npx vitest run tests/db`, after the four
+mandatory gates. `TEST_DATABASE_URL` is set only on those two steps and points at the container on `127.0.0.1`
+(local, so no `ALLOW_HOSTED_DB`); no other database URL exists in the workflow, so the isolation guard has
+nothing else to compare against. `tests/architecture/ci-workflow.test.ts` pins that shape. The container's
+Postgres major version is a tag in that file: keep it equal to production's (`SHOW server_version;`).
 
 `tests/db/expense-rule-seed-race.db.test.ts` (G4-sprint-3.4) builds TWO independent app module graphs
 (`vi.resetModules()` => two Sequelize singletons => two pools => two real Postgres connections) and races the

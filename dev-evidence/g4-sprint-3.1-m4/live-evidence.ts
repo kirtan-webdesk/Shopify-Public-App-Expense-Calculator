@@ -1,3 +1,12 @@
+// ARCHIVED (G4-sprint-4.2) - DO NOT RUN. Historical evidence script kept only because the
+// G4-sprint-3.1 evidence in this folder refers to it. It no longer matches the app:
+//  - it calls getDuplicatePrefill(ctx, id, rules), a signature J6 (G4-sprint-3.x/4.1) removed; the
+//    service is now getDuplicatePrefill(ctx, id) and returns revenue + currency only (no `.rules`);
+//  - as written it connects with .env's DATABASE_URL, i.e. the HOSTED database, which db/config's
+//    test-db guard (G4-sprint-3.4) and migrate-guard (G4-sprint-3.6) now forbid for anything that
+//    writes. Use the opt-in suites (tests/db/*.db.test.ts, RUN_DB_TESTS=1 with TEST_DATABASE_URL) instead.
+// dev-evidence/** is excluded from eslint and tsc, so this file is not compiled or linted.
+//
 // Live-evidence script for G4-sprint-3.1 (M4 Save + History).
 //
 // NOT part of the permanent vitest suite (vitest.config.ts stays DB-free by

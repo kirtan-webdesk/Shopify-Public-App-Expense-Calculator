@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Form, useActionData, useLoaderData, useNavigate } from "react-router";
+import { Form, useActionData, useLoaderData, useNavigate, useNavigation } from "react-router";
 import type { Route } from "./+types/app.rules";
 import { authenticate } from "~/shopify.server";
 import { requireShopContext } from "~/services/shop-context.service";
@@ -115,6 +115,9 @@ type LoaderRules = Awaited<ReturnType<typeof loader>>["rules"];
 function RulesEditor({ rules }: { readonly rules: LoaderRules }) {
   const actionData = useActionData<typeof action>() as SaveResult | undefined;
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  // Only THIS form's own submission counts (not, say, a navigation to another page).
+  const isSaving = navigation.state === "submitting" && navigation.formData !== undefined;
   const loadedRows = useMemo(() => rowStatesFromRules(rules), [rules]);
   const [rows, setRows] = useState<Record<string, RuleRowState>>(loadedRows);
   const [edited, setEdited] = useState<Edited>({ response: actionData, keys: NOTHING_EDITED });
@@ -301,6 +304,25 @@ function RulesEditor({ rules }: { readonly rules: LoaderRules }) {
                   />
                 );
               })}
+
+              {/* In-body FALLBACK for the App Bridge contextual save bar (G4-sprint-4.2). The bar only appears
+                  when App Bridge detects a change against the form's initial values, and it stays hidden
+                  after a Save (including a FAILED one) until the next edit; the s-* controls with dotted names,
+                  the programmatic hidden inputs and the remount on the saved values are all things that
+                  detection can miss. These two buttons work regardless. Save is the form's own native submit
+                  (the same <Form>, the same action, the same server validation and the same "Rule changes not
+                  saved" banner as the bar's Save); Discard resets that same form (form.reset() fires onReset={discard},
+                  exactly what the bar's Discard triggers). Both are disabled while a submission is in flight, so a
+                  click during a save that is still running is ignored. */}
+              <s-divider></s-divider>
+              <s-stack direction="inline" gap="small" justifyContent="end">
+                <s-button type="button" onClick={() => formRef.current?.reset()} disabled={isSaving}>
+                  Discard
+                </s-button>
+                <s-button type="submit" variant="primary" loading={isSaving} disabled={isSaving}>
+                  Save
+                </s-button>
+              </s-stack>
             </s-stack>
           </s-section>
         </Form>

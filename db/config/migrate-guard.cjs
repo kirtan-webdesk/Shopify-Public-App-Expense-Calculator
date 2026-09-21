@@ -222,11 +222,14 @@ function evaluate(argv, opts) {
       `env=${envName} resolves to a HOSTED database (host ${maskHost(target.host)}, db ${target.database}) — not ` +
         "localhost / 127.0.0.1 / ::1. This is exactly how a bare command ends up on production data. If you " +
         "really mean to run against that hosted database, acknowledge it explicitly for this one command:\n" +
-        `  Windows cmd : set "${ACK_VAR}=1"&& ${runPrefix(command)} --env ${envName}\n` +
-        `  PowerShell  : $env:${ACK_VAR}=1; ${runPrefix(command)} --env ${envName}\n` +
+        `  Windows cmd : set "${ACK_VAR}=1"&& ${runPrefix(command)} --env ${envName} & set "${ACK_VAR}="\n` +
+        `  PowerShell  : $env:${ACK_VAR}=1; try { ${runPrefix(command)} --env ${envName} } finally { Remove-Item Env:${ACK_VAR} }\n` +
         `  bash        : ${ACK_VAR}=1 ${runPrefix(command)} --env ${envName}\n` +
-        "(The variable is read from the shell only — a value in .env is ignored on purpose. If the target is " +
-        "production, prefer `--env production`.)",
+        "(Use the one-shot forms above: in cmd and PowerShell a plain `set` / `$env:` assignment stays in force for the " +
+        "whole terminal session, so every LATER --env development / --env test command would pass this guard silently " +
+        "against the hosted database. The trailing clear / `finally` removes it even if the command fails; the bash form " +
+        "only lasts for that one command. The variable is read from the shell only — a value in .env is ignored on " +
+        "purpose. If the target is production, prefer `--env production`.)",
     );
   }
 

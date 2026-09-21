@@ -176,6 +176,20 @@ export default function ResultsPage({ loaderData }: Route.ComponentProps) {
             <strong>Save calculation</strong> to keep a permanent snapshot in History.{" "}
             <s-link href="/app/rules">Review rules</s-link>
           </s-paragraph>
+          {/* In-body FALLBACK for the header "Save calculation" button (G4-sprint-4.2). Every header
+              action is an s-page slot button that Admin hoists into its own chrome, and it is unverified
+              that the chrome forwards clicks / invoker commands into this iframe. This one lives in the
+              page body, opens the SAME save-calculation-modal with the SAME command, and is deliberately
+              not variant="primary" (the header button stays the page's one primary action). */}
+          <s-button
+            slot="secondary-actions"
+            commandFor={SAVE_MODAL_ID}
+            command="--show"
+            loading={isSaving}
+            disabled={isSaving}
+          >
+            Save calculation
+          </s-button>
         </s-banner>
 
         {/* Data-driven banners: shown by what the calculation contains. */}

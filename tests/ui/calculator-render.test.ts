@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // DB-free tests of the Calculator route (G4-sprint-4.1, G2-revision v2):
@@ -118,7 +120,8 @@ describe("/app/calculator server render (v2: revenue + currency + read-only rule
 
   it("Calculate is the header primary action, enabled and not loading at rest", async () => {
     const html = await render({ rules: viewOf(), ...NO_PREFILL });
-    const calc = (html.match(/<s-button\b[^>]*>Calculate<\/s-button>/) ?? [""])[0];
+    // the HEADER one: an in-body fallback also exists (see the G4-sprint-4.2 block below)
+    const calc = (html.match(/<s-button\b[^>]*slot="primary-action"[^>]*>Calculate<\/s-button>/) ?? [""])[0];
     expect(calc).toContain('slot="primary-action"');
     expect(calc).toContain('variant="primary"');
     expect(calc).not.toContain("disabled");
@@ -421,5 +424,52 @@ describe("/app/calculator action - Calculate uses the SAVED rules (J1)", () => {
     const res = (await run(form({ intent: "save", revenue: "100", currency: "USD" }))) as Response;
     expect(res.status).toBe(302); // treated as Calculate; nothing was written
     expect(ruleRepo.replaceExpenseRulesForShop).not.toHaveBeenCalled();
+  });
+});
+
+// G4-sprint-4.2: every v2 primary action is an s-page slot button, and it is unverified that Admin's chrome forwards
+// clicks into the iframe. The in-body fallbacks below keep the page usable either way.
+describe("/app/calculator in-body Calculate fallback (G4-sprint-4.2)", () => {
+  const source = readFileSync(resolve(process.cwd(), "app/routes/app.calculator.tsx"), "utf8");
+  const calculateButtons = (html: string) => html.match(/<s-button\b[^>]*>Calculate<\/s-button>/g) ?? [];
+
+  it("there are exactly two Calculate buttons: the header primary one (kept) and a non-primary in-body one", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    const buttons = calculateButtons(html);
+    expect(buttons).toHaveLength(2);
+    const header = buttons.find((b) => b.includes('slot="primary-action"'))!;
+    const body = buttons.find((b) => !b.includes("slot="))!;
+    expect(header).toContain('variant="primary"');
+    expect(header).toContain('type="button"');
+    // the fallback is not a second primary action, has no slot (it lives in the page body), and is enabled at rest
+    expect(body).toContain('type="button"');
+    expect(body).not.toContain("variant=");
+    expect(body).not.toMatch(/disabled|loading/);
+  });
+
+  it("the in-body Calculate sits AFTER the Revenue and rules sections", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    const body = calculateButtons(html).find((b) => !b.includes("slot="))!;
+    expect(html.indexOf(body)).toBeGreaterThan(html.indexOf('heading="Rules used for this estimate"'));
+    expect(html.indexOf(body)).toBeGreaterThan(html.indexOf('heading="Revenue"'));
+  });
+
+  it("both buttons run the SAME handler and share the SAME pending state (source-level: s-button onClick is not observable in static markup)", () => {
+    const buttons = source.match(/<s-button\b[^>]*>\s*Calculate\s*<\/s-button>/g) ?? [];
+    expect(buttons).toHaveLength(2);
+    for (const b of buttons) {
+      expect(b).toContain("onClick={handleCalculate}");
+      expect(b).toContain("loading={isCalculating}");
+      expect(b).toContain("disabled={isCalculating}");
+      expect(b).toContain('type="button"');
+    }
+  });
+
+  it("the fallback adds NO form field: the only submitted fields are still revenue and currency, no rule value travels", async () => {
+    const html = await render({ rules: viewOf(), ...NO_PREFILL });
+    const names = (html.match(/<input[^>]*\sname="([^"]+)"/g) ?? []).map((t) => /name="([^"]+)"/.exec(t)![1]);
+    expect(names.sort()).toEqual(["currency", "revenue"]);
+    // the button itself carries no name/value pair either
+    for (const b of calculateButtons(html)) expect(b).not.toMatch(/\s(name|value)=/);
   });
 });
