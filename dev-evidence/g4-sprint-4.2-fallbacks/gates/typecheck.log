@@ -1,0 +1,5 @@
+
+> typecheck
+> react-router typegen && tsc --noEmit
+
+__GATE_EXIT__:0

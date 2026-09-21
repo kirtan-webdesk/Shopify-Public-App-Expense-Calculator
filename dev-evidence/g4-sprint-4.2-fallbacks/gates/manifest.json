@@ -1,0 +1,56 @@
+{
+  "root": "D:\\Projects\\Shopify Public App \u2014 Expense Calculator",
+  "gates": {
+    "lint": {
+      "gate": "lint",
+      "command": "npm run lint",
+      "argv": [
+        "C:\\nvm4w\\nodejs\\npm.cmd",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-4.2-fallbacks/gates/lint.log",
+      "output_sha256": "4cec702d0ae808dd432eccb0647c0a5341f4a0e074036e78dc63360dd71f2a15"
+    },
+    "typecheck": {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "argv": [
+        "C:\\nvm4w\\nodejs\\npm.cmd",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-4.2-fallbacks/gates/typecheck.log",
+      "output_sha256": "c0bb7becd3db20b1e92fc8bc82645c71802917adc07464354264d244295a58b9"
+    },
+    "tests": {
+      "gate": "tests",
+      "command": "npm test",
+      "argv": [
+        "C:\\nvm4w\\nodejs\\npm.cmd",
+        "test"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-4.2-fallbacks/gates/tests.log",
+      "output_sha256": "a2474b3355b3d0a258f36be3136d291b0be3ac8d71ac3aea5ff4b1884abd7651"
+    },
+    "build": {
+      "gate": "build",
+      "command": "npm run build",
+      "argv": [
+        "C:\\nvm4w\\nodejs\\npm.cmd",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "dev-evidence/g4-sprint-4.2-fallbacks/gates/build.log",
+      "output_sha256": "50d7d2584de1acc4df2c2ec544a04df59ecc1d05130b39b829c6ba38beba85e6"
+    }
+  }
+}

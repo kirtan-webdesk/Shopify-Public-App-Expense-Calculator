@@ -1,0 +1,28 @@
+// Probe: a REAL mouse click (not element.click()) on the in-body Save / Discard buttons. usage: PORT=5288 POLARIS_LOCAL=... node probe-mouse-save.mjs
+import { launch, reset, base, routePolaris } from "./lib.mjs";
+await reset();
+const browser = await launch();
+const ctx = await browser.newContext({ viewport: { width: 1000, height: 900 } });
+await routePolaris(ctx);
+await ctx.addInitScript(() => { window.__toasts = []; window.shopify = { toast: { show: (m) => window.__toasts.push(m) } }; });
+const page = await ctx.newPage();
+const events = [];
+page.on("framenavigated", (f) => { if (f === page.mainFrame()) events.push("navigated " + f.url().replace(base, "")); });
+page.on("request", (r) => { if (r.resourceType() === "document" || r.method() === "POST") events.push(r.method() + " " + r.resourceType() + " " + r.url().replace(base, "")); });
+await page.goto(base + "/app/rules", { waitUntil: "load" });
+await page.waitForTimeout(2500);
+const setPercent = async (t) => { const i = page.locator("#cost_of_goods-percent input").first(); await i.click({ clickCount: 3 }); await i.fill(t); await page.waitForTimeout(300); };
+const center = (text) => page.evaluate((t) => { const s = [...document.querySelectorAll("form[data-save-bar] s-button")].find((x) => x.textContent.trim() === t); const inner = s.shadowRoot?.querySelector("button, a") ?? s; /* the s-button host is display:contents (no box), so use the button inside its shadow root */ inner.scrollIntoView({ block: "center" }); const r = inner.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, text);
+const state = () => page.evaluate(() => ({ writes: window.__saveCount ?? "(window reset)", stored: window.__ruleStore?.get("cost_of_goods")?.rateBasisPoints ?? null, toasts: window.__toasts }));
+await setPercent("23");
+events.push("--- single mouse click on Save");
+let c = await center("Save"); await page.mouse.click(c.x, c.y);
+await page.waitForTimeout(1500);
+console.log(JSON.stringify({ events, state: await state(), url: page.url().replace(base, "") }, null, 1));
+events.length = 0;
+await setPercent("24");
+events.push("--- mouse double click on Save");
+c = await center("Save"); await page.mouse.dblclick(c.x, c.y);
+await page.waitForTimeout(1500);
+console.log(JSON.stringify({ events, state: await state(), url: page.url().replace(base, "") }, null, 1));
+await browser.close();

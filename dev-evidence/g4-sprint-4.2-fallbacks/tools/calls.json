@@ -1,0 +1,5 @@
+[
+ {"name":"validate_component_codeblocks","arguments":{"code":[{"content":"@file:app/routes/app.calculator.tsx","language":"tsx","artifactId":"app/routes/app.calculator.tsx","revision":1}],"api":"polaris-app-home","conversationId":"<CID>"}},
+ {"name":"validate_component_codeblocks","arguments":{"code":[{"content":"@file:app/routes/app.rules.tsx","language":"tsx","artifactId":"app/routes/app.rules.tsx","revision":1}],"api":"polaris-app-home","conversationId":"<CID>"}},
+ {"name":"validate_component_codeblocks","arguments":{"code":[{"content":"@file:app/routes/app.results.tsx","language":"tsx","artifactId":"app/routes/app.results.tsx","revision":1}],"api":"polaris-app-home","conversationId":"<CID>"}}
+]

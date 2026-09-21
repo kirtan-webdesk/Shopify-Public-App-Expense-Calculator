@@ -1,0 +1,381 @@
+{
+  "rules": {
+    "buttons_embedded": [
+      {
+        "text": "Reset to placeholder defaults",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "reset-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Discard",
+        "slot": null,
+        "type": "button",
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save",
+        "slot": null,
+        "type": "submit",
+        "variant": "primary",
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Replace values",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "reset-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Cancel",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "reset-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      }
+    ],
+    "header_button_visible_when_embedded": {
+      "w": 0,
+      "h": 0,
+      "display": ""
+    },
+    "header_buttons_in_dom_when_embedded": 1,
+    "initial_percent": "32.50",
+    "after_edit": "12.5",
+    "after_discard": "32.50",
+    "after_discard_field_value": "32.50",
+    "discard_writes": 0,
+    "failed_save": {
+      "writes": 0,
+      "banner": "Rule changes not saved",
+      "buttons_after": [
+        {
+          "text": "Discard",
+          "disabled": false,
+          "loading": false
+        },
+        {
+          "text": "Save",
+          "disabled": false,
+          "loading": false
+        }
+      ]
+    },
+    "retry_save": {
+      "writes": 1,
+      "stored_basis_points": 2000,
+      "error_banner_gone": true,
+      "toasts": [
+        "Rule changes saved"
+      ],
+      "value_after": "20.00"
+    },
+    "synthetic_same_tick_double_click_writes": 2,
+    "real_mouse_click_writes": 1,
+    "stored_after_all": 2200,
+    "errors": [],
+    "standalone_buttons": [
+      {
+        "text": "Reset to placeholder defaults",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "reset-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Discard",
+        "slot": null,
+        "type": "button",
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save",
+        "slot": null,
+        "type": "submit",
+        "variant": "primary",
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Replace values",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "reset-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Cancel",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "reset-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      }
+    ],
+    "standalone_errors": []
+  },
+  "calculator": {
+    "buttons_embedded": [
+      {
+        "text": "Calculate",
+        "slot": "primary-action",
+        "type": "button",
+        "variant": "primary",
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Edit rules",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Calculate",
+        "slot": null,
+        "type": "button",
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      }
+    ],
+    "header_buttons_in_dom_when_embedded": 2,
+    "inbody_button_text": "Calculate",
+    "header_button_visible_when_embedded": {
+      "w": 0,
+      "h": 0,
+      "display": ""
+    },
+    "empty_click": {
+      "posts": 0,
+      "url": "/app/calculator",
+      "revenue_error": "Enter a revenue amount."
+    },
+    "valid_click": {
+      "posts": [],
+      "url": "/app/results"
+    },
+    "errors": [],
+    "standalone_buttons": [
+      {
+        "text": "Calculate",
+        "slot": "primary-action",
+        "type": "button",
+        "variant": "primary",
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Edit rules",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Calculate",
+        "slot": null,
+        "type": "button",
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      }
+    ],
+    "standalone_errors": []
+  },
+  "results": {
+    "d_present": true,
+    "standalone_buttons": [
+      {
+        "text": "Save calculation",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "save-calculation-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Change revenue",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save calculation",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "save-calculation-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Cancel",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "save-calculation-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save calculation",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "save-calculation-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      }
+    ],
+    "same_target_as_header": true,
+    "fallback_variant": "(none: default)",
+    "modal_before": {
+      "dialogOpen": false,
+      "dialogW": 0,
+      "dialogH": 0
+    },
+    "modal_after_fallback_click": {
+      "dialogOpen": true,
+      "dialogW": 620,
+      "dialogH": 198
+    },
+    "saved_redirect": "/app/history/<id>",
+    "posts": [],
+    "errors": [],
+    "embedded_buttons": [
+      {
+        "text": "Save calculation",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "save-calculation-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Change revenue",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": null,
+        "command": null,
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save calculation",
+        "slot": "primary-action",
+        "type": null,
+        "variant": "primary",
+        "commandFor": "save-calculation-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Cancel",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "save-calculation-modal",
+        "command": "--hide",
+        "inModal": true,
+        "disabled": false,
+        "loading": false
+      },
+      {
+        "text": "Save calculation",
+        "slot": "secondary-actions",
+        "type": null,
+        "variant": null,
+        "commandFor": "save-calculation-modal",
+        "command": "--show",
+        "inModal": false,
+        "disabled": false,
+        "loading": false
+      }
+    ]
+  }
+}

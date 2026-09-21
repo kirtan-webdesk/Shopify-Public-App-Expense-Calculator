@@ -1,0 +1,67 @@
+{
+  "server": {
+    "name": "shopify-dev-mcp",
+    "version": "1.14.5"
+  },
+  "conversationId": "315f5f16-b0c7-4365-94b5-9260162da4ef",
+  "learn": "🔗 **IMPORTANT - SAVE THIS CONVERSATION ID:** 315f5f16-b0c7-4365-94b5-9260162da4ef\n⚠️  CRITICAL: You MUST use this exact conversationId in ALL subsequent Shopify tool calls in this conversation.\n🚨 ALL OTHER SHOPIFY TOOLS WILL RETURN ERRORS if you don't provide this conversationId.\n🔎 When looking up polaris-app-home schema or reference details, you can pass api_name: \"polaris-app-home\" to search_",
+  "results": [
+    {
+      "call": {
+        "name": "validate_component_codeblocks",
+        "arguments": {
+          "code": [
+            {
+              "content": "@file:app/routes/app.calculator.tsx",
+              "language": "tsx",
+              "artifactId": "app/routes/app.calculator.tsx",
+              "revision": 1
+            }
+          ],
+          "api": "polaris-app-home",
+          "conversationId": "<CID>"
+        }
+      },
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.calculator.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-button, s-stack, s-banner, s-paragraph, s-link, s-section, s-query-container, s-grid, s-text-field, s-select, s-option, s-badge, s-text, s-table, s-table-header-row, s-table-header, s-table-body, s-table-row, s-table-cell.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - CalculatorForm\n  - Form\n  - input\n  - input\n  - div\n  - strong\n\n",
+      "isError": false
+    },
+    {
+      "call": {
+        "name": "validate_component_codeblocks",
+        "arguments": {
+          "code": [
+            {
+              "content": "@file:app/routes/app.rules.tsx",
+              "language": "tsx",
+              "artifactId": "app/routes/app.rules.tsx",
+              "revision": 1
+            }
+          ],
+          "api": "polaris-app-home",
+          "conversationId": "<CID>"
+        }
+      },
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.rules.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-button, s-stack, s-banner, s-paragraph, s-link, s-section, s-divider, s-modal, s-box, s-query-container, s-grid, s-switch, s-badge, s-select, s-option, s-number-field.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - RulesEditor\n  - ul\n  - li\n  - Form\n  - RuleRow\n  - strong\n  - strong\n  - input\n  - input\n  - input\n  - input\n  - input\n\n",
+      "isError": false
+    },
+    {
+      "call": {
+        "name": "validate_component_codeblocks",
+        "arguments": {
+          "code": [
+            {
+              "content": "@file:app/routes/app.results.tsx",
+              "language": "tsx",
+              "artifactId": "app/routes/app.results.tsx",
+              "revision": 1
+            }
+          ],
+          "api": "polaris-app-home",
+          "conversationId": "<CID>"
+        }
+      },
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.results.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-link, s-banner, s-paragraph, s-button, s-modal, s-stack, s-section.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - strong\n  - Form\n  - input\n  - input\n  - strong\n  - strong\n  - MetricTiles\n  - ExpenseBreakdown\n\n",
+      "isError": false
+    }
+  ]
+}

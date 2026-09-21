@@ -1,0 +1,11 @@
+import { launch, reset, base } from "./lib.mjs";
+const browser = await launch(); await reset();
+const page = await (await browser.newContext({ viewport: { width: 1000, height: 900 } })).newPage();
+await page.goto(base + "/app/rules", { waitUntil: "load" }); await page.waitForTimeout(2500);
+await page.evaluate(() => { const s = document.getElementById("payroll-type"); window.__log = []; for (const t of ["input", "change"]) s.addEventListener(t, (e) => window.__log.push(t)); });
+await page.locator("#payroll-type select").first().selectOption("formula"); await page.waitForTimeout(600);
+console.log("rules select real user:", JSON.stringify(await page.evaluate(() => ({ log: window.__log, type: document.querySelector('input[name="type-payroll"]').value, formulaShown: !!document.getElementById("payroll-formula") }))));
+await page.goto(base + "/app/calculator", { waitUntil: "load" }); await page.waitForTimeout(2500);
+await page.locator('s-select[label="Currency"] select').first().selectOption("CAD"); await page.waitForTimeout(600);
+console.log("currency real user:", JSON.stringify(await page.evaluate(() => ({ posted: document.querySelector('input[name="currency"]').value, prefix: document.getElementById("revenue").getAttribute("prefix") ?? document.getElementById("revenue").prefix }))));
+await browser.close();

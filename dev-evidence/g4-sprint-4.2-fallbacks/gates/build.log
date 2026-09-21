@@ -1,0 +1,70 @@
+
+> build
+> react-router build
+
+[36mvite v7.3.6 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 82 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mbuild/client/[22m[32m.vite/manifest.json                                 [39m[1m[2m  5.89 kB[22m[1m[22m[2m │ gzip:  0.82 kB[22m
+[2mbuild/client/[22m[35massets/app-D068lcaU.css                             [39m[1m[2m  0.71 kB[22m[1m[22m[2m │ gzip:  0.38 kB[22m
+[2mbuild/client/[22m[36massets/_index-l0sNRNKZ.js                           [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/api.cron.tick-l0sNRNKZ.js                    [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/app._index-l0sNRNKZ.js                       [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/auth._-l0sNRNKZ.js                           [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/healthz-l0sNRNKZ.js                          [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/webhooks.app-uninstalled-l0sNRNKZ.js         [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/webhooks.customers-data-request-l0sNRNKZ.js  [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/webhooks.customers-redact-l0sNRNKZ.js        [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/webhooks.shop-redact-l0sNRNKZ.js             [39m[1m[2m  0.00 kB[22m[1m[22m[2m │ gzip:  0.02 kB[22m
+[2mbuild/client/[22m[36massets/app-Bp5ZGRh7.js                              [39m[1m[2m  0.38 kB[22m[1m[22m[2m │ gzip:  0.24 kB[22m
+[2mbuild/client/[22m[36massets/root-DR-MTERG.js                             [39m[1m[2m  1.16 kB[22m[1m[22m[2m │ gzip:  0.63 kB[22m
+[2mbuild/client/[22m[36massets/presentation-CDgg6SAb.js                     [39m[1m[2m  2.22 kB[22m[1m[22m[2m │ gzip:  1.14 kB[22m
+[2mbuild/client/[22m[36massets/app.history-DzV3tRvL.js                      [39m[1m[2m  2.45 kB[22m[1m[22m[2m │ gzip:  0.93 kB[22m
+[2mbuild/client/[22m[36massets/app.history._id-Cc7Fle6-.js                  [39m[1m[2m  2.84 kB[22m[1m[22m[2m │ gzip:  1.22 kB[22m
+[2mbuild/client/[22m[36massets/expense-rule-validation-k5qztvVR.js          [39m[1m[2m  3.79 kB[22m[1m[22m[2m │ gzip:  1.55 kB[22m
+[2mbuild/client/[22m[36massets/app.results-CB5rIVT0.js                      [39m[1m[2m  4.20 kB[22m[1m[22m[2m │ gzip:  1.51 kB[22m
+[2mbuild/client/[22m[36massets/app.calculator-B5DZcJW3.js                   [39m[1m[2m  4.85 kB[22m[1m[22m[2m │ gzip:  2.02 kB[22m
+[2mbuild/client/[22m[36massets/expense-breakdown-JnOWmeYD.js                [39m[1m[2m  6.48 kB[22m[1m[22m[2m │ gzip:  2.31 kB[22m
+[2mbuild/client/[22m[36massets/app.rules-CMIyysWI.js                        [39m[1m[2m  9.30 kB[22m[1m[22m[2m │ gzip:  3.38 kB[22m
+[2mbuild/client/[22m[36massets/chunk-OB3PAWPO-BWEHKrvr.js                   [39m[1m[2m130.78 kB[22m[1m[22m[2m │ gzip: 44.11 kB[22m
+[2mbuild/client/[22m[36massets/entry.client-GTOmcQPx.js                     [39m[1m[2m218.98 kB[22m[1m[22m[2m │ gzip: 68.38 kB[22m
+[32m✓ built in 4.58s[39m
+[33m  ⚠️  Future Flag Warning: Route middleware support is changing in React Router v8.
+     You can use the `future.v8_middleware` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_middleware[39m
+[33m  ⚠️  Future Flag Warning: Route module splitting behavior is changing in React Router v8.
+     You can use the `future.v8_splitRouteModules` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_splitroutemodules[39m
+[33m  ⚠️  Future Flag Warning: Vite Environment API usage is changing in React Router v8.
+     You can use the `future.v8_viteEnvironmentApi` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_viteenvironmentapi[39m
+[33m  ⚠️  Future Flag Warning: Request handling behavior is changing in React Router v8.
+     You can use the `future.v8_passThroughRequests` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_passthroughrequests[39m
+[33m  ⚠️  Future Flag Warning: Data request URL formats are changing in React Router v8.
+     You can use the `future.v8_trailingSlashAwareDataRequests` flag to opt in early.
+     -> https://reactrouter.com/v7/upgrading/future#futurev8_trailingslashawaredatarequests[39m
+[36mvite v7.3.6 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+[32m✓[39m 68 modules transformed.
+rendering chunks...
+[2mbuild/server/[22m[32m.vite/manifest.json      [39m[1m[2m  0.43 kB[22m[1m[22m
+[2mbuild/server/[22m[35massets/app-D068lcaU.css  [39m[1m[2m  0.71 kB[22m[1m[22m
+[2mbuild/server/[22m[36mindex.js                 [39m[1m[2m143.43 kB[22m[1m[22m
+
+[32m✓[39m 1 asset cleaned from React Router server build.
+[2mbuild\client\assets\app-D068lcaU.css[22m
+
+[32m✓ built in 1.07s[39m
+[33mGenerated an empty chunk: "_index".[39m
+[33mGenerated an empty chunk: "api.cron.tick".[39m
+[33mGenerated an empty chunk: "app._index".[39m
+[33mGenerated an empty chunk: "auth._".[39m
+[33mGenerated an empty chunk: "healthz".[39m
+[33mGenerated an empty chunk: "webhooks.app-uninstalled".[39m
+[33mGenerated an empty chunk: "webhooks.customers-data-request".[39m
+[33mGenerated an empty chunk: "webhooks.customers-redact".[39m
+[33mGenerated an empty chunk: "webhooks.shop-redact".[39m
+__GATE_EXIT__:0
