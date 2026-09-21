@@ -23,8 +23,8 @@
       "built_for_shopify": false
     },
     "created_at": "2026-09-17T17:55:22Z",
-    "updated_at": "2026-09-21T07:07:20Z",
-    "version": 57,
+    "updated_at": "2026-09-21T07:18:30Z",
+    "version": 59,
     "status": "active",
     "repository": {
       "url": "git@github.com:kirtan-webdesk/Shopify-Public-App-Expense-Calculator.git",
@@ -1721,6 +1721,111 @@
       },
       "project_version_before": 57,
       "project_version_after": 57
+    },
+    {
+      "timestamp": "2026-09-21T07:16:46Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "dev_handoff_checked",
+      "details": {
+        "checker": "check-dev-handoff.py",
+        "handoff": "dev-evidence/g4-sprint-3.3-ui-fixes/DEVELOPER-HANDOFF.md",
+        "commit": "ee967b2",
+        "result": "EXIT 0 HANDOFF OK, 6 validations, independently re-run by orchestrator",
+        "provenance_caveat": "developer could not reach harness MCP tools; drove the plugin's pinned @shopify/dev-mcp@1.14.5 over stdio and called validate_component_codeblocks once per file (6 VALID). Tool-call ids are descriptive not harness ids. Checker passes (consistency-checked) but this is weaker runtime provenance than a harness-invoked call; QA/G5 should weigh accordingly."
+      },
+      "project_version_before": 57,
+      "project_version_after": 57
+    },
+    {
+      "timestamp": "2026-09-21T07:16:46Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "ui_pass1_delivered",
+      "details": {
+        "commits": {
+          "ee967b2": "code, 10 files",
+          "d9b5eb1": "evidence",
+          "32b3978": "gate logs (force-added)",
+          "dd4c266": "NOT the developer's: blanket commit that swept screenshots + tools/ scripts + another agent's tests + project.json"
+        },
+        "method": "server-rendered real route components with loader/auth stubbed, real Polaris+App Bridge scripts from CDN, Playwright screenshots at 1000px/600px vs mockups. NOT the live Admin page: App Bridge cannot start outside the iframe so nav highlight, contextual save bar and toast were not seen; hydration not run.",
+        "fixed_13_of_24": [
+          "currency select showed USD for CAD/EUR/GBP snapshot (value ignored on SSR; now <s-option selected>)",
+          "hardcoded $ in calculator summary/prefix and no symbol on Results/detail fixed amounts",
+          "currency options 'USD - US Dollar'",
+          "percent text 32.5% not 32.50%",
+          "formula rules show label not internal key",
+          "chevrons restored",
+          "'above' copy reworded",
+          "snapshot banner lock icon inline",
+          "radios spacing / summary weight / helper spacing (inline styles moved to app.css)",
+          "toast replay: ?saved=1 removed after toast",
+          "stuck hidden intent reset to 'save' after requestSubmit (SUSPECTED, fixed defensively)"
+        ],
+        "checked_no_defect": [
+          "app.css wired via links() and present in built bundles",
+          "Polaris usage valid on all 6 files",
+          "empty/error states",
+          "a11y basics",
+          "no stale M1 copy",
+          "no horizontal overflow at 1000/600"
+        ],
+        "not_fixed": [
+          "donut aria-label says table is 'below' (donut-chart.ts outside allowed files, test asserts string)",
+          "donut percent-of-revenue and table order match G2 mockup so left",
+          "--p-* tokens undefined at runtime (fallbacks used)"
+        ],
+        "gates": "on a clean worktree of ee967b2: lint/typecheck/build exit 0, 249 tests passed, 37 opt-in DB skipped; run-gates.py Windows gap (F4) unchanged",
+        "not_yet_done_from_human_and_trace_lists": [
+          "nav: remove Calculator child (rel=home)",
+          "B2/B2b donut at zero revenue + expenses>revenue",
+          "B3 negative revenue validation + message",
+          "NEW P2 disabled-row Save 500",
+          "B1 belt-and-braces + currencyError never rendered",
+          "Discard not resetting currency, stale server errors, save toast on calculator, loading states, table overflow wrappers"
+        ]
+      },
+      "project_version_before": 57,
+      "project_version_after": 57
+    },
+    {
+      "timestamp": "2026-09-21T07:18:30Z",
+      "actor": "shopify-developer",
+      "actor_type": "agent",
+      "action": "seed_race_and_test_db_isolation_delivered",
+      "details": {
+        "commits": {
+          "dd4c266": "NOT the developer's blanket commit that swept the code (also project.json, 3.3 evidence)",
+          "4cd4cb3": "evidence",
+          "c37f488": "evidence logs"
+        },
+        "seed_race": "seedExpenseRulesIfMissing = bulkCreate ignoreDuplicates (single INSERT ON CONFLICT DO NOTHING) then re-read; no transaction opened (pool.max:1 safe). Two-pool test (vi.resetModules, hook holds both first reads) 5 fresh shops: both succeed, exactly 10 rows, defaults intact, winner's customisation not overwritten. Test FAILS on old code (unique violation AND old path UPDATE-overwrote the winner's customisation - a defect QA had not noted).",
+        "test_isolation": "db/config/test-db-guard.cjs shared by config.cjs + tests/helpers/test-database.ts: TEST_DATABASE_URL only, refuses if host+db equals any other postgres URL (process env, .env, .env.*, commented lines; -pooler == direct host), masked errors, current_database() check in beforeAll; refusals demonstrated (unset, equals prod, equals commented staging, --env test); default-CI tests test-db-isolation + test-db-guard. Local expense_calculator_test created and migrated; DB suites 40/40 x3 zero residue. Prod Neon never connected.",
+        "config_cjs_changed": "all three env blocks now lazy getters (also fixes the known eager-evaluation P3); test env no longer falls back to DIRECT_DATABASE_URL/DATABASE_URL",
+        "gates": "npm test 293 passed/40 skipped, typecheck+build exit 0, lint exit 1 ONLY from UI-pass-1 scratch scripts dev-evidence/g4-sprint-3.3-ui-fixes/tools/*.mjs (33 no-undef) - queued for pass 2",
+        "disclosed_not_fixed": [
+          "agent's broad grep printed a .env line matching part of SHOPIFY_API_SECRET into ITS tool output (not in any file) - rotation recommended again",
+          "replaceExpenseRulesForShop has same first-Save race (queued for pass 2)",
+          "bare 'npm run db:migrate' still hits DATABASE_URL which .env points at hosted Neon - DECISION needed",
+          "Neon-branch TLS as TEST_DATABASE_URL untested (only non-TLS local run)",
+          "hosted TLS for app pool relies on PGSSLMODE in Vercel env because sequelize.ts enables ssl only when NODE_ENV=production and ignores ?sslmode="
+        ]
+      },
+      "project_version_before": 58,
+      "project_version_after": 58
+    },
+    {
+      "timestamp": "2026-09-21T07:18:30Z",
+      "actor": "orchestrator",
+      "actor_type": "agent",
+      "action": "pushed_origin_main",
+      "details": {
+        "range": "dd4c266..c37f488",
+        "contents": "UI pass 1 (ee967b2 + evidence), seed-race fix + test-DB isolation (dd4c266 blanket + evidence), secret scan clean; gates on tree: tests/typecheck/build green, lint red only from scratch scripts (fixed in pass 2). QA of pass 1 + seed race still owed after pass 2."
+      },
+      "project_version_before": 58,
+      "project_version_after": 58
     }
   ],
   "lock": {
