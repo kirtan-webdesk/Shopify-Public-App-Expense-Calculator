@@ -1,0 +1,34 @@
+
+> test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Admin/AppData/Local/Temp/claude/D--Projects-Shopify-Public-App---Expense-Calculator/93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f/scratchpad/wt[39m
+
+ [32m✓[39m tests/architecture/no-in-process-scheduler.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+ [32m✓[39m tests/architecture/no-rest-admin-api.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+ [32m✓[39m tests/domain/history-presentation.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 131[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-engine.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 294[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/db/shop-ensure.db.test.ts [2m([22m[2m15 tests[22m[2m | [22m[33m15 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/db/calculation-history.db.test.ts [2m([22m[2m22 tests[22m[2m | [22m[33m22 skipped[39m[2m)[22m
+ [32m✓[39m tests/architecture/shop-context-choke-point.test.ts [2m([22m[2m29 tests[22m[2m)[22m[32m 76[2mms[22m[39m
+ [32m✓[39m tests/architecture/repository-boundary.test.ts [2m([22m[2m65 tests[22m[2m)[22m[32m 68[2mms[22m[39m
+ [32m✓[39m tests/architecture/history-append-only.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m tests/ui/history-results-render.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 140[2mms[22m[39m
+ [32m✓[39m tests/domain/calculation-verification.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+ [32m✓[39m tests/services/cron-auth.service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+ [32m✓[39m tests/services/calculation-history.service.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+ [32m✓[39m tests/architecture/route-auth-matrix.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 58[2mms[22m[39m
+ [32m✓[39m tests/domain/donut-chart.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/domain/calculation-transport.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-rule-validation.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m tests/domain/money.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-categories.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m tests/architecture/webhook-route-placement.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/domain/expense-formulas.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m19 passed[39m[22m[2m | [22m[33m2 skipped[39m[90m (21)[39m
+[2m      Tests [22m [1m[32m249 passed[39m[22m[2m | [22m[33m37 skipped[39m[90m (286)[39m
+[2m   Start at [22m 12:35:56
+[2m   Duration [22m 9.92s[2m (transform 4.35s, setup 0ms, collect 15.89s, tests 1.37s, environment 31ms, prepare 18.46s)[22m
+__GATE_EXIT__:0
