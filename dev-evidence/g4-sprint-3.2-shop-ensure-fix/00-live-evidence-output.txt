@@ -1,0 +1,90 @@
+◇ injected env (0) from .env
+(node:1620) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[shopify-api/INFO] version 15.0.0, environment React Router
+
+=== 0. Environment ===
+{
+  "poolMax": 1,
+  "runId": "391d8110"
+}
+PASS: 1a. outage state reproduced: a session exists for the shop, NO shop row exists
+PASS: 1b. the OLD request path (findShopContextByDomain) returns null here => this is what threw the 404
+
+=== 1c. SQL trace of the first request via requireShopContext ===
+[
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';",
+  "INSERT INTO \"shop\" (\"id\",\"shop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\") VALUES ('72d ... hop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\";",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';"
+]
+PASS: 1d. requireShopContext created the shop row for the EXISTING session (no new token exchange needed)
+
+=== 1e. shop row ===
+{
+  "id": "72d6b542-1d97-4273-8f34-3d85566b4805",
+  "installed_at": "2026-09-21 06:30:47.708+00",
+  "uninstalled_at": null
+}
+PASS: 2. calculator path: default rules seeded (10) for the fresh shop
+PASS: 3a. precondition: no row for the race shop
+
+=== 3b. SQL trace of two simultaneous first requests ===
+[
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... HERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-race.myshopify.com';",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... HERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-race.myshopify.com';",
+  "INSERT INTO \"shop\" (\"id\",\"shop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\") VALUES ('402 ... hop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\";",
+  "INSERT INTO \"shop\" (\"id\",\"shop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\") VALUES ('7b3 ... hop_domain\",\"installed_at\",\"uninstalled_at\",\"created_at\",\"updated_at\";",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... HERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-race.myshopify.com';",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... HERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-race.myshopify.com';"
+]
+PASS: 3c. both requests succeeded and resolved the SAME single row (exactly ONE shop row)
+PASS: 3d. the losing request really hit the unique(shop_domain) conflict path (>=2 INSERT ... ON CONFLICT DO NOTHING attempts)
+
+=== 4a. SQL trace of three repeat requests ===
+[
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';",
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';"
+]
+PASS: 4b. hot path is one SELECT per request, zero writes
+PASS: 4c. row unchanged (id / installed_at / created_at)
+PASS: 5a. one calculation saved for shop A
+PASS: 5b. app/uninstalled repository step applied: uninstalled_at is set
+
+=== 5c. SQL trace of the first request after reinstall ===
+[
+  "SELECT \"id\", \"shop_domain\" AS \"shopDomain\", \"installed_at\" AS \"installedAt\", \"uninstalled_at\" AS \"uninstalledA ... \" WHERE \"Shop\".\"shop_domain\" = 'ensure-live-391d8110-a.myshopify.com';",
+  "UPDATE \"shop\" SET \"uninstalled_at\"=$1,\"updated_at\"=$2 WHERE \"id\" = $3 AND \"uninstalled_at\" IS NOT NULL"
+]
+PASS: 5d. reinstall: uninstalled_at cleared, SAME shop row (ADR-0008 step 2)
+PASS: 5e. rules (10) and history (1) retained across the reinstall
+PASS: 6a. shop/redact repository step applied: shop row hard-deleted
+PASS: 6b. a session after redact recreates a NEW row (new id)
+PASS: 6c. nothing from the redacted shop is resurrected (empty history, no rules until first calculator load)
+PASS: 7a. shop A saves a calculation
+PASS: 7b. the row demonstrably exists (raw SQL by id)
+PASS: 7c. shop B (first-ever request) cannot read shop A's calculation by id (null => identical 404 in the route)
+PASS: 7d. a nonexistent id gives the identical null
+PASS: 7e. shop B's history is empty
+PASS: 8. cleanup verified: zero shop rows and zero sessions remain for this run's domains
+
+=== 9. Real dev store wds55.myshopify.com, READ-ONLY observation (this script never writes to it) ===
+{
+  "shopRowCount": 1,
+  "shopRow": {
+    "id": "c9a82c63-5e84-4ead-af2b-a92f516264c2",
+    "created_at": "2026-09-21 06:24:04.532+00",
+    "uninstalled_at": null
+  },
+  "sessionCount": 1,
+  "note": "observed as found. If the row is absent, the deployed fix creates it on the store's next /app request (existing session, no new token exchange). If present, it was created outside this run (this script cannot have created it: it never writes to this domain) and requireShopContext leaves it as-is."
+}
+
+ALL LIVE CHECKS PASSED

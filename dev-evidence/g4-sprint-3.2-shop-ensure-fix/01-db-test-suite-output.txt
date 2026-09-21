@@ -1,0 +1,75 @@
+
+ RUN  v3.2.7 D:/Projects/Shopify Public App — Expense Calculator
+
+stderr | tests/db/shop-ensure.db.test.ts > ensure-shop on the request path (real Postgres, NO pre-seeded shop row)
+◇ injected env (12) from .env
+
+stderr | tests/db/calculation-history.db.test.ts > M4 save + history (real Postgres)
+◇ injected env (12) from .env
+
+(node:4712) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17168) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | tests/db/calculation-history.db.test.ts > M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > a reconciliation failure caught by the deferred DB trigger at commit rolls everything back
+Committing transaction 768b735c-97a4-4d22-b9f8-83ef6d9073b0 failed with error "calculation c62012f2-df7c-4d50-8512-cabedebccbbf line items (sum=3662000) do not reconcile with total_expenses_minor (3662001)". We are killing its connection as it is now in an undetermined state.
+
+stderr | tests/db/calculation-history.db.test.ts > M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > the pool is not wedged by failures: a valid save afterwards succeeds under pool.max = 1
+Committing transaction c2405b61-ae8c-4d7e-a592-6083af7e5f68 failed with error "calculation 91901557-afec-4858-b52f-0898741181f0 line items (sum=3662000) do not reconcile with total_expenses_minor (3662007)". We are killing its connection as it is now in an undetermined state.
+
+ ✓ tests/db/calculation-history.db.test.ts (22 tests) 150850ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > persists one calculation + one line item per applied category, redirects to the detail page  2122ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > has NO foreign key from any saved-calculation table to expense_rule  346ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > rejects a tampered payload through the real action and writes nothing  1503ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > cannot save under another shop's identity: the shop comes from the session, not the form  4679ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > FT-14a: editing every live rule afterwards leaves the saved detail byte-identical  9594ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > FT-14a: the detail renders the STORED label/rule, not anything current  3243ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > FT-14b: reading the history list and a detail issues no query that touches expense_rule  1335ms
+   ✓ M4 save + history (real Postgres) > save (route action -> service -> repository) > FT-14c: UPDATE against calculation / calculation_line_item is rejected by the database (append-only)  1376ms
+   ✓ M4 save + history (real Postgres) > tenant isolation (FT-02b) > seeds a calculation for shop A  2419ms
+   ✓ M4 save + history (real Postgres) > tenant isolation (FT-02b) > shop B cannot read shop A's calculation by id; the 404 is identical to a nonexistent id's  1789ms
+   ✓ M4 save + history (real Postgres) > tenant isolation (FT-02b) > shop B's history list never contains shop A's rows  1339ms
+   ✓ M4 save + history (real Postgres) > tenant isolation (FT-02b) > the duplicate-as-new-calculation loader ignores another shop's id (no prefill, no leak)  8603ms
+   ✓ M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > a CHECK violation on a later line item rolls back the calculation row and the earlier line items  3508ms
+   ✓ M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > a duplicate category (unique violation) rolls everything back  3109ms
+   ✓ M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > a reconciliation failure caught by the deferred DB trigger at commit rolls everything back  7306ms
+   ✓ M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > the pool is not wedged by failures: a valid save afterwards succeeds under pool.max = 1  10334ms
+   ✓ M4 save + history (real Postgres) > save atomicity — a failure mid-save leaves zero rows > an all-disabled calculation (zero line items) saves atomically as a single row  2718ms
+   ✓ M4 save + history (real Postgres) > history list: newest first, pagination, empty state > a shop with no saved calculations gets an empty first page  1582ms
+   ✓ M4 save + history (real Postgres) > history list: newest first, pagination, empty state > pages 25 saved calculations as 20 + 5, newest first, with no overlap  41732ms
+   ✓ M4 save + history (real Postgres) > duplicate as new calculation > pre-fills from the SNAPSHOT (not the live rules) and writes nothing  20198ms
+ ✓ tests/db/shop-ensure.db.test.ts (15 tests) 153593ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (a) /app/calculator on a first-ever request > loader succeeds (no 404), creates the shop row and seeds the default rules  19377ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (a) /app/calculator on a first-ever request > action (save intent) succeeds on a first-ever request and persists the rules  9541ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (b) results / history / history-detail on a first-ever request (each alone, fresh shop) > /app/results loader succeeds (it does not need a shop row)  325ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (b) results / history / history-detail on a first-ever request (each alone, fresh shop) > /app/results action (save) succeeds on a first-ever request, creating the row and the calculation  3348ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (b) results / history / history-detail on a first-ever request (each alone, fresh shop) > /app/history loader returns the empty state for a first-ever request (not a 404)  2003ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (b) results / history / history-detail on a first-ever request (each alone, fresh shop) > /app/history/:id loader for a first-ever request gives the ordinary 'Saved calculation not found' 404 — not the old shop-not-found one  2035ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (c) concurrent first requests > two simultaneous first requests both succeed and exactly ONE shop row exists (conflict path exercised)  16290ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (c) concurrent first requests > five mixed simultaneous first requests (loaders + action) all succeed; still exactly one row  10120ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (d) reinstall / redact semantics (ADR-0008) > reinstall after uninstall (row has uninstalled_at set, redact NOT yet run): the next valid session clears uninstalled_at, keeps the SAME row, rules and history  17986ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (d) reinstall / redact semantics (ADR-0008) > auth/* route (upsertInstalledShop) still works and reactivates an uninstalled shop the same way  3733ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (d) reinstall / redact semantics (ADR-0008) > a session arriving AFTER shop/redact hard-deleted the shop simply recreates a fresh, empty row ('start clean')  20893ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (e) created once, never duplicated; hot path is read-only > repeat requests reuse the one row and issue no shop writes after the first  11755ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (f) tenancy is unchanged > shop B (also first-ever) cannot read shop A's calculation: identical 404 for a foreign, nonexistent and malformed id  19329ms
+   ✓ ensure-shop on the request path (real Postgres, NO pre-seeded shop row) > (f) tenancy is unchanged > the shop comes ONLY from the session: shop/shopId in the URL or form create no row and never redirect the tenant  13242ms
+
+ Test Files  2 passed (2)
+      Tests  37 passed (37)
+   Start at  12:03:42
+   Duration  157.41s (transform 12.01s, setup 0ms, collect 4.17s, tests 304.44s, environment 1ms, prepare 1.31s)
+

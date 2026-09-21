@@ -1,0 +1,1 @@
+{"test_prefixed_shop_rows":0,"test_prefixed_session_rows":0,"total_shop_rows":1}

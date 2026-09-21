@@ -1,0 +1,35 @@
+
+> test
+> vitest run
+
+
+ RUN  v3.2.7 D:/Projects/Shopify Public App — Expense Calculator
+
+ ✓ tests/architecture/shop-context-choke-point.test.ts (29 tests) 78ms
+ ✓ tests/services/calculation-history.service.test.ts (10 tests) 46ms
+ ✓ tests/domain/expense-engine.test.ts (12 tests) 254ms
+ ✓ tests/domain/calculation-verification.test.ts (14 tests) 83ms
+ ↓ tests/db/shop-ensure.db.test.ts (15 tests | 15 skipped)
+ ✓ tests/architecture/repository-boundary.test.ts (65 tests) 97ms
+ ✓ tests/ui/history-results-render.test.ts (10 tests) 138ms
+ ↓ tests/db/calculation-history.db.test.ts (22 tests | 22 skipped)
+ ✓ tests/architecture/no-in-process-scheduler.test.ts (3 tests) 123ms
+ ✓ tests/architecture/no-rest-admin-api.test.ts (3 tests) 117ms
+ ✓ tests/architecture/history-append-only.test.ts (9 tests) 68ms
+ ✓ tests/architecture/route-auth-matrix.test.ts (19 tests) 44ms
+ ✓ tests/services/cron-auth.service.test.ts (7 tests) 44ms
+ ✓ tests/domain/calculation-transport.test.ts (4 tests) 33ms
+ ✓ tests/domain/money.test.ts (15 tests) 118ms
+ ✓ tests/domain/expense-rule-validation.test.ts (17 tests) 100ms
+ ✓ tests/domain/expense-categories.test.ts (6 tests) 28ms
+ ✓ tests/domain/donut-chart.test.ts (6 tests) 33ms
+ ✓ tests/domain/expense-formulas.test.ts (8 tests) 25ms
+ ✓ tests/domain/history-presentation.test.ts (6 tests) 25ms
+ ✓ tests/architecture/webhook-route-placement.test.ts (1 test) 17ms
+
+ Test Files  19 passed | 2 skipped (21)
+      Tests  244 passed | 37 skipped (281)
+   Start at  12:03:00
+   Duration  10.42s (transform 3.44s, setup 0ms, collect 17.17s, tests 1.47s, environment 21ms, prepare 19.57s)
+
+__GATE_EXIT__:0
