@@ -1,0 +1,56 @@
+{
+  "root": "C:\\Users\\Admin\\AppData\\Local\\Temp\\claude\\D--Projects-Shopify-Public-App---Expense-Calculator\\93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f\\scratchpad\\wt",
+  "gates": {
+    "lint": {
+      "gate": "lint",
+      "command": "npm run lint",
+      "argv": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "gates-out/lint.log",
+      "output_sha256": "4cec702d0ae808dd432eccb0647c0a5341f4a0e074036e78dc63360dd71f2a15"
+    },
+    "typecheck": {
+      "gate": "typecheck",
+      "command": "npm run typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "gates-out/typecheck.log",
+      "output_sha256": "c0bb7becd3db20b1e92fc8bc82645c71802917adc07464354264d244295a58b9"
+    },
+    "tests": {
+      "gate": "tests",
+      "command": "npm test",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "gates-out/tests.log",
+      "output_sha256": "4b16c9cd57c2a27ce00007f7f216d6d0015b94da2b580286b7094fbcc92bebb2"
+    },
+    "build": {
+      "gate": "build",
+      "command": "npm run build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "status": "pass",
+      "output_ref": "gates-out/build.log",
+      "output_sha256": "ca1bb7e0f0c4854af7f173c8c3347c83acd11d183f84a9f47d520902184e66cb"
+    }
+  }
+}

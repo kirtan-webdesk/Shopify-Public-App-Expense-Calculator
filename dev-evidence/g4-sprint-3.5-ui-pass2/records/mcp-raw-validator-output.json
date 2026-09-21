@@ -1,0 +1,34 @@
+{
+  "server": {
+    "name": "shopify-dev-mcp",
+    "version": "1.14.5"
+  },
+  "conversationId": "d48af1de-860a-4050-87d6-155e9a10ced3",
+  "results": [
+    {
+      "file": "app/routes/app.calculator.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.calculator.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-section, s-banner, s-number-field, s-select, s-option, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - CalculatorForm\n  - Form\n  - input\n  - input\n  - input\n  - p\n  - p\n  - p\n  - p\n  - div\n  - p\n  - div\n  - details\n  - summary\n  - svg\n  - path\n  - span\n  - span\n  - input\n  - div\n  - fieldset\n  - legend\n  - label\n  - input\n  - div\n  - div\n  - div\n  - p\n  - input\n  - input\n  - input\n  - div\n  - p\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.results.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.results.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-link, s-section, s-banner, s-modal, s-button.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - p\n  - p\n  - strong\n  - Form\n  - input\n  - input\n  - p\n  - p\n  - strong\n  - div\n  - SummaryField\n  - SummaryField\n  - SummaryField\n  - div\n  - ExpenseBreakdown\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.history.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.history.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** All components validated successfully by TypeScript. Found components: s-page, s-section, s-banner, s-button, s-link.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - p\n  - svg\n  - rect\n  - path\n  - p\n  - strong\n  - div\n  - div\n  - table\n  - caption\n  - thead\n  - tr\n  - th\n  - th\n  - th\n  - th\n  - th\n  - th\n  - span\n  - tbody\n  - tr\n  - td\n  - td\n  - td\n  - td\n  - td\n  - td\n  - div\n  - span\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/components/expense-breakdown.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ✅ VALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/components/expense-breakdown.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ✅ SUCCESS\n**Details:** No components found to validate by TypeScript.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - div\n  - span\n  - span\n  - div\n  - div\n  - table\n  - caption\n  - thead\n  - tr\n  - th\n  - th\n  - th\n  - th\n  - tbody\n  - tr\n  - td\n  - tr\n  - th\n  - span\n  - td\n  - td\n  - td\n  - tfoot\n  - tr\n  - th\n  - td\n  - td\n  - td\n  - div\n  - DonutChart\n  - p\n  - ul\n  - li\n  - span\n  - span\n  - span\n  - svg\n  - circle\n  - text\n  - svg\n  - g\n  - circle\n\n",
+      "isError": false
+    },
+    {
+      "file": "app/routes/app.tsx",
+      "text": "## Validation Summary\n\n**Overall Status:** ❌ INVALID\n**Total Code Blocks:** 1\n\n## Detailed Results\n\n### Code Block 1\n**Artifact ID:** app/routes/app.tsx\n**Revision:** 1\n*Use same ID & increment revision when retrying on an improvement of this artifact*\n\n**Status:** ❌ FAILED\n**Details:** Validation errors:\ns-app-nav validation failed: Property 'unknown': Property 's-app-nav' does not exist on type 'JSX.IntrinsicElements'.\ns-link validation failed: Property 'rel': Type '{ children: string; href: string; rel: string; }' is not assignable to type 'ReactProps$w & PreactBaseElementPropsWithChildren<Link>'.\n  Property 'rel' does not exist on type 'ReactProps$w & PreactBaseElementPropsWithChildren<Link>'.\n'loader', which lacks return-type annotation, implicitly has an 'any' return type.\nProperty 's-app-nav' does not exist on type 'JSX.IntrinsicElements'.\n\nTry and use component from Shopify Polaris components. Non-Shopify components (not validated):\n  - Outlet\n\n",
+      "isError": false
+    }
+  ]
+}

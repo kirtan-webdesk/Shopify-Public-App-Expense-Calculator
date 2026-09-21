@@ -1,0 +1,18 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-4-expense-breakdown",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+    "api": "polaris-app-home",
+    "validated_input_sha256": [
+      "bd66d7d02f9ed8292f0c6e474f27bbd5682b4eece07b004e148c7a6e09f2dc1c"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=d48af1de-860a-4050-87d6-155e9a10ced3), call 4 of 4, Overall Status VALID. Input: the byte-exact on-disk content of app/components/expense-breakdown.tsx at commit 9d6407f1e8869352cf62600fc3256404136afb8e. Code block 1: SUCCESS. No Polaris components in this file to validate (plain HTML/SVG only). Invoked by driving the plugin-pinned server @shopify/dev-mcp@1.14.5 over stdio (harness MCP tools were not exposed to this session); raw response in records/mcp-raw-validator-output.json.",
+      "errors": []
+    }
+  }
+}

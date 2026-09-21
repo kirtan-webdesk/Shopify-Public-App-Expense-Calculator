@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "distribution_type": "public",
+  "api_version": "2026-07",
+  "commit_sha": "9d6407f1e8869352cf62600fc3256404136afb8e",
+  "executed_at_utc": "2026-09-21T08:09:58Z",
+  "executor": "shopify-developer-agent (Claude Code, session 93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f)",
+  "session_id": "93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f",
+  "local_gates": {
+    "lint": {
+      "status": "pass",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/gates/lint.log",
+      "output_sha256": "4cec702d0ae808dd432eccb0647c0a5341f4a0e074036e78dc63360dd71f2a15",
+      "detail": "eslint . --max-warnings=0 on the WHOLE repo (dev-evidence/** now ignored), exit 0."
+    },
+    "typecheck": {
+      "status": "pass",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/gates/typecheck.log",
+      "output_sha256": "c0bb7becd3db20b1e92fc8bc82645c71802917adc07464354264d244295a58b9",
+      "detail": "react-router typegen && tsc --noEmit, exit 0."
+    },
+    "tests": {
+      "status": "pass",
+      "command": "npm test",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/gates/tests.log",
+      "output_sha256": "4b16c9cd57c2a27ce00007f7f216d6d0015b94da2b580286b7094fbcc92bebb2",
+      "detail": "vitest run: 31 files passed + 4 skipped; 390 tests passed + 43 skipped (skipped = opt-in real-Postgres suites, RUN_DB_TESTS=1)."
+    },
+    "build": {
+      "status": "pass",
+      "command": "npm run build",
+      "exit_code": 0,
+      "output_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/gates/build.log",
+      "output_sha256": "ca1bb7e0f0c4854af7f173c8c3347c83acd11d183f84a9f47d520902184e66cb",
+      "detail": "react-router build (client + ssr), exit 0."
+    }
+  },
+  "validations": [
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-1-calculator",
+      "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.calculator.tsx",
+          "sha256": "c42e78ee1d06d52cf582b6909cd892ef4b143863349c06dd46df95a2848c6a7e"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/records/polaris-1-calculator-record.json",
+        "sha256": "020fe9a77c319b0ef8ed20ddf9b639b4a97dc7096503609ac83a8a910e0a7bb3"
+      }
+    },
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-2-results",
+      "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.results.tsx",
+          "sha256": "a400153566d43943ed5a772def989493a13f8f147353cd14ea2bdb79e1f66bb6"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/records/polaris-2-results-record.json",
+        "sha256": "91c4a3198c16b3bf61a8b0723989e3bfb02dcc518ac9a4c073d55abebe50f44c"
+      }
+    },
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-3-history",
+      "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/routes/app.history.tsx",
+          "sha256": "8401e180cc9b99bfd9a654be54cd82b6369fd5575e61acb6d99eb6775b091916"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/records/polaris-3-history-record.json",
+        "sha256": "8e903cac9a6c4daea7c3b91ae164da244400eed633613b3394ac4974eeb68d68"
+      }
+    },
+    {
+      "mcp_tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+      "tool_call_ref": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-4-expense-breakdown",
+      "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+      "validator_type": "polaris-component",
+      "validated_files": [
+        {
+          "path": "app/components/expense-breakdown.tsx",
+          "sha256": "bd66d7d02f9ed8292f0c6e474f27bbd5682b4eece07b004e148c7a6e09f2dc1c"
+        }
+      ],
+      "status": "VALID",
+      "record": {
+        "record_ref": "dev-evidence/g4-sprint-3.5-ui-pass2/records/polaris-4-expense-breakdown-record.json",
+        "sha256": "267044fd6afed275d7f1c1837afa164d1ec8dfbbd94c2cf586673a0f93e70805"
+      }
+    }
+  ],
+  "overall_status": "VALID",
+  "remaining_warnings": [
+    "MCP PROVENANCE (read first): the harness-scoped mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__* tools were NOT exposed to this agent session. Validation was run by driving the plugin-pinned server (@shopify/dev-mcp@1.14.5) over stdio JSON-RPC from dev-evidence/g4-sprint-3.5-ui-pass2/tools/mcp.mjs: initialize -> learn_shopify_api(api=polaris-app-home) -> one validate_component_codeblocks call per file (api=polaris-app-home, language=tsx). Raw responses: records/mcp-raw-validator-output.json. The scoped tool names and descriptive tool_call_ref values follow the schema but are NOT runtime tool_use ids; this is a consistency-checked record of a real validator run, not an authenticated harness capture.",
+    "app/routes/app.tsx (the s-app-nav rel=home change) was submitted to validate_component_codeblocks and the validator returned INVALID: 's-app-nav' is an App Bridge web component (not in the polaris-app-home type universe) and the Polaris Link type has no 'rel' prop. That is the same namespace limitation pass 1 documented for this file, not a defect in the markup, so app.tsx is deliberately NOT listed as a validation (an INVALID entry would poison overall_status) and its raw INVALID output is kept in records/mcp-raw-validator-output.json. The behaviour was instead confirmed against shopify.dev through search_docs_chunks (records/docs-app-nav-rel-home.txt): 'rel=home ... the link is hidden from the navigation menu. Only one link should have rel=home', and 'The app name in the sidebar already links to your app's home route'. The docs only verify the mechanism; that the sidebar really shows only History needs the live Admin.",
+    "app/components/expense-breakdown.tsx contains no Polaris components (plain HTML/SVG); the validator reports VALID with 'No components found to validate', which says nothing about its markup. Its behaviour was checked by tests and browser renders instead.",
+    "Local gates were run on a CLEAN clone of the reviewed commit (a scratch clone with its own npm install, autocrlf off), NOT the shared working tree: the shared tree's node_modules is damaged (no node_modules/.bin, no @react-router/*, @eslint/*, @babel/* ... 112 top-level lockfile packages missing, directory last modified 12:44 today, right after pass 1) so no npm script can run there, and the shared tree also holds another agent's uncommitted db/config, .sequelizerc, .env.example, tests/README.md work. npm ci / deleting node_modules was forbidden, so nothing in the shared tree was touched. The clone was created with git clone + npm install --no-audit --no-fund (package-lock honoured); the scratch clone lives outside the repo and is disposable.",
+    "run-gates.py was used, but cannot exec npm.cmd on Windows with shell=False (same gap disclosed in every prior sprint), so it was launched through a tiny wrapper that only swaps argv[0] 'npm' for the resolved npm.cmd path (PYTHONUTF8=1 so vitest's unicode output decodes); command strings, exit codes, __GATE_EXIT__ markers and SHA-256s are run-gates.py's own. Logs are the wrapper run's gates-out/*.log copied byte-for-byte.",
+    "A CRLF checkout fails tests/architecture/test-db-isolation.test.ts (its regex for the config.cjs 'get test()' block needs LF): on a Windows clone with core.autocrlf=true (the repo's own setting here) 'npm test' shows 2 failures that are unrelated to this change and do not occur with LF line endings. Not fixed (not mine; the config.cjs area is another agent's).",
+    "DB suites were NOT run: TEST_DATABASE_URL is not set in the shell and the local Postgres requires a password that lives only in the gitignored .env, which this task forbids reading. tests/db/expense-rule-save-race.db.test.ts (two-pool first-Save race + disabled-blank Save writes nothing) is written and wired to the guard but has never executed; its DB-free counterparts do run: tests/services/expense-rule-replace-sql.test.ts intercepts sequelize.query and asserts the REAL generated statement is one INSERT ... ON CONFLICT (\"shop_id\",\"category_key\") DO UPDATE SET, and expense-rule-replace-repository.test.ts / expense-rule-save.test.ts cover the call shape and validation.",
+    "Browser verification was a HYDRATED harness, not the live Admin: the real route modules (loader, action, component) bundled with vite against in-memory stubs for auth and the repositories (the repository stub throws on a NULL in the active value column, emulating chk_expense_rule_value_shape), driven in Chromium with the real polaris.js from the CDN; app-bridge.js was NOT loaded (it cannot start outside the Admin iframe) and window.shopify.toast was a recording stub. So NOT seen: s-app-nav in the sidebar, the App Bridge contextual save bar and its Save/Discard buttons (Save/Discard were simulated with form.requestSubmit() and form.reset()), the real toast, iframe sizing. Harness sources are under dev-evidence/g4-sprint-3.5-ui-pass2/tools/harness/.",
+    "B1 (currency select blank) was NOT reproducible in this harness on the OLD code either: 9 server-render+hydrate loads (USD/CAD/GBP), a run with polaris.js delayed 3 s (upgrade after hydration), and a client-side navigation all showed the correct option with the old value= prop. The fix follows the human's/QA's direction (no value=, selected on the option) and additionally makes a blank select harmless (currency is submitted from state via a hidden input and a blank/invalid currency now shows an error and disables Calculate), but whether the blank is gone in the live Admin can only be confirmed there.",
+    "Number-input limitation: Polaris s-number-field wraps <input type=number>, which the browser will not let a person type '1,5' or 'abc' into (its value becomes ''), so live typing yields the empty-field message for those. The comma/non-numeric messages are reached only by a direct/crafted POST (covered by unit tests on the action); typed '-5', '.5', '1e5', '10.555' get their specific messages live.",
+    "The task text asked for 'revenue 100000 with cogs 5000 + shipping 45000 -> dashes 10 and 90'. Under the stated ring rule (share of revenue when revenue > 0 and the total is <= 100%) that input yields 5 and 45, not 10 and 90 (50000 of 100000 fits inside revenue). 10 and 90 are what share-of-total-expenses gives, so the tests pin BOTH: revenue 10000c (expenses exceed it) -> dashes 10 and 90; revenue 100000c -> dashes 5 and 45.",
+    "The task said no other agent was editing; during this run another agent (or the human) created/edited db/config/config.cjs, db/config/migrate-guard.cjs, .sequelizerc, .env.example, tests/README.md, tests/architecture/migrate-guard.test.ts, design/v2/*, listing-assets/logo/* and made commits 5659a8b/3f7135f/4745ac2, and staged some of my files in the index. Only the 25 paths of 9d6407f were committed (git commit -- <paths>); the others were left exactly as found.",
+    "Not fixed on purpose (product decisions, disclosed): tiered-by-revenue-band formula cliff ($500 at $10,000.00 -> $350 at +1 cent); no cap at 100% for percentage rules (cap is 1000%) and no warning when percentages sum past 100; Back-navigation to the calculator loses unsaved inputs. Not done: moving the per-category enable checkbox out of <summary> (only relabelled it with aria-label; a full fix needs a layout restructure); the App Bridge save bar's own Save button has no loading state that this page controls; the calculator shows 'Needs attention' inline errors on a DISABLED row with a blank value (required for Save) while Calculate stays allowed, since a disabled row does not take part in a calculation."
+  ],
+  "live_store_items": [
+    "Left sidebar: the app entry 'Expense Calculator' lists ONLY 'History' as a child (no 'Calculator' child); clicking the app name opens /app/calculator; History highlights on /app/history and /app/history/:id. Opening the app from the Apps list and a bare /app hit both land on the calculator.",
+    "Currency select on /app/calculator shows 'USD - US Dollar' immediately (no blank flash) on a fresh open, after client-side navigation from History, and after 'Duplicate as new calculation' from a CAD/EUR/GBP snapshot (this was NOT reproducible outside the Admin - confirm it is gone there).",
+    "Contextual save bar: change a rule -> the bar appears; Discard restores rules, revenue AND currency and clears any error banner/summary; Save with a category whose value is cleared and which is unticked shows the 'Rule changes not saved' banner and 'Needs attention' on that row instead of the error page; a good Save shows the 'Rule changes saved' toast exactly once (not again on reload or when coming back to the page).",
+    "Calculate button shows its loading spinner while working and cannot be double-submitted; the 'Save this calculation' buttons on Results show loading while saving.",
+    "Revenue field: typing -5 shows 'Revenue amount must be zero or greater.' inline and disables Calculate; 0 and 1,234.50 are accepted.",
+    "Results at revenue 0 shows the donut (not 'No data') with the 'share of total expenses' caption; with the seeded defaults at $1,000 revenue (expenses > revenue) the donut ring is complete with no overlapping arcs.",
+    "Narrow Admin window (~400-600px): the results and history tables scroll sideways inside their own box and the page itself does not gain a horizontal scrollbar; the enable checkbox in each category header is announced as 'Enable <category> rule' by a screen reader and does not open/close the row."
+  ]
+}

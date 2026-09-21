@@ -1,0 +1,78 @@
+
+> test
+> vitest run
+
+
+ RUN  v3.2.7 C:/Users/Admin/AppData/Local/Temp/claude/D--Projects-Shopify-Public-App---Expense-Calculator/93ac17bf-6bda-4fa3-8a8a-8050ec1b1b8f/scratchpad/wt
+
+ ✓ tests/domain/expense-engine.test.ts (12 tests) 270ms
+ ✓ tests/architecture/test-db-guard.test.ts (15 tests) 144ms
+ ✓ tests/ui/history-results-render.test.ts (10 tests) 145ms
+ ✓ tests/services/expense-rule-replace-sql.test.ts (1 test) 2038ms
+   ✓ replaceExpenseRulesForShop — generated SQL > is ONE multi-row INSERT with ON CONFLICT (shop_id, category_key) DO UPDATE (not insert-ignore, not find-then-create)  2031ms
+ ✓ tests/ui/calculator-render.test.ts (21 tests) 856ms
+ ✓ tests/domain/history-presentation.test.ts (11 tests) 119ms
+ ✓ tests/domain/calculation-transport-currency.test.ts (3 tests) 159ms
+ ✓ tests/architecture/repository-boundary.test.ts (65 tests) 72ms
+ ✓ tests/architecture/test-db-isolation.test.ts (22 tests) 3583ms
+   ✓ db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy > requiring the module never throws, whatever is unset (nothing is evaluated eagerly)  428ms
+   ✓ db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy > --env test needs ONLY TEST_DATABASE_URL (no DATABASE_URL / DIRECT_DATABASE_URL required)  318ms
+   ✓ db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy > --env test refuses a TEST_DATABASE_URL equal to DATABASE_URL (masked message)  307ms
+   ✓ db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy > --env development needs only DATABASE_URL; --env production needs only DIRECT_DATABASE_URL (the known eager-evaluation P3 bug)  1286ms
+   ✓ db/config/config.cjs — the test env is TEST_DATABASE_URL only, and per-env values are lazy > TLS for the test env comes from the test URL alone (not an ambient PGSSLMODE)  929ms
+ ✓ tests/architecture/no-in-process-scheduler.test.ts (3 tests) 138ms
+ ✓ tests/architecture/shop-context-choke-point.test.ts (29 tests) 93ms
+ ✓ tests/services/expense-rule-seed.test.ts (6 tests) 65ms
+ ✓ tests/services/expense-rule-save.test.ts (7 tests) 37ms
+ ✓ tests/architecture/route-auth-matrix.test.ts (19 tests) 51ms
+ ✓ tests/architecture/no-rest-admin-api.test.ts (3 tests) 70ms
+ ✓ tests/domain/calculation-verification.test.ts (15 tests) 57ms
+ ✓ tests/services/calculation-history.service.test.ts (10 tests) 49ms
+ ✓ tests/services/expense-rule-replace-repository.test.ts (6 tests) 46ms
+ ✓ tests/domain/expense-rule-validation.test.ts (26 tests) 49ms
+ ✓ tests/domain/donut-chart-basis.test.ts (9 tests) 46ms
+ ✓ tests/services/cron-auth.service.test.ts (7 tests) 40ms
+ ✓ tests/architecture/history-append-only.test.ts (9 tests) 36ms
+ ✓ tests/services/expense-rule-seed-repository.test.ts (3 tests) 37ms
+ ✓ tests/services/expense-calculation.service.test.ts (10 tests) 30ms
+ ✓ tests/domain/donut-chart.test.ts (6 tests) 31ms
+ ✓ tests/domain/expense-formulas.test.ts (8 tests) 25ms
+ ✓ tests/domain/money.test.ts (15 tests) 26ms
+ ✓ tests/domain/calculation-transport.test.ts (4 tests) 27ms
+ ✓ tests/domain/expense-categories.test.ts (6 tests) 24ms
+ ✓ tests/architecture/webhook-route-placement.test.ts (1 test) 22ms
+ ↓ tests/db/expense-rule-save-race.db.test.ts (3 tests | 3 skipped)
+ ↓ tests/db/expense-rule-seed-race.db.test.ts (3 tests | 3 skipped)
+ ↓ tests/db/calculation-history.db.test.ts (22 tests | 22 skipped)
+ ↓ tests/db/shop-ensure.db.test.ts (15 tests | 15 skipped)
+ ✓ tests/architecture/migrate-guard.test.ts (28 tests) 22161ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:migrate` is refused, with the exact correct usage  466ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:migrate:undo` is refused, with the exact correct usage  486ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:migrate:undo:all` is refused, with the exact correct usage  421ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:migrate:status` is refused, with the exact correct usage  463ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:seed:all` is refused, with the exact correct usage  412ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:seed:undo:all` is refused, with the exact correct usage  477ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:create` is refused, with the exact correct usage  496ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > bare `sequelize-cli db:drop` is refused, with the exact correct usage  862ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > NODE_ENV / ambient variables are NOT accepted as the environment  1144ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > `--env` with a missing value is refused (end of line, or followed by another flag)  1506ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > an `--env` that only appears after a bare `--` does not count (sequelize-cli would ignore it and use development)  509ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > unknown, duplicate and negated --env are refused  1617ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > --url / --config (which would bypass the checks) are refused  1234ms
+   ✓ db:* commands refuse without an explicit --env (before any connection) > --options-path replaces .sequelizerc entirely, so it is caught by the guard inside config.cjs (defence in depth)  6445ms
+   ✓ hosted-target safety for --env development / --env test > the same for db:migrate:undo, and via a DATABASE_URL-only fallback (no DIRECT_DATABASE_URL)  531ms
+   ✓ hosted-target safety for --env development / --env test > the acknowledgement must come from the shell: ALLOW_HOSTED_DB in a .env file is ignored  503ms
+   ✓ hosted-target safety for --env development / --env test > --env production is the intended hosted target: only the explicit --env is needed (no acknowledgement)  532ms
+   ✓ success-path parsing: the guard passes up to (not including) connecting > accepts `--env=test`, flag-before-command order, and every db:* command  1040ms
+   ✓ success-path parsing: the guard passes up to (not including) connecting > the existing --env test isolation guard still runs (unset / equal-to-production URL are refused)  491ms
+   ✓ success-path parsing: the guard passes up to (not including) connecting > non-DB commands (e.g. migration:generate --help) are not guarded  1225ms
+
+ Test Files  31 passed | 4 skipped (35)
+      Tests  390 passed | 43 skipped (433)
+   Start at  13:35:33
+   Duration  24.26s (transform 4.27s, setup 0ms, collect 16.92s, tests 30.55s, environment 43ms, prepare 22.88s)
+
+stderr | tests/services/expense-rule-replace-sql.test.ts > replaceExpenseRulesForShop — generated SQL > is ONE multi-row INSERT with ON CONFLICT (shop_id, category_key) DO UPDATE (not insert-ignore, not find-then-create)
+◇ injected env (0) from .env
+
+__GATE_EXIT__:0

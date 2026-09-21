@@ -1,0 +1,49 @@
+code commit: 9d6407f1e8869352cf62600fc3256404136afb8e
+
+# git blob ids of the files in the code commit
+90e80dd4e1aa2b7301a86909fe93ad9663902fe9  app/components/expense-breakdown.tsx
+893bbcf36a90d869390c8ac2a1d6a4a074a73a94  app/db/repositories/expense-rule.repository.ts
+1a8e09c3c78ff2c4f228dc8aa4f4b61407db5703  app/domain/calculation-transport.ts
+688f4813ff3170102c510d4379976916fcb8725d  app/domain/donut-chart.ts
+8c26588536e0d046fa1b693e7d3d548299c26214  app/domain/expense-formulas.ts
+4700d35cb8749c197e8f7b2666abcb5e9ca28bac  app/domain/expense-rule-validation.ts
+c31732b3c498d9f11c00e938d3bd861ea430be78  app/routes/app._index.tsx
+cfb2d0205f8f1103ecb47f368f86505bb6318db4  app/routes/app.calculator.tsx
+88f1b185de69d92fdf0b590f59550ced930cb931  app/routes/app.history.tsx
+6b9094ec483cc27e2636228d8ca4666718f3ddf2  app/routes/app.results.tsx
+c60e3da6b025473b44b016e30b1d22c100b2cedc  app/routes/app.tsx
+a708bd25b9e41b369d8e7a48b53f866751473fcc  app/services/expense-calculation.service.ts
+774255dbbde790950b63d4b8795e7d85b0e3433a  app/services/expense-rule.service.ts
+44dc62edfdc4db3e28eb4b8c6969bbd056bbf96e  app/styles/app.css
+21d283340b62b86eeab5bcf155045d06aec7cf5c  eslint.config.js
+de9d7bac8acdba60327dd655d80ffbef80fd0b09  tests/db/expense-rule-save-race.db.test.ts
+22cd37fe6b926db161007ec723ffdd839a929e01  tests/domain/calculation-transport-currency.test.ts
+08d61e68067db8e0fe4dff4f7989dd5ba24888cb  tests/domain/calculation-verification.test.ts
+a873dc316a6d31be73b16887bae16f537f01e364  tests/domain/donut-chart-basis.test.ts
+059baadce5f1cdd34a083a46240032055da1d5ac  tests/domain/expense-rule-validation.test.ts
+1fbccba7398b131379a78c8c8e8618e2d1f33462  tests/services/expense-calculation.service.test.ts
+4ff575b752c67a9337f763d602172caff5f7a0c9  tests/services/expense-rule-replace-repository.test.ts
+56942f6e26cfbee82c0f6d6543a9b6a455004ef0  tests/services/expense-rule-replace-sql.test.ts
+a319f94ad66e79c91156b0a6150ded81fad79adb  tests/services/expense-rule-save.test.ts
+e19836afa9379f225adaa20bd9b61914c44c5c6c  tests/ui/calculator-render.test.ts
+
+# sha256 of evidence artifacts
+453866664ec19bd20aca2aba0e332c2cac8729eb71bc7367677f812cfc57c6ea  mcp-validation-evidence.json
+4cec702d0ae808dd432eccb0647c0a5341f4a0e074036e78dc63360dd71f2a15  gates/lint.log
+c0bb7becd3db20b1e92fc8bc82645c71802917adc07464354264d244295a58b9  gates/typecheck.log
+4b16c9cd57c2a27ce00007f7f216d6d0015b94da2b580286b7094fbcc92bebb2  gates/tests.log
+ca1bb7e0f0c4854af7f173c8c3347c83acd11d183f84a9f47d520902184e66cb  gates/build.log
+04c7b2145bf9576174a8cb2618da96f73ebbca4777ce324012791a03c1fe36fe  records/mcp-raw-validator-output.json
+1024ee7f30b2bcfcb708efc908e52538b72b11efe8f28ce68493e0dbca311793  records/docs-app-nav-rel-home.txt
+020fe9a77c319b0ef8ed20ddf9b639b4a97dc7096503609ac83a8a910e0a7bb3  records/polaris-1-calculator-record.json
+91c4a3198c16b3bf61a8b0723989e3bfb02dcc518ac9a4c073d55abebe50f44c  records/polaris-2-results-record.json
+8e903cac9a6c4daea7c3b91ae164da244400eed633613b3394ac4974eeb68d68  records/polaris-3-history-record.json
+267044fd6afed275d7f1c1837afa164d1ec8dfbbd94c2cf586673a0f93e70805  records/polaris-4-expense-breakdown-record.json
+c4ce21fc92cfca5e5b1199d23b177864756a59ed5c7cf3cd72427167dccc65c7  results-before.json
+b21e0bd744546319d3f34e0d2fdcf0b12127d793183a0186d7010e14466350b8  results-after.json
+
+# sha256 of the validated on-disk files (what the MCP validator was sent)
+c42e78ee1d06d52cf582b6909cd892ef4b143863349c06dd46df95a2848c6a7e  app/routes/app.calculator.tsx
+a400153566d43943ed5a772def989493a13f8f147353cd14ea2bdb79e1f66bb6  app/routes/app.results.tsx
+8401e180cc9b99bfd9a654be54cd82b6369fd5575e61acb6d99eb6775b091916  app/routes/app.history.tsx
+bd66d7d02f9ed8292f0c6e474f27bbd5682b4eece07b004e148c7a6e09f2dc1c  app/components/expense-breakdown.tsx

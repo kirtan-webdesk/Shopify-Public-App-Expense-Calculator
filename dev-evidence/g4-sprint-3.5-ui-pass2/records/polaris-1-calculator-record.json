@@ -1,0 +1,18 @@
+{
+  "record_version": "1.0.0",
+  "event": {
+    "tool_call_id": "shopify-dev-mcp-validate-component-codeblocks-g4-sprint-3-5-call-1-calculator",
+    "tool": "mcp__plugin_webdesk-shopify-apps_shopify-dev-mcp__validate_component_codeblocks",
+    "validator_type": "polaris-component",
+    "conversation_id": "d48af1de-860a-4050-87d6-155e9a10ced3",
+    "api": "polaris-app-home",
+    "validated_input_sha256": [
+      "c42e78ee1d06d52cf582b6909cd892ef4b143863349c06dd46df95a2848c6a7e"
+    ],
+    "result": {
+      "status": "VALID",
+      "summary": "validate_component_codeblocks (api=polaris-app-home, conversationId=d48af1de-860a-4050-87d6-155e9a10ced3), call 1 of 4, Overall Status VALID. Input: the byte-exact on-disk content of app/routes/app.calculator.tsx at commit 9d6407f1e8869352cf62600fc3256404136afb8e. Code block 1: SUCCESS. Found components: s-page, s-section, s-banner, s-number-field, s-select, s-option, s-button. Invoked by driving the plugin-pinned server @shopify/dev-mcp@1.14.5 over stdio (harness MCP tools were not exposed to this session); raw response in records/mcp-raw-validator-output.json.",
+      "errors": []
+    }
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "label": "after",
+  "scenarios": {
+    "S1_calculator_default_currency": {
+      "select": {
+        "prop": "USD",
+        "native": "USD",
+        "idx": 0,
+        "shown": "USD — US Dollar",
+        "error": null
+      },
+      "errors": []
+    },
+    "S2_from_cad": {
+      "spa": {
+        "prop": "CAD",
+        "native": "CAD",
+        "idx": 1,
+        "shown": "CAD — Canadian Dollar",
+        "error": null
+      },
+      "affixes": {
+        "revenue": [
+          "$",
+          "CAD"
+        ]
+      },
+      "direct": {
+        "prop": "CAD",
+        "native": "CAD",
+        "idx": 1,
+        "shown": "CAD — Canadian Dollar",
+        "error": null
+      }
+    },
+    "S2_from_eur": {
+      "spa": {
+        "prop": "EUR",
+        "native": "EUR",
+        "idx": 2,
+        "shown": "EUR — Euro",
+        "error": null
+      },
+      "affixes": {
+        "revenue": [
+          "€",
+          "EUR"
+        ]
+      },
+      "direct": {
+        "prop": "EUR",
+        "native": "EUR",
+        "idx": 2,
+        "shown": "EUR — Euro",
+        "error": null
+      }
+    },
+    "S2_from_gbp": {
+      "spa": {
+        "prop": "GBP",
+        "native": "GBP",
+        "idx": 3,
+        "shown": "GBP — British Pound",
+        "error": null
+      },
+      "affixes": {
+        "revenue": [
+          "£",
+          "GBP"
+        ]
+      },
+      "direct": {
+        "prop": "GBP",
+        "native": "GBP",
+        "idx": 3,
+        "shown": "GBP — British Pound",
+        "error": null
+      }
+    },
+    "S3_revenue_validation_live": {
+      "\"-5\"": {
+        "error": "Revenue amount must be zero or greater.",
+        "calc": {
+          "disabled": true,
+          "loading": false
+        }
+      },
+      "\"\"": {
+        "error": "Enter a revenue amount.",
+        "calc": {
+          "disabled": true,
+          "loading": false
+        }
+      },
+      "\"10.555\"": {
+        "error": "Use at most 2 decimal places.",
+        "calc": {
+          "disabled": true,
+          "loading": false
+        }
+      },
+      "\".5\"": {
+        "error": "Enter a digit before the decimal point, for example 0.50.",
+        "calc": {
+          "disabled": true,
+          "loading": false
+        }
+      },
+      "\"1e5\"": {
+        "error": "Enter a plain number without an exponent, for example 100000 instead of 1e5.",
+        "calc": {
+          "disabled": true,
+          "loading": false
+        }
+      },
+      "\"5.\"": {
+        "error": null,
+        "calc": {
+          "disabled": false,
+          "loading": false
+        }
+      },
+      "\"1234.50\"": {
+        "error": null,
+        "calc": {
+          "disabled": false,
+          "loading": false
+        }
+      },
+      "\"0\"": {
+        "error": null,
+        "calc": {
+          "disabled": false,
+          "loading": false
+        }
+      }
+    },
+    "S4_donut_revenue-0": {
+      "donut": {
+        "aria": "Expense breakdown donut chart, shown as a share of total expenses. Shipping 51.7%, Apps/Software 13.8%, Overhead 34.5%. Full figures are in the table above.",
+        "noData": false,
+        "dasharrays": [
+          "51.724137931034484 48.275862068965516",
+          "13.793103448275861 86.20689655172414",
+          "34.48275862068966 65.51724137931035"
+        ],
+        "caption": "No revenue was entered, so each segment is that category's share of total expenses.",
+        "legend": [
+          "Shipping$450.00 · 51.7%",
+          "Apps/Software$120.00 · 13.8%",
+          "Overhead$300.00 · 34.5%"
+        ]
+      },
+      "errors": []
+    },
+    "S4_donut_expenses-exceed-revenue": {
+      "donut": {
+        "aria": "Expense breakdown donut chart, shown as a share of total expenses. Cost of Goods 20.5%, Marketing 5.0%, Platform Fees 1.8%, Payment Processing 1.6%, Shipping 28.4%, Apps/Software 7.6%, Payroll 11.4%, Overhead 18.9%, Taxes 3.8%, Misc 0.95%. Full figures are in the table above.",
+        "noData": false,
+        "dasharrays": [
+          "20.50473186119874 79.49526813880126",
+          "5.047318611987381 94.95268138801262",
+          "1.829652996845426 98.17034700315457",
+          "1.6403785488958993 98.3596214511041",
+          "28.391167192429023 71.60883280757098",
+          "7.570977917981073 92.42902208201893",
+          "11.35646687697161 88.64353312302839",
+          "18.92744479495268 81.07255520504732",
+          "3.7854889589905363 96.21451104100946",
+          "0.9463722397476341 99.05362776025237"
+        ],
+        "caption": "Expenses are higher than revenue, so each segment is that category's share of total expenses.",
+        "legend": [
+          "Cost of Goods$325.00 · 20.5%",
+          "Marketing$80.00 · 5.0%",
+          "Platform Fees$29.00 · 1.8%",
+          "Payment Processing$26.00 · 1.6%",
+          "Shipping$450.00 · 28.4%",
+          "Apps/Software$120.00 · 7.6%",
+          "Payroll$180.00 · 11.4%",
+          "Overhead$300.00 · 18.9%",
+          "Taxes$60.00 · 3.8%",
+          "Misc$15.00 · 0.95%"
+        ]
+      },
+      "errors": []
+    },
+    "S4_donut_normal-revenue": {
+      "donut": {
+        "aria": "Expense breakdown donut chart, shown as a share of revenue. Cost of Goods 32.5%, Marketing 8.0%, Platform Fees 2.9%, Payment Processing 2.6%, Shipping 0.90%, Apps/Software 0.24%, Payroll 18.0%, Overhead 0.60%, Taxes 6.0%, Misc 1.5%. Full figures are in the table above.",
+        "noData": false,
+        "dasharrays": [
+          "32.5 67.5",
+          "8 92",
+          "2.9000000000000004 97.1",
+          "2.6 97.4",
+          "0.8999999999999999 99.1",
+          "0.6 99.4",
+          "18 82",
+          "0.6 99.4",
+          "6 94",
+          "1.5 98.5"
+        ],
+        "caption": "Each segment is that category's share of revenue.",
+        "legend": [
+          "Cost of Goods32.5%",
+          "Marketing8.0%",
+          "Platform Fees2.9%",
+          "Payment Processing2.6%",
+          "Shipping0.90%",
+          "Apps/Software0.24%",
+          "Payroll18.0%",
+          "Overhead0.60%",
+          "Taxes6.0%",
+          "Misc1.5%"
+        ]
+      },
+      "errors": []
+    },
+    "S5_S7_save_disabled_blank": {
+      "title": "Shipping",
+      "beforeSave": {
+        "summary": "Needs attention",
+        "fieldError": "Enter an amount of 0 or greater."
+      },
+      "afterSave": {
+        "routeError": null,
+        "bannerHeading": "Rule changes not saved",
+        "summaryTexts": [
+          "32.5% of revenue",
+          "8% of revenue",
+          "2.9% of revenue",
+          "2.6% of revenue",
+          "Needs attention",
+          "$120.00 fixed",
+          "18% of revenue",
+          "$300.00 fixed",
+          "6% of revenue",
+          "1.5% of revenue"
+        ],
+        "fieldError": "Enter an amount of 0 or greater.",
+        "saveCount": 0,
+        "formStillThere": true
+      },
+      "fixed": {
+        "bannerHeading": null,
+        "summary": "Disabled",
+        "fieldError": null,
+        "afterResave": {
+          "toasts": [
+            "Rule changes saved"
+          ],
+          "saveCount": 1,
+          "criticalBanner": false,
+          "stored": "{\"categoryKey\":\"shipping\",\"ruleType\":\"fixed\",\"rateBasisPoints\":null,\"fixedAmountMinor\":\"45000\",\"formulaKey\":null,\"enabled\":false}"
+        }
+      },
+      "errors": []
+    },
+    "S6_discard_resets_currency": {
+      "dirty": {
+        "select": {
+          "prop": "EUR",
+          "native": "EUR",
+          "idx": 2,
+          "shown": "EUR — Euro",
+          "error": null
+        },
+        "rev": "12345",
+        "fixedPrefix": "€"
+      },
+      "after": {
+        "select": {
+          "prop": "USD",
+          "native": "USD",
+          "idx": 0,
+          "shown": "USD — US Dollar",
+          "error": null
+        },
+        "rev": "0.00",
+        "hiddenCurrency": "USD",
+        "fixedPrefix": "USD"
+      }
+    },
+    "S8_toast": {
+      "first": [
+        "Rule changes saved"
+      ],
+      "afterRerender": [
+        "Rule changes saved"
+      ],
+      "afterLeaveAndReturn": [
+        "Rule changes saved"
+      ]
+    },
+    "S9_pending_calculate": {
+      "idle": {
+        "disabled": false,
+        "loading": false
+      },
+      "pending": {
+        "disabled": true,
+        "loading": true
+      }
+    },
+    "S10_from_change_reinit": {
+      "s0": {
+        "sel": {
+          "prop": "CAD",
+          "native": "CAD",
+          "idx": 1,
+          "shown": "CAD — Canadian Dollar",
+          "error": null
+        },
+        "rev": "50000.00"
+      },
+      "s1": {
+        "sel": {
+          "prop": "EUR",
+          "native": "EUR",
+          "idx": 2,
+          "shown": "EUR — Euro",
+          "error": null
+        },
+        "rev": "50000.00",
+        "banner": true
+      },
+      "s2": {
+        "sel": {
+          "prop": "USD",
+          "native": "USD",
+          "idx": 0,
+          "shown": "USD — US Dollar",
+          "error": null
+        },
+        "rev": "0.00"
+      }
+    },
+    "S11_history_empty": {
+      "text": "CalculatorHistory\n\nEvery saved calculation is a snapshot — it keeps the revenue and rule values from the moment it was saved, even if you change your default rules later.\n\nRun a calculation and select"
+    },
+    "S12_checkbox_a11y": {
+      "wasOpen": false,
+      "afterClick": false,
+      "afterSpace": false,
+      "name": {
+        "aria": "Enable Marketing rule",
+        "labels": 0
+      },
+      "summaryLabels": 0
+    },
+    "S13_narrow_overflow": {
+      "docScroll": 380,
+      "docClient": 380,
+      "tableWrapper": {
+        "scroll": 379,
+        "client": 348,
+        "overflowX": "auto"
+      }
+    }
+  }
+}
