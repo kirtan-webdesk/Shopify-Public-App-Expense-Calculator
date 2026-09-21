@@ -1,6 +1,6 @@
 # Developer handoff - G4-sprint-4.1 (build the confirmed G2-revision v2 design)
 
-Code commit: `6a8657feda9d5855223a3ae4e3f2609a9c4490bf` (31 files, on top of `91d74ed`). Not pushed. Evidence is committed separately.
+Code commit: `6a8657feda9d5855223a3ae4e3f2609a9c4490bf` (31 files, on top of `82577eb`, the design-v2 commit that landed after `91d74ed`). Not pushed. Evidence is committed separately.
 
 MCP-Evidence: dev-evidence/g4-sprint-4.1-ui-v2/mcp-validation-evidence.json
 
